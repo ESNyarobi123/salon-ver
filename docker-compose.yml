@@ -1,0 +1,111 @@
+# Production-style stack: Traefik (HTTPS), Laravel (Apache+PHP), MySQL, phpMyAdmin.
+# 1. cp env.docker.example .env   then edit secrets and APP_KEY
+# 2. docker compose up -d --build
+# 3. Point DNS A/AAAA for sln.tiptapafrica.co.tz to this server; open ports 80+443.
+#
+# phpMyAdmin: https://sln.tiptapafrica.co.tz/database — log in as root + MYSQL_ROOT_PASSWORD (full privileges: drop DB, import SQL, etc.)
+#
+# CLI examples (from repo root, after .env exists):
+#   docker compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES;"'
+#   docker compose exec -T mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" DATABASE_NAME' < backup.sql
+
+services:
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    command:
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=ezekielsalehe00@gmail.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_acme:/letsencrypt
+    networks:
+      - web
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      # Note: official image forbids MYSQL_USER=root; use root via DB_USERNAME=root + DB_PASSWORD=MYSQL_ROOT_PASSWORD in .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+    volumes:
+      - ./.env:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.laravel.rule=Host(`sln.tiptapafrica.co.tz`)
+      - traefik.http.routers.laravel.entrypoints=websecure
+      - traefik.http.routers.laravel.tls.certresolver=myresolver
+      - traefik.http.routers.laravel.priority=10
+      - traefik.http.services.laravel.loadbalancer.server.port=80
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_ABSOLUTE_URI: https://sln.tiptapafrica.co.tz/database/
+      UPLOAD_LIMIT: 512M
+      MEMORY_LIMIT: 512M
+      # Allow any host user (e.g. root) — full server admin from UI when logged in as root
+      PMA_ARBITRARY_SERVER: "0"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pma.rule=Host(`sln.tiptapafrica.co.tz`) && PathPrefix(`/database`)
+      - traefik.http.routers.pma.entrypoints=websecure
+      - traefik.http.routers.pma.tls.certresolver=myresolver
+      - traefik.http.routers.pma.priority=100
+      - traefik.http.middlewares.pma-stripprefix.stripprefix.prefixes=/database
+      - traefik.http.routers.pma.middlewares=pma-stripprefix
+      - traefik.http.services.pma.loadbalancer.server.port=80
+
+networks:
+  web:
+
+volumes:
+  traefik_acme:
+  mysql_data:

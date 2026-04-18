@@ -1,6 +1,6 @@
 <x-manager-layout>
     <x-slot name="header">
-        Menu Image
+        {{ config('salon.service_menu_image') }}
     </x-slot>
 
     <div class="max-w-4xl mx-auto">
@@ -15,10 +15,9 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Restaurant Menu Image</h2>
+                    <h2 class="text-2xl font-bold text-white mb-2">{{ config('salon.entity') }} service menu image</h2>
                     <p class="text-white/60 text-sm leading-relaxed">
-                        Upload a single image of your restaurant menu. This image will be displayed on the WhatsApp bot when customers request to view the menu.
-                        Make sure the image is clear and readable.
+                        Upload one clear image of your price list / treatments &amp; retail. Clients see it on WhatsApp when they ask for your service list.
                     </p>
                 </div>
             </div>
@@ -30,7 +29,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <h3 class="text-lg font-bold text-white">Current Menu Image</h3>
+                        <h3 class="text-lg font-bold text-white">Current image</h3>
                     </div>
                     <span class="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full uppercase tracking-wider border border-emerald-500/20">
                         Active
@@ -42,7 +41,7 @@
                     <div class="relative overflow-hidden rounded-xl border border-white/10">
                         <img 
                             src="{{ $restaurant->menuImageUrl() }}" 
-                            alt="Menu Image" 
+                            alt="Service menu image" 
                             class="w-full h-auto max-h-[600px] object-contain bg-surface-900 transition-transform duration-500 group-hover:scale-105"
                         >
                         <!-- Overlay on hover -->
@@ -63,7 +62,7 @@
                         </div>
                         
                         <!-- Delete Button -->
-                        <form action="{{ route('manager.menu-image.destroy') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this menu image?');">
+                        <form action="{{ route('manager.menu-image.destroy') }}" method="POST" onsubmit="return confirm('Delete this service menu image?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-all text-sm font-medium border border-red-500/20">
@@ -87,7 +86,7 @@
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-3 h-3 bg-violet-500 rounded-full"></div>
                 <h3 class="text-lg font-bold text-white">
-                    {{ $restaurant && $restaurant->menu_image ? 'Replace Menu Image' : 'Upload Menu Image' }}
+                    {{ $restaurant && $restaurant->menu_image ? 'Replace image' : 'Upload image' }}
                 </h3>
             </div>
 
@@ -118,7 +117,7 @@
                         </div>
                         <div>
                             <p class="text-white font-semibold text-lg mb-2">
-                                Drop your menu image here
+                                Drop your {{ strtolower(config('salon.service_menu_image')) }} here
                             </p>
                             <p class="text-white/40 text-sm">
                                 or click to browse files
@@ -167,7 +166,7 @@
                             <polyline points="17 8 12 3 7 8"/>
                             <line x1="12" x2="12" y1="3" y2="15"/>
                         </svg>
-                        <span id="btnText">Upload Menu Image</span>
+                        <span id="btnText">Upload image</span>
                     </button>
                 </div>
             </form>
@@ -184,7 +183,7 @@
                 </div>
                 <div>
                     <h4 class="text-white font-semibold">Bot API Endpoint</h4>
-                    <p class="text-white/40 text-xs">Use this endpoint to fetch the menu image in your bot</p>
+                    <p class="text-white/40 text-xs">Use this endpoint to fetch the service menu image in your bot</p>
                 </div>
             </div>
             <div class="bg-surface-900 rounded-xl p-4 font-mono text-sm">

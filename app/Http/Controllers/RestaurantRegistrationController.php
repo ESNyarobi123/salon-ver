@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RestaurantRegistrationController extends Controller
 {
@@ -47,6 +47,6 @@ class RestaurantRegistrationController extends Controller
         // 3. Auto-login manager
         Auth::login($manager);
 
-        return redirect()->route('manager.dashboard')->with('status', 'Restaurant created successfully! Please set up your menu.');
+        return redirect()->route('manager.dashboard')->with('status', config('salon.entity').' created successfully! Please set up your '.strtolower(config('salon.service_catalog_title')).'.');
     }
 }

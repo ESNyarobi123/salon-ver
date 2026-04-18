@@ -5,7 +5,7 @@
 
     <div class="mb-8">
         <h2 class="text-3xl font-bold text-white tracking-tight">QR & Mobile API</h2>
-        <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Connect your restaurant to the TIPTAP network</p>
+        <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Connect your {{ strtolower(config('salon.entity')) }} to the TIPTAP network</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -17,7 +17,7 @@
                         <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white tracking-tight">Table QR Codes</h3>
+                <h3 class="text-xl font-bold text-white tracking-tight">{{ config('salon.seat') }} QR codes</h3>
             </div>
             
             <div class="glass p-8 rounded-xl flex flex-col items-center justify-center mb-6 border border-dashed border-white/20">
@@ -26,14 +26,14 @@
                         <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
                     </svg>
                 </div>
-                <p class="text-sm font-medium text-white/40 uppercase tracking-wider mb-5">Table #05 QR Code</p>
+                <p class="text-sm font-medium text-white/40 uppercase tracking-wider mb-5">{{ config('salon.seat') }} #05 QR code</p>
                 <button class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all">Download PDF Pack</button>
             </div>
 
             <div class="space-y-3">
                 <div class="flex items-center justify-between p-4 glass rounded-xl">
-                    <span class="font-medium text-white/70">Total Tables</span>
-                    <span class="font-bold text-white">24 Tables</span>
+                    <span class="font-medium text-white/70">Total {{ config('salon.seat_plural') }}</span>
+                    <span class="font-bold text-white">24 {{ config('salon.seat_plural') }}</span>
                 </div>
                 <div class="flex items-center justify-between p-4 glass rounded-xl">
                     <span class="font-medium text-white/70">Active Scans Today</span>
@@ -188,7 +188,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold text-white tracking-tight">Customer Support Number</h3>
+                    <h3 class="text-xl font-bold text-white tracking-tight">{{ config('salon.customer') }} support number</h3>
                     <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Shown on WhatsApp bot menu</p>
                 </div>
             </div>
@@ -203,11 +203,50 @@
                     <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Phone number (e.g. 0712345678)</label>
                     <input type="text" name="support_phone" value="{{ old('support_phone', $restaurant->support_phone) }}" placeholder="0712345678 or 255712345678"
                            class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
-                    <p class="text-white/40 text-xs mt-1">Customers will see this under "📞 Customer Support" on WhatsApp. Leave empty to hide the option or use the main restaurant phone.</p>
+                    <p class="text-white/40 text-xs mt-1">{{ config('salon.customer') }}s will see this under "📞 Customer Support" on WhatsApp. Leave empty to hide the option or use the main {{ strtolower(config('salon.entity')) }} phone.</p>
                     @error('support_phone') <p class="text-rose-400 text-[10px] font-medium mt-1">{{ $message }}</p> @enderror
                 </div>
                 <button type="submit" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3.5 px-6 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/25 transition-all">
                     Save Support Number
+                </button>
+            </form>
+        </div>
+
+        <!-- Guest Wi‑Fi (WhatsApp bot) -->
+        <div class="glass-card p-8 rounded-2xl">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 bg-gradient-to-br from-sky-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center border border-sky-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-400">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white tracking-tight">Guest Wi‑Fi</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">WiFi password option on WhatsApp bot</p>
+                </div>
+            </div>
+            @if(session('success') && str_contains(session('success'), 'Guest Wi-Fi'))
+            <div class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                <p class="text-sm font-medium text-emerald-400">{{ session('success') }}</p>
+            </div>
+            @endif
+            <form action="{{ route('manager.api.guest-wifi.update') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Network name (SSID)</label>
+                    <input type="text" name="guest_wifi_ssid" value="{{ old('guest_wifi_ssid', $restaurant->guest_wifi_ssid) }}" placeholder="e.g. SalonGuest"
+                           class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all">
+                    @error('guest_wifi_ssid') <p class="text-rose-400 text-[10px] font-medium mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Password</label>
+                    <input type="text" name="guest_wifi_password" value="{{ old('guest_wifi_password', $restaurant->guest_wifi_password) }}" placeholder="Guest Wi‑Fi password"
+                           class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all">
+                    <p class="text-white/40 text-xs mt-1">Customers tap “WiFi password” on the bot to see this. Leave both empty if you do not want to share Wi‑Fi here.</p>
+                    @error('guest_wifi_password') <p class="text-rose-400 text-[10px] font-medium mt-1">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="bg-gradient-to-r from-sky-600 to-indigo-600 text-white py-3.5 px-6 rounded-xl font-semibold hover:shadow-lg hover:shadow-sky-500/25 transition-all">
+                    Save Guest Wi‑Fi
                 </button>
             </form>
         </div>
@@ -230,7 +269,7 @@
 
         <div class="space-y-4 relative z-10">
             <div>
-                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Restaurant ID</label>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.entity') }} ID</label>
                 <div class="flex gap-2">
                     <input type="text" readonly value="RES-{{ Auth::user()->restaurant_id }}-TIPTAP" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex-1 font-mono text-sm text-white">
                     <button class="p-3 glass rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white">
@@ -258,13 +297,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-400 shrink-0">
                     <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
                 </svg>
-                <p class="text-sm font-medium text-white/80">Keep your API keys secret. Anyone with these keys can manage your restaurant orders and menu.</p>
+                <p class="text-sm font-medium text-white/80">Keep your API keys secret. Anyone with these keys can manage your {{ strtolower(config('salon.entity')) }} bookings and service catalog.</p>
             </div>
         </div>
     </div>
 
-    <!-- Kitchen Display System -->
-    <div class="glass-card p-8 rounded-2xl relative overflow-hidden mt-8">
+    <!-- Floor display (opens existing /kitchen/display URL; token routes unchanged) -->
+    <div id="manager-kds" class="glass-card p-8 rounded-2xl relative overflow-hidden mt-8 scroll-mt-24">
         <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl"></div>
         
         <div class="flex items-center gap-4 mb-8 relative z-10">
@@ -275,17 +314,17 @@
                 </svg>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-white tracking-tight">Kitchen Display System</h3>
-                <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Real-time order display for your kitchen staff</p>
+                <h3 class="text-xl font-bold text-white tracking-tight">{{ config('salon.floor_display') }}</h3>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Live {{ strtolower(config('salon.booking_plural')) }} for your front desk &amp; floor team</p>
             </div>
         </div>
 
         <p class="text-white/60 mb-8 relative z-10 leading-relaxed">
-            Generate a secret URL that your kitchen staff can open on any device (tablet, TV, or computer) to view incoming orders in real-time. This link is private and only accessible with the unique token.
+            Generate a secret URL your team can open on a tablet, TV, or computer to show live {{ strtolower(config('salon.booking_plural')) }}. The link stays private and only works with your unique token.
         </p>
 
         @if($restaurant->kitchen_token)
-        <!-- Active KDS Link -->
+        <!-- Active floor display link -->
         <div class="relative z-10 space-y-4">
             <div class="p-5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <div class="flex items-center gap-3 mb-4">
@@ -295,10 +334,10 @@
                             <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
                     </div>
-                    <span class="text-sm font-semibold text-emerald-400">Kitchen Display Link Active</span>
+                    <span class="text-sm font-semibold text-emerald-400">{{ config('salon.floor_display') }} link active</span>
                 </div>
                 
-                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Secret Kitchen Display URL</label>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Secret {{ config('salon.floor_display') }} URL</label>
                 <div class="flex gap-2">
                     <input type="text" readonly id="kitchen-url" value="{{ url('/kitchen/display/' . $restaurant->kitchen_token) }}" 
                            class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex-1 font-mono text-sm text-white truncate">
@@ -307,7 +346,7 @@
                             <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                         </svg>
                     </button>
-                    <a href="{{ url('/kitchen/display/' . $restaurant->kitchen_token) }}" target="_blank" class="p-3 glass rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white" title="Open Kitchen Display">
+                    <a href="{{ url('/kitchen/display/' . $restaurant->kitchen_token) }}" target="_blank" class="p-3 glass rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white" title="Open {{ config('salon.floor_display') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
                         </svg>
@@ -327,7 +366,7 @@
                     </button>
                 </form>
                 
-                <form action="{{ route('manager.kitchen.revoke') }}" method="POST" onsubmit="return confirm('Are you sure? This will disable the current kitchen display link.')">
+                <form action="{{ route('manager.kitchen.revoke') }}" method="POST" onsubmit="return confirm('Are you sure? This will disable the current {{ strtolower(config('salon.floor_display')) }} link.')">
                     @csrf
                     <button type="submit" class="w-full px-6 py-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl font-semibold text-rose-400 hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -339,7 +378,7 @@
             </div>
         </div>
         @else
-        <!-- No KDS Link Yet -->
+        <!-- No floor display link yet -->
         <div class="relative z-10">
             <div class="p-6 glass rounded-xl border border-dashed border-white/20 text-center mb-6">
                 <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -348,8 +387,8 @@
                         <line x1="6" x2="18" y1="17" y2="17"/>
                     </svg>
                 </div>
-                <p class="text-sm font-semibold text-white mb-1">No Kitchen Display Link</p>
-                <p class="text-[11px] text-white/40">Generate a secret link to start using the Kitchen Display System</p>
+                <p class="text-sm font-semibold text-white mb-1">No {{ config('salon.floor_display') }} link</p>
+                <p class="text-[11px] text-white/40">Generate a secret link to start using the {{ config('salon.floor_display') }}</p>
             </div>
 
             <form action="{{ route('manager.kitchen.generate') }}" method="POST">
@@ -358,13 +397,13 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>
                     </svg>
-                    Generate Kitchen Display Link
+                    Generate {{ config('salon.floor_display') }} link
                 </button>
             </form>
         </div>
         @endif
 
-        <!-- KDS Features Info -->
+        <!-- Floor display features -->
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
             <div class="p-4 glass rounded-xl">
                 <div class="w-10 h-10 bg-violet-500/20 rounded-lg flex items-center justify-center mb-3">
@@ -373,7 +412,7 @@
                     </svg>
                 </div>
                 <h4 class="text-sm font-bold text-white mb-1">Real-time Updates</h4>
-                <p class="text-[11px] text-white/50">Orders appear instantly with live timer tracking</p>
+                <p class="text-[11px] text-white/50">{{ config('salon.booking_plural') }} appear instantly with live timers</p>
             </div>
             <div class="p-4 glass rounded-xl">
                 <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center mb-3">
@@ -382,7 +421,7 @@
                     </svg>
                 </div>
                 <h4 class="text-sm font-bold text-white mb-1">VIP Priority</h4>
-                <p class="text-[11px] text-white/50">VIP orders highlighted for faster service</p>
+                <p class="text-[11px] text-white/50">VIP {{ strtolower(config('salon.booking_plural')) }} highlighted for faster service</p>
             </div>
             <div class="p-4 glass rounded-xl">
                 <div class="w-10 h-10 bg-rose-500/20 rounded-lg flex items-center justify-center mb-3">
@@ -391,7 +430,7 @@
                     </svg>
                 </div>
                 <h4 class="text-sm font-bold text-white mb-1">SLA Tracking</h4>
-                <p class="text-[11px] text-white/50">Color-coded alerts when orders are overdue</p>
+                <p class="text-[11px] text-white/50">Color-coded alerts when {{ strtolower(config('salon.booking_plural')) }} run over time</p>
             </div>
         </div>
     </div>
@@ -401,7 +440,7 @@
             const input = document.getElementById('kitchen-url');
             input.select();
             navigator.clipboard.writeText(input.value);
-            alert('Kitchen Display URL copied to clipboard!');
+            alert(@json(config('salon.floor_display')) + ' URL copied to clipboard!');
         }
 
         function testSelcomConnection() {

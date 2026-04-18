@@ -49,7 +49,7 @@
                         <x-nav-link href="{{ route('manager.dashboard') }}" :active="request()->routeIs('manager.dashboard')" icon="layout-dashboard" label="Dashboard" />
                         <x-nav-link href="{{ route('manager.orders.live') }}" :active="request()->routeIs('manager.orders.live')" icon="shopping-bag" label="Live Orders" badge="12" />
                         <x-nav-link href="{{ route('manager.menu.index') }}" :active="request()->routeIs('manager.menu.index')" icon="utensils-crossed" label="Menu Management" />
-                        <x-nav-link href="{{ route('manager.waiters.index') }}" :active="request()->routeIs('manager.waiters.index')" icon="users" label="Waiters & Staff" />
+                        <x-nav-link href="{{ route('manager.waiters.index') }}" :active="request()->routeIs('manager.waiters.index')" icon="users" label="{{ config('salon.staff_plural') }} &amp; team" />
 
                         <p class="sidebar-text text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-8 mb-4 px-4 opacity-50">Finance & Feedback</p>
                         

@@ -42,7 +42,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Assigned Restaurant</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Assigned {{ config('salon.entity') }}</label>
                         <select name="restaurant_id" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all [&>option]:text-black">
                             <option value="">None (System Admin)</option>
                             @foreach($restaurants as $restaurant)

@@ -8,7 +8,7 @@
 @endphp
 <div class="glass p-4 rounded-xl card-hover border border-white/5 min-w-0 overflow-hidden">
     <div class="flex justify-between items-start gap-2 mb-3">
-        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border {{ $badgeClass }} shrink-0">T#{{ $order->table_number }}</span>
+        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border {{ $badgeClass }} shrink-0" title="{{ config('salon.seat') }}">S#{{ $order->table_number }}</span>
         <span class="text-[10px] font-medium text-white/40 shrink-0 whitespace-nowrap">{{ $order->created_at->diffForHumans() }}</span>
     </div>
     <div class="space-y-2 mb-4 max-h-28 sm:max-h-32 overflow-y-auto custom-scrollbar">

@@ -64,6 +64,25 @@ class ApiController extends Controller
     }
 
     /**
+     * Guest Wi‑Fi (SSID + password) shown to customers on the WhatsApp bot.
+     */
+    public function updateGuestWifi(Request $request)
+    {
+        $request->validate([
+            'guest_wifi_ssid' => 'nullable|string|max:100',
+            'guest_wifi_password' => 'nullable|string|max:100',
+        ]);
+
+        $restaurant = Auth::user()->restaurant;
+        $restaurant->update([
+            'guest_wifi_ssid' => $request->filled('guest_wifi_ssid') ? trim((string) $request->input('guest_wifi_ssid')) : null,
+            'guest_wifi_password' => $request->filled('guest_wifi_password') ? trim((string) $request->input('guest_wifi_password')) : null,
+        ]);
+
+        return back()->with('success', 'Guest Wi-Fi details saved. Customers can open “WiFi password” on the bot to see them.');
+    }
+
+    /**
      * Test Selcom Connection
      */
     public function testSelcomConnection()

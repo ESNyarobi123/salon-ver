@@ -41,12 +41,12 @@
                             <select id="targetSelect" name="target" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white focus:ring-2 focus:ring-violet-500 [&>option]:bg-gray-900">
                                 <option value="all" {{ old('target', 'all') === 'all' ? 'selected' : '' }}>Watumiaji wote</option>
                                 <option value="managers" {{ old('target') === 'managers' ? 'selected' : '' }}>Managers wote</option>
-                                <option value="waiters" {{ old('target') === 'waiters' ? 'selected' : '' }}>Waiters wote</option>
-                                <option value="specific_restaurant" {{ old('target') === 'specific_restaurant' ? 'selected' : '' }}>Restaurant maalum</option>
+                                <option value="waiters" {{ old('target') === 'waiters' ? 'selected' : '' }}>{{ config('salon.staff_plural') }} wote</option>
+                                <option value="specific_restaurant" {{ old('target') === 'specific_restaurant' ? 'selected' : '' }}>{{ config('salon.entity') }} maalum</option>
                             </select>
                         </div>
                         <div id="restaurantSelectContainer" class="space-y-2 {{ old('target') === 'specific_restaurant' ? '' : 'hidden' }}">
-                            <label for="restaurant_id" class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Chagua Restaurant</label>
+                            <label for="restaurant_id" class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Chagua {{ config('salon.entity') }}</label>
                             <select id="restaurant_id" name="restaurant_id" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white focus:ring-2 focus:ring-violet-500 [&>option]:bg-gray-900">
                                 <option value="">-- Chagua --</option>
                                 @foreach ($restaurants as $r)

@@ -1,5 +1,5 @@
 <x-waiter-layout>
-    <x-slot name="header">Active Orders</x-slot>
+    <x-slot name="header">Active {{ config('salon.booking_plural') }}</x-slot>
 
     <!-- Quick Stats Bar -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -8,7 +8,7 @@
             <p class="text-2xl font-bold text-emerald-400" id="readyCount">{{ $orders->where('status', 'ready')->count() }}</p>
         </div>
         <div class="glass-card p-3 rounded-xl border border-white/10">
-            <p class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-1">In Kitchen</p>
+            <p class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-1">In progress</p>
             <p class="text-2xl font-bold text-amber-400" id="cookingCount">{{ $orders->whereIn('status', ['pending', 'preparing'])->count() }}</p>
         </div>
         <div class="glass-card p-3 rounded-xl border border-white/10">
@@ -47,7 +47,7 @@
                                 {{ $order->table_number }}
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-white">Order #{{ $order->id }}</p>
+                                <p class="text-sm font-bold text-white">Booking #{{ $order->id }}</p>
                                 <p class="text-[9px] text-white/40 uppercase font-bold tracking-wider">{{ $order->created_at->format('H:i') }}</p>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
     @if($inProgressOrders->count() > 0)
     <section class="mb-6">
         <div class="flex items-center gap-3 mb-4">
-            <h2 class="text-lg font-bold text-white">In Kitchen</h2>
+            <h2 class="text-lg font-bold text-white">In progress</h2>
             <span class="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full border border-amber-500/30">{{ $inProgressOrders->count() }}</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -94,7 +94,7 @@
                                 {{ $order->table_number }}
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-white">Order #{{ $order->id }}</p>
+                                <p class="text-sm font-bold text-white">Booking #{{ $order->id }}</p>
                                 <p class="text-[9px] text-white/40 uppercase font-bold tracking-wider">{{ $order->created_at->format('H:i') }}</p>
                             </div>
                         </div>
@@ -163,8 +163,8 @@
                     <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
                 </svg>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">No Active Orders</h3>
-            <p class="text-sm text-white/40 mb-4">You don't have any active orders right now.</p>
+            <h3 class="text-lg font-bold text-white mb-2">No active {{ strtolower(config('salon.booking_plural')) }}</h3>
+            <p class="text-sm text-white/40 mb-4">You don&apos;t have any active {{ strtolower(config('salon.booking_plural')) }} right now.</p>
             <a href="{{ route('waiter.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>

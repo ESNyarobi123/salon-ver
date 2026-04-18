@@ -58,7 +58,7 @@ class WhatsAppBotController extends Controller
         $restaurant = Restaurant::find($request->restaurant_id);
 
         if (! $restaurant || ! $restaurant->is_active) {
-            return response()->json(['success' => false, 'message' => 'Restaurant not found or inactive'], 404);
+            return response()->json(['success' => false, 'message' => 'Saloon not found or inactive'], 404);
         }
 
         // Check if waiter_id or table_id is provided
@@ -99,8 +99,8 @@ class WhatsAppBotController extends Controller
     }
 
     /**
-     * Verify Service Tag (SMK-T01, SMK-W01, etc.)
-     * Supports both table tags and waiter codes
+     * Verify service tag: PREFIX-T## (seat) or PREFIX-W## (stylist at that saloon).
+     * TipTap-wide stylist account IDs (TIPTAP-W-#####) are handled in parseEntry(), not here.
      */
     public function verifyTag(Request $request)
     {
@@ -124,7 +124,7 @@ class WhatsAppBotController extends Controller
             if (! $table || ! $table->restaurant || ! $table->restaurant->is_active) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid table tag or restaurant inactive',
+                    'message' => 'Invalid seat tag or saloon inactive',
                 ], 404);
             }
 
@@ -156,7 +156,7 @@ class WhatsAppBotController extends Controller
             if (! $waiter || ! $waiter->restaurant || ! $waiter->restaurant->is_active) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid waiter code or restaurant inactive',
+                    'message' => 'Invalid stylist code or saloon inactive',
                 ], 404);
             }
 
@@ -200,14 +200,14 @@ class WhatsAppBotController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid tag format. Use PREFIX-T## for tables or PREFIX-W## for waiters.',
+                'message' => 'Invalid tag. Use PREFIX-T## (seat) or PREFIX-W## (stylist at that saloon). For TipTap ID TIPTAP-W-#####, use parse-entry as plain text.',
             ], 400);
         }
     }
 
     /**
      * Parse QR code or tag input and return appropriate data
-     * Handles: START_2, START_2_T5, START_2_W3, SMK-T01, SMK-W01
+     * Handles: START_2, START_2_T5, START_2_S3 (stylist), legacy START_2_W3, TIPTAP-W-00001, SMK-T01, SMK-W01
      */
     public function parseEntry(Request $request)
     {
@@ -218,7 +218,7 @@ class WhatsAppBotController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'The input field is required.',
-                'hint' => 'Send input as POST body: {"input": "START_2_W12"} or as query: ?input=START_2_W12',
+                'hint' => 'Send input as POST body: {"input": "START_2_S12"} or ?input=TIPTAP-W-00001',
             ], 422);
         }
 
@@ -228,7 +228,7 @@ class WhatsAppBotController extends Controller
         if (preg_match('/^START_(\d+)$/i', $input, $matches)) {
             $restaurant = Restaurant::find($matches[1]);
             if (! $restaurant || ! $restaurant->is_active) {
-                return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
+                return response()->json(['success' => false, 'message' => 'Saloon not found'], 404);
             }
 
             return response()->json([
@@ -249,7 +249,7 @@ class WhatsAppBotController extends Controller
             $table = Table::withoutGlobalScopes()->find($matches[2]);
 
             if (! $restaurant || ! $restaurant->is_active) {
-                return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
+                return response()->json(['success' => false, 'message' => 'Saloon not found'], 404);
             }
 
             return response()->json([
@@ -267,13 +267,13 @@ class WhatsAppBotController extends Controller
             ]);
         }
 
-        // Pattern 3: START_{restaurant_id}_W{waiter_id}
-        if (preg_match('/^START_(\d+)_W(\d+)$/i', $input, $matches)) {
+        // Pattern 3a: START_{restaurant_id}_S{user_id} — stylist deep link (current QR format)
+        if (preg_match('/^START_(\d+)_S(\d+)$/i', $input, $matches)) {
             $restaurant = Restaurant::find($matches[1]);
             $waiter = User::find($matches[2]);
 
             if (! $restaurant || ! $restaurant->is_active) {
-                return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
+                return response()->json(['success' => false, 'message' => 'Saloon not found'], 404);
             }
 
             return response()->json([
@@ -291,6 +291,61 @@ class WhatsAppBotController extends Controller
             ]);
         }
 
+        // Pattern 3b: Legacy START_{restaurant_id}_W{user_id} (old printed QRs)
+        if (preg_match('/^START_(\d+)_W(\d+)$/i', $input, $matches)) {
+            $restaurant = Restaurant::find($matches[1]);
+            $waiter = User::find($matches[2]);
+
+            if (! $restaurant || ! $restaurant->is_active) {
+                return response()->json(['success' => false, 'message' => 'Saloon not found'], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'type' => 'waiter',
+                'skip_standalone_welcome' => true,
+                'data' => [
+                    'restaurant_id' => $restaurant->id,
+                    'restaurant_name' => $restaurant->name,
+                    'support_phone' => $restaurant->getCustomerSupportPhone(),
+                    'waiter_id' => $waiter ? $waiter->id : null,
+                    'waiter_name' => $waiter ? $waiter->name : null,
+                    'waiter_code' => $waiter ? $waiter->waiter_code : null,
+                ],
+            ]);
+        }
+
+        // Pattern 3c: Global TipTap stylist ID (typed or scanned as plain text)
+        if (preg_match('/^TIPTAP-W-\d+$/i', $input)) {
+            $waiter = User::role('waiter')
+                ->where('global_waiter_number', $input)
+                ->with('restaurant')
+                ->first();
+
+            if (! $waiter || ! $waiter->restaurant_id || ! $waiter->restaurant || ! $waiter->restaurant->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stylist not found or not linked to an active saloon',
+                ], 404);
+            }
+
+            $restaurant = $waiter->restaurant;
+
+            return response()->json([
+                'success' => true,
+                'type' => 'waiter',
+                'skip_standalone_welcome' => true,
+                'data' => [
+                    'restaurant_id' => $restaurant->id,
+                    'restaurant_name' => $restaurant->name,
+                    'support_phone' => $restaurant->getCustomerSupportPhone(),
+                    'waiter_id' => $waiter->id,
+                    'waiter_name' => $waiter->name,
+                    'waiter_code' => $waiter->waiter_code,
+                ],
+            ]);
+        }
+
         // Pattern 4: Service tags (SMK-T01, SMK-W01)
         if (preg_match('/^([A-Z0-9]+)-(T|W)(\d+)$/i', $input)) {
             return $this->verifyTag(new Request(['tag' => $input]));
@@ -300,7 +355,7 @@ class WhatsAppBotController extends Controller
         if (preg_match('/^START_(\d+)_(\d+)$/i', $input, $matches)) {
             $restaurant = Restaurant::find($matches[1]);
             if (! $restaurant || ! $restaurant->is_active) {
-                return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
+                return response()->json(['success' => false, 'message' => 'Saloon not found'], 404);
             }
 
             // Treat second number as table_number (old format)
@@ -347,6 +402,7 @@ class WhatsAppBotController extends Controller
             ->get(['id', 'name', 'price', 'description', 'image'])
             ->map(function ($item) {
                 $item->imageUrl = $item->imageUrl();
+
                 return $item;
             });
 
@@ -366,7 +422,7 @@ class WhatsAppBotController extends Controller
         }])->find($itemId);
 
         if (! $item) {
-            return response()->json(['success' => false, 'message' => 'Item not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Service not found'], 404);
         }
 
         $item->imageUrl = $item->imageUrl();
@@ -388,8 +444,10 @@ class WhatsAppBotController extends Controller
             $category->imageUrl = $category->imageUrl();
             $category->menuItems->map(function ($item) {
                 $item->imageUrl = $item->imageUrl();
+
                 return $item;
             });
+
             return $category;
         });
 
@@ -473,9 +531,14 @@ class WhatsAppBotController extends Controller
                     'total' => $totalAmount,
                     'waiter_id' => $request->waiter_id,
                     'table_number' => $tableNumber,
-                    'message' => 'Order created successfully',
+                    'message' => 'Booking created successfully',
                 ]);
             });
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -492,7 +555,7 @@ class WhatsAppBotController extends Controller
         }, 'payments'])->find($orderId);
 
         if (! $order) {
-            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Booking not found'], 404);
         }
 
         $payment = $order->payments()->where('method', 'ussd')->latest()->first();
@@ -529,7 +592,7 @@ class WhatsAppBotController extends Controller
 
                     // Log successful payment
                     Activity::create([
-                        'description' => 'Order #'.$order->id.' payment completed: Tsh '.number_format($order->total_amount),
+                        'description' => 'Booking #'.$order->id.' payment completed: Tsh '.number_format($order->total_amount),
                         'type' => 'order_payment_success',
                         'properties' => [
                             'order_id' => $order->id,
@@ -595,7 +658,7 @@ class WhatsAppBotController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Feedback submitted successfully',
+            'message' => 'Thanks — feedback received.',
         ]);
     }
 
@@ -624,7 +687,7 @@ class WhatsAppBotController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tip submitted successfully',
+                'message' => 'Tip received — thank you.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -673,7 +736,7 @@ class WhatsAppBotController extends Controller
         if (! $restaurant || ! $restaurant->hasSelcomConfigured()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Restaurant payment gateway not configured',
+                'message' => 'Saloon payment gateway not configured',
             ], 400);
         }
 
@@ -681,10 +744,10 @@ class WhatsAppBotController extends Controller
         $result = $selcom->initiatePayment($restaurant->getSelcomCredentials(), [
             'order_id' => $transactionId,
             'email' => $order->customer_phone.'@taptap.com',
-            'name' => 'WhatsApp Customer',
+            'name' => 'WhatsApp '.config('salon.customer'),
             'phone' => $request->phone_number,
             'amount' => $request->amount,
-            'description' => 'Order #'.$order->id,
+            'description' => 'Booking #'.$order->id,
         ]);
 
         if (isset($result['status']) && $result['status'] === 'success') {
@@ -732,7 +795,7 @@ class WhatsAppBotController extends Controller
         if (! $restaurant) {
             return response()->json([
                 'success' => false,
-                'message' => 'Restaurant not found',
+                'message' => 'Saloon not found',
             ], 404);
         }
 
@@ -793,7 +856,7 @@ class WhatsAppBotController extends Controller
         if (! $restaurant->hasSelcomConfigured()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Restaurant payment gateway not configured',
+                'message' => 'Saloon payment gateway not configured',
             ], 400);
         }
 
@@ -801,7 +864,7 @@ class WhatsAppBotController extends Controller
         $result = $selcom->initiatePayment($restaurant->getSelcomCredentials(), [
             'order_id' => $transactionId,
             'email' => $request->phone_number.'@taptap.com',
-            'name' => 'WhatsApp Customer',
+            'name' => 'WhatsApp '.config('salon.customer'),
             'phone' => $request->phone_number,
             'amount' => $request->amount,
             'description' => $request->description,
@@ -985,7 +1048,7 @@ class WhatsAppBotController extends Controller
         if (! $waiter) {
             return response()->json([
                 'success' => false,
-                'message' => 'Waiter not found',
+                'message' => 'Stylist not found',
             ], 404);
         }
 
@@ -1009,10 +1072,10 @@ class WhatsAppBotController extends Controller
         $type = $request->input('type') ?? $request->input('request_type');
 
         // Map bot values to DB values
-        if ($type === 'Call Waiter') {
+        if (in_array($type, ['Call Waiter', 'Call stylist'], true)) {
             $type = 'call_waiter';
         }
-        if ($type === 'Request Bill') {
+        if (in_array($type, ['Request Bill', 'Request bill'], true)) {
             $type = 'request_bill';
         }
 
@@ -1064,11 +1127,14 @@ class WhatsAppBotController extends Controller
             'status' => 'pending',
         ]);
 
-        $message = $request->type === 'request_bill' ? 'Bill request sent' : 'Waiter called successfully';
+        $stylist = config('salon.staff');
+        $message = $request->type === 'request_bill'
+            ? 'Receipt request sent'
+            : "{$stylist} notified";
         if ($waiterName) {
             $message = $request->type === 'request_bill'
-                ? "Bill request sent to {$waiterName}"
-                : "{$waiterName} has been called";
+                ? "Receipt request sent to {$waiterName}"
+                : "{$waiterName} ({$stylist}) has been notified";
         }
 
         return response()->json([
@@ -1115,34 +1181,56 @@ class WhatsAppBotController extends Controller
             ->where('restaurant_id', $request->restaurant_id)
             ->where('table_number', $request->table_number)
             ->whereIn('status', ['pending', 'preparing', 'ready'])
-            ->with(['items.menuItem' => function ($query) {
-                $query->withoutGlobalScopes();
-            }])
+            ->with([
+                'items.menuItem' => function ($query) {
+                    $query->withoutGlobalScopes();
+                },
+                'waiter',
+                'payments' => fn ($q) => $q->latest(),
+            ])
             ->latest()
             ->first();
 
         if (! $order) {
             return response()->json([
                 'success' => false,
-                'message' => 'No active order found for this table',
+                'message' => 'No active booking found for this seat',
             ], 404);
         }
 
+        $latestPayment = $order->payments->first();
+        $paymentStatus = $latestPayment ? $latestPayment->status : 'unpaid';
+
+        $items = $order->items->map(function ($item) {
+            return [
+                'name' => $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom item'),
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'subtotal' => $item->total,
+            ];
+        });
+
+        $orderPayload = [
+            'id' => $order->id,
+            'total' => (float) $order->total_amount,
+            'status' => $order->status,
+            'payment_status' => $paymentStatus,
+            'waiter_name' => $order->waiter?->name,
+            'items' => $items,
+        ];
+
         return response()->json([
             'success' => true,
+            /** @deprecated Bot should prefer `order`; kept for older clients */
             'data' => [
                 'order_id' => $order->id,
                 'total' => $order->total_amount,
                 'status' => $order->status,
-                'items' => $order->items->map(function ($item) {
-                    return [
-                        'name' => $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom Order'),
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'subtotal' => $item->total,
-                    ];
-                }),
+                'payment_status' => $paymentStatus,
+                'waiter_name' => $order->waiter?->name,
+                'items' => $items,
             ],
+            'order' => $orderPayload,
         ]);
     }
 
@@ -1156,14 +1244,14 @@ class WhatsAppBotController extends Controller
         if (! $restaurant) {
             return response()->json([
                 'success' => false,
-                'message' => 'Restaurant not found',
+                'message' => 'Saloon not found',
             ], 404);
         }
 
         if (! $restaurant->menu_image) {
             return response()->json([
                 'success' => false,
-                'message' => 'No menu image available for this restaurant',
+                'message' => 'No service menu image available for this saloon',
             ], 404);
         }
 
@@ -1176,6 +1264,29 @@ class WhatsAppBotController extends Controller
                 'restaurant_id' => $restaurant->id,
                 'restaurant_name' => $restaurant->name,
                 'menu_image_url' => $imageUrl,
+            ],
+        ]);
+    }
+
+    /**
+     * Guest Wi‑Fi credentials for the WhatsApp bot (manager-configured).
+     */
+    public function getGuestWifi($restaurantId)
+    {
+        $restaurant = Restaurant::find($restaurantId);
+
+        if (! $restaurant || ! $restaurant->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Saloon not found or inactive',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'wifi_ssid' => $restaurant->guest_wifi_ssid,
+                'wifi_password' => $restaurant->guest_wifi_password,
             ],
         ]);
     }
@@ -1288,9 +1399,14 @@ class WhatsAppBotController extends Controller
                         'order_id' => $order->id,
                         'total' => 0,
                         'items' => [['name' => $request->order_text, 'quantity' => 1, 'price' => 0]],
-                        'message' => 'Order created successfully. Waiter will confirm the price.',
+                        'message' => 'Booking created successfully. Stylist will confirm the price.',
                     ]);
                 });
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => collect($e->errors())->flatten()->first(),
+                ], 422);
             } catch (\Exception $e) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
@@ -1337,9 +1453,14 @@ class WhatsAppBotController extends Controller
                     'items' => $matchedItems,
                     'waiter_id' => $request->waiter_id,
                     'table_number' => $tableNumber,
-                    'message' => 'Order created successfully',
+                    'message' => 'Booking created successfully',
                 ]);
             });
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

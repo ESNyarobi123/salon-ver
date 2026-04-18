@@ -189,6 +189,7 @@ Route::prefix('bot')->middleware('auth:sanctum')->group(function () {
     Route::get('/restaurant/{restaurantId}/waiters', [App\Http\Controllers\Api\WhatsAppBotController::class, 'getWaiters']);
     Route::get('/active-order', [App\Http\Controllers\Api\WhatsAppBotController::class, 'getActiveOrder']);
     Route::get('/restaurant/{restaurantId}/menu-image', [App\Http\Controllers\Api\WhatsAppBotController::class, 'getMenuImage']);
+    Route::get('/restaurant/{restaurantId}/guest-wifi', [App\Http\Controllers\Api\WhatsAppBotController::class, 'getGuestWifi']);
 
     // Quick Payment Routes (payment without order)
     Route::post('/payment/quick', [App\Http\Controllers\Api\WhatsAppBotController::class, 'initiateQuickPayment']);

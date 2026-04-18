@@ -38,7 +38,7 @@ class TableController extends Controller
         // Generate QR Code content URL (WhatsApp format)
         $table->update(['qr_code' => $table->whatsapp_qr_url]);
 
-        return back()->with('success', 'Table created successfully!');
+        return back()->with('success', 'Seat created successfully!');
     }
 
     public function update(Request $request, Table $table)
@@ -55,13 +55,13 @@ class TableController extends Controller
 
         $table->update($data);
 
-        return back()->with('success', 'Table updated successfully!');
+        return back()->with('success', 'Seat updated successfully!');
     }
 
     public function destroy(Table $table)
     {
         $table->delete();
 
-        return back()->with('success', 'Table deleted successfully!');
+        return back()->with('success', 'Seat deleted successfully!');
     }
 }

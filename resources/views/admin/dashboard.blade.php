@@ -5,7 +5,7 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-        <!-- Total Restaurants -->
+        <!-- Total saloons -->
         <div class="glass-card rounded-2xl p-6 card-hover relative overflow-hidden group">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-violet-500/20 to-violet-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
             <div class="relative z-10">
@@ -17,12 +17,12 @@
                     </div>
                     <span class="px-3 py-1.5 bg-violet-500/10 text-violet-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-violet-500/20">Growth</span>
                 </div>
-                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Total Restaurants</p>
+                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Total {{ config('salon.entity_plural') }}</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-total-restaurants">{{ $stats['total_restaurants'] }}</h3>
             </div>
         </div>
 
-        <!-- Total Waiters -->
+        <!-- Total stylists -->
         <a href="{{ route('admin.waiters.index') }}" class="glass-card rounded-2xl p-6 card-hover relative overflow-hidden group block">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-amber-500/20 to-amber-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
             <div class="relative z-10">
@@ -34,12 +34,12 @@
                     </div>
                     <span class="px-3 py-1.5 bg-amber-500/10 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-amber-500/20">View all</span>
                 </div>
-                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Total Waiters</p>
+                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Total {{ config('salon.staff_plural') }}</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-total-waiters">{{ $stats['total_waiters'] ?? 0 }}</h3>
             </div>
         </a>
 
-        <!-- Active Orders -->
+        <!-- Active bookings -->
         <div class="glass-card rounded-2xl p-6 card-hover relative overflow-hidden group">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
             <div class="relative z-10">
@@ -54,7 +54,7 @@
                         Live
                     </span>
                 </div>
-                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Active Orders</p>
+                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">{{ config('salon.admin_stat_active_bookings') }}</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-active-orders">{{ $stats['active_orders'] }}</h3>
             </div>
         </div>
@@ -96,12 +96,12 @@
 
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Recent Restaurants Table -->
+        <!-- Recent saloons -->
         <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden">
             <div class="p-6 border-b border-white/5 flex justify-between items-center">
                 <div>
-                    <h3 class="text-xl font-bold text-white tracking-tight">Newest Partners</h3>
-                    <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-wider mt-1">Recently registered restaurants</p>
+                    <h3 class="text-xl font-bold text-white tracking-tight">{{ config('salon.admin_dashboard_newest_partners') }}</h3>
+                    <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-wider mt-1">Recently registered {{ config('salon.entity_plural_lower') }}</p>
                 </div>
                 <a href="{{ route('admin.restaurants.index') }}" class="px-4 py-2 bg-violet-500/10 text-violet-400 text-[11px] font-bold uppercase tracking-wider rounded-xl hover:bg-violet-500 hover:text-white transition-all border border-violet-500/20 hover:border-violet-500">View All</a>
             </div>
@@ -109,8 +109,8 @@
                 <table class="w-full">
                     <thead>
                         <tr class="bg-white/[0.02]">
-                            <th class="px-6 py-4 text-left text-[10px] font-bold text-white/40 uppercase tracking-wider">Restaurant</th>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold text-white/40 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-white/40 uppercase tracking-wider">{{ config('salon.entity') }}</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-white/40 uppercase tracking-wider">{{ config('salon.admin_table_location') }}</th>
                             <th class="px-6 py-4 text-left text-[10px] font-bold text-white/40 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-4 text-right text-[10px] font-bold text-white/40 uppercase tracking-wider">Action</th>
                         </tr>

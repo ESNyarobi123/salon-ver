@@ -1,4 +1,4 @@
-<x-guest-layout title="TIPTAP | Register Restaurant">
+<x-guest-layout title="TIPTAP | Register {{ config('salon.entity') }}">
     <div class="max-w-2xl mx-auto">
         <!-- Progress Bar -->
         <div class="mb-8 bg-white/5 h-2 rounded-full overflow-hidden border border-white/10">
@@ -23,13 +23,13 @@
             <form id="registration-form" method="POST" action="{{ route('restaurant.register.store') }}" class="flex flex-col flex-1">
                 @csrf
 
-                <!-- Step 1: Restaurant Name -->
+                <!-- Step 1: Saloon name (stored as restaurant_name) -->
                 <div class="step step-active" data-step="1">
                     <div class="chat-bubble-left bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-white/80 font-medium mb-4">
-                        Habari! Karibu TIPTAP. Ningependa kuanza kwa kujua, jina la restaurant yako ni nani?
+                        Habari! Karibu TIPTAP. Ningependa kuanza kwa kujua, jina la {{ strtolower(config('salon.entity')) }} yako ni nani?
                     </div>
                     <div class="mt-4">
-                        <input id="restaurant_name" type="text" name="restaurant_name" value="{{ old('restaurant_name') }}" required placeholder="Mfano: TIPTAP Grill"
+                        <input id="restaurant_name" type="text" name="restaurant_name" value="{{ old('restaurant_name') }}" required placeholder="Mfano: Glow Studio Dar"
                                class="block w-full text-lg p-4 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                         <x-input-error :messages="$errors->get('restaurant_name')" class="mt-2" />
                     </div>
@@ -38,7 +38,7 @@
                 <!-- Step 2: Location -->
                 <div class="step step-hidden" data-step="2">
                     <div class="chat-bubble-left bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-white/80 font-medium mb-4">
-                        Safi sana! Na restaurant yako inapatikana wapi (Location)?
+                        Safi sana! Na {{ strtolower(config('salon.entity')) }} yako inapatikana wapi (Location)?
                     </div>
                     <div class="mt-4">
                         <input id="location" type="text" name="location" value="{{ old('location') }}" required placeholder="Mfano: Masaki, Dar es Salaam"
@@ -50,7 +50,7 @@
                 <!-- Step 3: Phone -->
                 <div class="step step-hidden" data-step="3">
                     <div class="chat-bubble-left bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-white/80 font-medium mb-4">
-                        Nimekupata. Naomba namba ya simu ya restaurant kwa ajili ya mawasiliano.
+                        Nimekupata. Naomba namba ya simu ya {{ strtolower(config('salon.entity')) }} kwa ajili ya mawasiliano.
                     </div>
                     <div class="mt-4">
                         <input id="phone" type="text" name="phone" value="{{ old('phone') }}" required placeholder="Mfano: 0712 345 678"
@@ -62,7 +62,7 @@
                 <!-- Step 4: Manager Name -->
                 <div class="step step-hidden" data-step="4">
                     <div class="chat-bubble-left bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-white/80 font-medium mb-4">
-                        Vizuri. Sasa, nani atakuwa Manager wa hii restaurant? (Jina lako kamili)
+                        Vizuri. Sasa, nani atakuwa Manager wa {{ strtolower(config('salon.entity')) }} hii? (Jina lako kamili)
                     </div>
                     <div class="mt-4">
                         <input id="manager_name" type="text" name="manager_name" value="{{ old('manager_name') }}" required placeholder="Mfano: John Doe"

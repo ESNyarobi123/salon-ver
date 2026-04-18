@@ -48,7 +48,7 @@ class MenuImageController extends Controller
         $path = $request->file('menu_image')->store('menu_images', 'public');
         $restaurant->update(['menu_image' => $path]);
 
-        return back()->with('success', 'Menu image uploaded successfully!');
+        return back()->with('success', 'Service menu image uploaded successfully!');
     }
 
     /**
@@ -67,6 +67,6 @@ class MenuImageController extends Controller
             $restaurant->update(['menu_image' => null]);
         }
 
-        return back()->with('success', 'Menu image deleted successfully!');
+        return back()->with('success', 'Service menu image deleted successfully!');
     }
 }

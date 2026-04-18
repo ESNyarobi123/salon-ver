@@ -1,0 +1,164 @@
+import 'package:flutter/foundation.dart';
+
+import '../models/user_model.dart';
+import '../services/api_service.dart';
+import '../services/storage_service.dart';
+
+class AuthProvider with ChangeNotifier {
+  final ApiService _api = ApiService();
+  final StorageService _storage = StorageService();
+
+  String? _token;
+  UserModel? _user;
+  bool _isLoading = true;
+  String? _error;
+  String? _registrationMessage;
+
+  String? get token => _token;
+  UserModel? get user => _user;
+  bool get isLoading => _isLoading;
+  bool get isLoggedIn => _token != null && _user != null;
+  String? get error => _error;
+  String? get registrationMessage => _registrationMessage;
+
+  ApiService get api => ApiService(token: _token);
+
+  Future<void> init() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _token = await _storage.getToken();
+      if (_token != null) {
+        _user = await _loadUser();
+      }
+    } catch (_) {
+      await logout();
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<UserModel?> _loadUser() async {
+    try {
+      final stored = await _storage.getStoredUser();
+      if (stored != null) return stored;
+      await ApiService(token: _token).getDashboard();
+      return stored;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> login(
+    String email,
+    String password, {
+    bool rememberMe = false,
+  }) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await _api.login(email, password);
+      _token = response.token;
+      _user = response.user;
+      await _storage.setToken(response.token);
+      if (rememberMe) {
+        await _storage.setRememberMe(true);
+        await _storage.setSavedEmail(email);
+        await _storage.setStoredUser(response.user);
+      } else {
+        await _storage.setRememberMe(false);
+        await _storage.setSavedEmail(null);
+        await _storage.clearStoredUser();
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    String? location,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    _error = null;
+    _registrationMessage = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await _api.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        location: location,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      _token = response.token;
+      _user = response.user;
+      _registrationMessage = response.message;
+      await _storage.setToken(response.token);
+      await _storage.setStoredUser(response.user);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void setUser(UserModel user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  /// Update user profile fields from dashboard waiter block
+  void updateUserFromWaiterInfo(
+    Map<String, dynamic> waiterInfo, {
+    bool? isLinked,
+  }) {
+    if (_user == null) return;
+    final u = _user!;
+    _user = UserModel(
+      id: waiterInfo['id'] as int? ?? u.id,
+      name: waiterInfo['name'] as String? ?? u.name,
+      email: u.email,
+      restaurantId: u.restaurantId,
+      restaurantName: u.restaurantName,
+      restaurantLocation: u.restaurantLocation,
+      waiterCode: waiterInfo['waiter_code'] as String? ?? u.waiterCode,
+      globalWaiterNumber:
+          waiterInfo['global_waiter_number'] as String? ?? u.globalWaiterNumber,
+      waiterQrUrl: waiterInfo['waiter_qr_url'] as String? ?? u.waiterQrUrl,
+      isLinked: isLinked ?? u.isLinked,
+      roles: u.roles,
+    );
+    _storage.setStoredUser(_user!);
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    try {
+      await api.logout();
+    } catch (_) {}
+    _token = null;
+    _user = null;
+    await _storage.clearToken();
+    await _storage.clearStoredUser();
+    notifyListeners();
+  }
+}

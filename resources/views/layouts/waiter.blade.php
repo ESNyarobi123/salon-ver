@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>TIPTAP Waiter</title>
+    <title>TIPTAP · {{ config('salon.staff') }}</title>
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -176,7 +176,7 @@
                     </div>
                     <div class="sidebar-logo-text min-w-0">
                         <span class="text-base font-black text-white tracking-tight block leading-none hidden">TIP<span class="gradient-text">TAP</span></span>
-                        <span class="text-[9px] font-semibold text-white/40 uppercase tracking-[0.2em]">Waiter</span>
+                        <span class="text-[9px] font-semibold text-white/40 uppercase tracking-[0.2em]">{{ strtoupper(config('salon.staff')) }}</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
@@ -194,7 +194,7 @@
 
             <nav class="flex-1 py-4 custom-scrollbar overflow-y-auto overflow-x-hidden">
                 <div class="mb-3 px-4 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Main</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.stylist_sidebar_section_main') }}</p>
                 </div>
                 
                 <a href="{{ route('waiter.dashboard') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.dashboard') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -203,7 +203,7 @@
                             <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Dashboard</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_home') }}</span>
                 </a>
 
                 <a href="{{ route('waiter.menu') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.menu') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -212,7 +212,7 @@
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Menu</span>
+                    <span class="font-medium text-xs">{{ config('salon.services') }}</span>
                 </a>
 
                 <a href="{{ route('waiter.orders') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.orders') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -221,7 +221,7 @@
                             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Orders</span>
+                    <span class="font-medium text-xs">{{ config('salon.booking_plural') }}</span>
                 </a>
 
                 <a href="{{ route('waiter.dashboard') }}#requests" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] text-white/55">
@@ -238,7 +238,7 @@
                             <span class="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-rose-500 rounded-full flex items-center justify-center text-[8px] font-bold text-white animate-pulse">{{ $pendingCount }}</span>
                         @endif
                     </div>
-                    <span class="font-medium text-xs">Calls</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_calls') }}</span>
                     @if($pendingCount > 0)
                         <span class="ml-auto bg-rose-500/20 text-rose-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{{ $pendingCount }}</span>
                     @endif
@@ -250,11 +250,11 @@
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Handover</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_handover') }}</span>
                 </a>
 
                 <div class="mt-5 mb-3 px-4 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Stats</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.stylist_sidebar_section_stats') }}</p>
                 </div>
 
                 <a href="{{ route('waiter.tips') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.tips') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -263,7 +263,7 @@
                             <circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Tips</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_tips') }}</span>
                 </a>
 
                 <a href="{{ route('waiter.ratings') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.ratings') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -272,11 +272,11 @@
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Ratings</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_ratings') }}</span>
                 </a>
 
                 <div class="mt-5 mb-3 px-4 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Account</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.stylist_sidebar_section_account') }}</p>
                 </div>
 
                 <a href="{{ route('waiter.salary-slip.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.salary-slip.*') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -285,12 +285,12 @@
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>
                         </svg>
                         @if(!empty($unreadSalaryCount) && $unreadSalaryCount > 0)
-                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white" title="New">{{ $unreadSalaryCount }}</span>
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white" title="{{ config('salon.stylist_badge_new') }}">{{ $unreadSalaryCount }}</span>
                         @endif
                     </div>
-                    <span class="font-medium text-xs">Salary</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_salary') }}</span>
                     @if(!empty($unreadSalaryCount) && $unreadSalaryCount > 0)
-                        <span class="text-[9px] font-semibold text-amber-400 shrink-0">New</span>
+                        <span class="text-[9px] font-semibold text-amber-400 shrink-0">{{ config('salon.stylist_badge_new') }}</span>
                     @endif
                 </a>
 
@@ -300,7 +300,7 @@
                             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0 11 18 0z"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">History</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_history') }}</span>
                 </a>
 
                 <a href="{{ route('waiter.help.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-2 mx-2 rounded-lg min-h-[44px] {{ request()->routeIs('waiter.help.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -309,7 +309,7 @@
                             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Help</span>
+                    <span class="font-medium text-xs">{{ config('salon.stylist_nav_help') }}</span>
                 </a>
             </nav>
 
@@ -325,7 +325,7 @@
                     @endif
                     <div class="flex-1 min-w-0 sidebar-user-text">
                         <p class="text-xs font-semibold text-white truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-[9px] font-medium text-white/40 truncate">Waiter</p>
+                        <p class="text-[9px] font-medium text-white/40 truncate">{{ config('salon.staff') }}</p>
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/40 transition-transform cursor-pointer shrink-0" :class="open ? 'rotate-180' : ''">
                         <path d="m18 15-6-6-6 6"/>
@@ -343,7 +343,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
                                 </svg>
-                                Sign Out
+                                {{ config('salon.stylist_sign_out') }}
                             </button>
                         </form>
                     </div>
@@ -376,8 +376,8 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
                         </button>
                         <div>
-                            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-[0.15em] mb-1">Waiter Portal</p>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">{{ $header ?? 'Dashboard' }}</h1>
+                            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-[0.15em] mb-1">{{ config('salon.portal_stylist') }}</p>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">{{ $header ?? config('salon.stylist_nav_home') }}</h1>
                         </div>
                     </div>
                     
@@ -476,7 +476,7 @@
                             <p class="text-[10px] font-bold text-white/40 uppercase tracking-wider">Unique ID</p>
                             <div class="flex items-center gap-2 mt-1">
                                 <code class="text-lg font-mono font-bold text-cyan-400">{{ $layoutWaiter->global_waiter_number ?? '—' }}</code>
-                                <button type="button" onclick="copyWaiterId('{{ $layoutWaiter->global_waiter_number ?? '' }}', this)" class="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 text-white/60 hover:text-cyan-400 transition-all" title="Copy ID">
+                                <button type="button" onclick="copyWaiterId('{{ $layoutWaiter->global_waiter_number ?? '' }}', this)" class="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 text-white/60 hover:text-cyan-400 transition-all" title="Copy {{ strtolower(config('salon.staff')) }} ID">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                 </button>
                             </div>

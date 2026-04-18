@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        Restaurant Details
+        {{ config('salon.entity') }} details
     </x-slot>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -25,7 +25,7 @@
                             @csrf
                             <button type="submit" class="px-6 py-3 {{ $restaurant->is_active ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' }} rounded-xl font-bold text-sm hover:opacity-80 transition-all flex items-center gap-2 border">
                                 <i data-lucide="{{ $restaurant->is_active ? 'slash' : 'check-circle' }}" class="w-4 h-4"></i>
-                                {{ $restaurant->is_active ? 'Block Restaurant' : 'Unblock Restaurant' }}
+                                {{ $restaurant->is_active ? 'Block ' . config('salon.entity') : 'Unblock ' . config('salon.entity') }}
                             </button>
                         </form>
                     </div>
@@ -76,7 +76,7 @@
             <div class="glass-card rounded-2xl overflow-hidden">
                 <div class="p-6 border-b border-white/5">
                     <h3 class="text-xl font-black text-white tracking-tight">Staff Management</h3>
-                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Managers and Waiters</p>
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Managers &amp; {{ config('salon.staff_plural') }}</p>
                 </div>
                 
                 <div class="p-6 space-y-8">
@@ -100,10 +100,10 @@
                         </div>
                     </div>
 
-                    <!-- Waiters -->
+                    <!-- Stylists -->
                     <div>
                         <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i data-lucide="user" class="w-3 h-3 text-orange-400"></i> Waiters ({{ $waiters->count() }})
+                            <i data-lucide="user" class="w-3 h-3 text-orange-400"></i> {{ config('salon.staff_plural') }} ({{ $waiters->count() }})
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($waiters as $waiter)

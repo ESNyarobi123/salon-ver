@@ -6,7 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class MenuItem extends Model
 {
-    protected $fillable = ['restaurant_id', 'category_id', 'name', 'description', 'price', 'image', 'is_available', 'preparation_time'];
+    protected $fillable = ['restaurant_id', 'category_id', 'name', 'description', 'price', 'image', 'is_available', 'preparation_time', 'stock_tracked', 'stock_quantity', 'low_stock_threshold'];
+
+    protected function casts(): array
+    {
+        return [
+            'is_available' => 'boolean',
+            'stock_tracked' => 'boolean',
+            'stock_quantity' => 'integer',
+            'low_stock_threshold' => 'integer',
+        ];
+    }
+
+    public function isLowStock(): bool
+    {
+        if (! $this->stock_tracked) {
+            return false;
+        }
+
+        return $this->stock_quantity <= $this->low_stock_threshold;
+    }
 
     protected static function booted()
     {

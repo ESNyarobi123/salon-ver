@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0f0a1e">
-    <title>TIPTAP ORDER @if(isset($restaurant)) · {{ $restaurant->name }} @endif</title>
+    <title>TIPTAP · {{ config('salon.portal_order') }} @if(isset($restaurant)) · {{ $restaurant->name }} @endif</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,7 +43,7 @@
                     <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center shadow-lg shadow-violet-500/20">
                         <img src="{{ asset('logo.jpeg') }}" alt="TIPTAP Logo" class="w-full h-full object-cover">
                     </div>
-                    <span class="text-lg sm:text-xl font-black text-white tracking-tight">TIPTAP <span class="gradient-text">ORDER</span></span>
+                    <span class="text-lg sm:text-xl font-black text-white tracking-tight">TIPTAP <span class="gradient-text">{{ config('salon.portal_order') }}</span></span>
                 </div>
                 @if(isset($restaurant))
                     <span class="hidden md:inline text-white/50 text-sm font-medium truncate max-w-[180px] lg:max-w-xs" title="{{ $restaurant->name }}">· {{ $restaurant->name }}</span>

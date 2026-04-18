@@ -1,19 +1,19 @@
-<x-guest-layout title="TIPTAP | Waiter Registration">
+<x-guest-layout title="TIPTAP | {{ config('salon.staff') }} registration">
     <div class="relative">
         {{-- Header --}}
         <div class="text-center mb-8">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider border border-cyan-500/30 mb-4">
                 <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></span>
-                For Waiters
+                For {{ config('salon.staff_plural') }}
             </span>
             <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-500/30 to-cyan-500/30 flex items-center justify-center border border-white/10 shadow-lg shadow-violet-500/20">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Sajili kama Waiter</h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Sajili kama {{ config('salon.staff') }}</h1>
             <p class="text-white/50 text-sm mt-2 max-w-xs mx-auto leading-relaxed">
-                Pata nambari yako ya pekee. Manager atakuunga na restaurant — muda mrefu au show-time.
+                Pata nambari yako ya pekee. Manager atakuunga na {{ strtolower(config('salon.entity')) }} — muda mrefu au show-time.
             </p>
         </div>
 
@@ -119,7 +119,7 @@
                 </a>
                 <span class="hidden sm:inline w-px h-4 bg-white/10"></span>
                 <a href="{{ route('restaurant.register') }}" class="text-white/50 text-sm hover:text-white/80 transition-colors">
-                    Sajili Restaurant (Manager)
+                    Sajili {{ config('salon.entity') }} (Manager)
                 </a>
             </div>
         </form>

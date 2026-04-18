@@ -1,14 +1,14 @@
 <x-manager-layout>
-    <x-slot name="header">Historia ya Waiters (Link / Unlink)</x-slot>
+    <x-slot name="header">Historia ya {{ config('salon.staff_plural') }} (Link / Unlink)</x-slot>
 
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-white tracking-tight">Historia ya Waiters</h2>
-            <p class="text-sm font-medium text-white/40 uppercase tracking-wider mt-0.5">Orodha ya waiters uliowaling na kuwatolea kwenye restaurant yako</p>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Historia ya {{ config('salon.staff_plural') }}</h2>
+            <p class="text-sm font-medium text-white/40 uppercase tracking-wider mt-0.5">Orodha ya {{ strtolower(config('salon.staff_plural')) }} uliowaling na kuwatolea kwenye {{ strtolower(config('salon.entity')) }} yako</p>
         </div>
         <a href="{{ route('manager.waiters.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 glass rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all text-sm font-semibold">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-            Rudi kwa Waiters
+            Rudi kwa {{ config('salon.staff_plural') }}
         </a>
     </div>
 
@@ -54,7 +54,7 @@
                 </svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">Hakuna matokeo</h3>
-            <p class="text-white/40">Badilisha filter au rudi kwenye waiters kwa historia kamili.</p>
+            <p class="text-white/40">Badilisha filter au rudi kwenye {{ strtolower(config('salon.staff_plural')) }} kwa historia kamili.</p>
             <a href="{{ route('manager.waiters.history') }}" class="inline-block mt-4 px-5 py-2.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">Ondoa filter</a>
         </div>
     @else
@@ -63,7 +63,7 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-white/10">
-                            <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/50">Waiter</th>
+                            <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/50">{{ config('salon.staff') }}</th>
                             <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/50">Nambari</th>
                             <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/50">Aina</th>
                             <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/50">Alilingwa</th>

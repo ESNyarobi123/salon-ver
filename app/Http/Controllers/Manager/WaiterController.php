@@ -99,7 +99,7 @@ class WaiterController extends Controller
             ->first();
 
         if (! $waiter) {
-            return response()->json(['success' => false, 'message' => 'Waiter hajapatikana. Angalia nambari ya pekee (TIPTAP-W-xxxxx).']);
+            return response()->json(['success' => false, 'message' => config('salon.stylist_lookup_failed_sw')]);
         }
 
         $workHistory = WaiterRestaurantAssignment::query()
@@ -141,16 +141,16 @@ class WaiterController extends Controller
     public function link(LinkWaiterRequest $request, User $waiter): RedirectResponse
     {
         if (! $waiter->hasRole('waiter')) {
-            return back()->with('error', 'User si waiter.');
+            return back()->with('error', 'Mtumiaji huyu si stylist.');
         }
 
         if ($waiter->restaurant_id !== null) {
-            return back()->with('error', 'Waiter tayari ameunganishwa na restaurant nyingine. Manager wa restaurant ile anafaa kum-unlink kwanza.');
+            return back()->with('error', 'Stylist tayari ameunganishwa na saloon nyingine. Manager wa saloon ile anafaa kum-unlink kwanza.');
         }
 
         $restaurant = Auth::user()->restaurant;
         if (! $restaurant || ! $restaurant->tag_prefix) {
-            return back()->with('error', 'Restaurant yako haijaweka tag prefix. Wasiliana na msaada.');
+            return back()->with('error', 'Saloon yako haijaweka tag prefix. Wasiliana na msaada.');
         }
 
         $waiter->restaurant_id = $restaurant->id;
@@ -169,7 +169,7 @@ class WaiterController extends Controller
             'linked_until' => $waiter->linked_until,
         ]);
 
-        $msg = "Waiter {$waiter->name} ameunganishwa na restaurant yako. Code: {$waiter->waiter_code}";
+        $msg = "Stylist {$waiter->name} ameunganishwa na saloon yako. Code: {$waiter->waiter_code}";
         if ($waiter->employment_type === 'temporary' && $waiter->linked_until) {
             $msg .= ' (muda mpaka '.$waiter->linked_until->format('d/m/Y').')';
         }
@@ -219,7 +219,7 @@ class WaiterController extends Controller
             ->whereNull('revoked_at')
             ->update(['revoked_at' => now()]);
 
-        return back()->with('success', "{$name} ameondolewa kwenye restaurant yako. History yake (orders, ratings) imebaki. Anaweza kuungwa na restaurant nyingine.");
+        return back()->with('success', "{$name} ameondolewa kwenye saloon yako. History yake (bookings, ratings) imebaki. Anaweza kuungwa na saloon nyingine.");
     }
 
     /**
@@ -256,7 +256,7 @@ class WaiterController extends Controller
         }
 
         return back()
-            ->with('success', 'Order Portal password imetengenezwa. Mwambie waiter nambari yake ya pekee na password hii.')
+            ->with('success', 'Nenosiri la service desk limetengenezwa. Mwambie stylist nambari yake ya pekee na nenosiri hili.')
             ->with('order_portal_password_generated', $plainPassword)
             ->with('order_portal_waiter_name', $waiter->name)
             ->with('order_portal_waiter_number', $waiter->global_waiter_number);

@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TIPTAP | The Future of  </title>
-    <meta name="description" content="The smartest QR & WhatsApp ordering system for modern restaurants.">
+    <title>TIPTAP | Salon &amp; beauty operations</title>
+    <meta name="description" content="QR, WhatsApp, and mobile money for salons—services, retail, bookings, and your team in one platform.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -200,11 +200,11 @@
                                 <div class="absolute right-0 top-full mt-2 w-56 py-2 bg-[#0f172a] border border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover/getstarted:opacity-100 group-hover/getstarted:visible transition-all duration-200 z-50" id="nav-getstarted-dropdown" onclick="event.stopPropagation()">
                                     <a href="{{ route('restaurant.register') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
                                         <i data-lucide="store" class="w-4 h-4 text-primary shrink-0"></i>
-                                        Register Restaurant / Manager
+                                        Register Saloon / Manager
                                     </a>
                                     <a href="{{ route('waiter.register') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
                                         <i data-lucide="user" class="w-4 h-4 text-accent shrink-0"></i>
-                                        Register as Waiter
+                                        Register as Stylist
                                     </a>
                                 </div>
                             </div>
@@ -240,11 +240,11 @@
             <p class="text-xs font-bold text-white/50 uppercase tracking-wider pt-2">Get Started</p>
             <a href="{{ route('restaurant.register') }}" class="flex items-center gap-3 py-3 px-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10">
                 <i data-lucide="store" class="w-5 h-5 text-primary"></i>
-                Register Restaurant / Manager
+                Register Saloon / Manager
             </a>
             <a href="{{ route('waiter.register') }}" class="flex items-center gap-3 py-3 px-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10">
                 <i data-lucide="user" class="w-5 h-5 text-accent"></i>
-                Register as Waiter
+                Register as Stylist
             </a>
         </div>
     </div>
@@ -255,16 +255,16 @@
             <div data-aos="fade-up" data-aos-duration="1000">
                 <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/5 text-primary text-xs font-bold uppercase tracking-widest mb-8 border border-white/10 backdrop-blur-sm">
                     <span class="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-                    The Future of Dining is Here
+                    Salon operations, elevated
                 </div>
                 
                 <h1 class="text-5xl lg:text-8xl font-display font-bold text-white tracking-tight mb-8 leading-[1.1]">
-                    Dining <span class="text-gradient-primary">Reimagined</span><br>
-                    for the Digital Age.
+                    Beauty &amp; bookings <span class="text-gradient-primary">reimagined</span><br>
+                    for the digital age.
                 </h1>
                 
                 <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                    Empower your restaurant with an intelligent operating system. Seamless QR ordering, WhatsApp integration, and instant payments—all in one platform.
+                    Empower your salon with one intelligent system—QR &amp; WhatsApp bookings, service &amp; retail catalog, team tools, and instant payments.
                 </p>
                 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -276,11 +276,11 @@
                         <div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 py-2 bg-[#0f172a] border border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover/herogetstarted:opacity-100 group-hover/herogetstarted:visible transition-all duration-200 z-50" id="hero-getstarted-dropdown" onclick="event.stopPropagation()">
                             <a href="{{ route('restaurant.register') }}" class="flex items-center gap-3 px-4 py-3.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors rounded-t-xl">
                                 <i data-lucide="store" class="w-5 h-5 text-primary shrink-0"></i>
-                                <span><strong class="text-white">Restaurant / Manager</strong><br><span class="text-xs">Start free trial</span></span>
+                                <span><strong class="text-white">Saloon / Manager</strong><br><span class="text-xs">Start free trial</span></span>
                             </a>
                             <a href="{{ route('waiter.register') }}" class="flex items-center gap-3 px-4 py-3.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors rounded-b-xl">
                                 <i data-lucide="user" class="w-5 h-5 text-accent shrink-0"></i>
-                                <span><strong class="text-white">Waiter</strong><br><span class="text-xs">Sajili na upate code yako</span></span>
+                                <span><strong class="text-white">Stylist</strong><br><span class="text-xs">Sajili na upate code yako</span></span>
                             </a>
                         </div>
                     </div>
@@ -330,9 +330,9 @@
                         <div class="w-14 h-14 bg-primary/20 rounded-2xl flex items-center justify-center mb-8">
                             <i data-lucide="message-circle" class="w-7 h-7 text-primary"></i>
                         </div>
-                        <h4 class="text-2xl font-bold text-white mb-4">WhatsApp Native Ordering</h4>
+                        <h4 class="text-2xl font-bold text-white mb-4">WhatsApp-native bookings</h4>
                         <p class="text-slate-400 leading-relaxed max-w-md">
-                            Turn conversations into conversions. Customers can browse your menu, customize orders, and checkout directly within WhatsApp. No app downloads required.
+                            Clients browse services &amp; retail, book, tip, and pay from WhatsApp—no app install required.
                         </p>
                     </div>
                     <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-1/2 opacity-50 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-700">
@@ -365,7 +365,7 @@
                     </div>
                     <h4 class="text-2xl font-bold text-white mb-4">Real-time Analytics</h4>
                     <p class="text-slate-400 leading-relaxed">
-                        Track sales, inventory, and staff performance in real-time from any device.
+                        Track bookings, retail, and team performance in real time from any device.
                     </p>
                 </div>
 
@@ -374,26 +374,26 @@
                     <div class="flex flex-col md:flex-row items-center gap-12">
                         <div class="flex-1">
                             <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center mb-8">
-                                <i data-lucide="chef-hat" class="w-7 h-7 text-pink-500"></i>
+                                <i data-lucide="layout-dashboard" class="w-7 h-7 text-pink-500"></i>
                             </div>
-                            <h4 class="text-2xl font-bold text-white mb-4">Kitchen Display System (KDS)</h4>
+                            <h4 class="text-2xl font-bold text-white mb-4">Floor display for your team</h4>
                             <p class="text-slate-400 leading-relaxed">
-                                Ditch the paper tickets. Orders appear instantly on a digital screen in the kitchen, color-coded by wait time.
+                                Replace paper tickets. Bookings show live on a big screen for stylists &amp; reception—priorities clear at a glance.
                             </p>
                         </div>
                         <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 w-full">
                             <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
-                                <span class="text-xs font-bold text-slate-400">ORDER #1024</span>
+                                <span class="text-xs font-bold text-slate-400">BOOKING #1024</span>
                                 <span class="text-xs font-bold text-green-400">JUST NOW</span>
                             </div>
                             <div class="space-y-2">
                                 <div class="flex justify-between text-sm text-white">
-                                    <span>2x Grilled Chicken</span>
-                                    <span class="text-slate-500">Main</span>
+                                    <span>1x Silk press</span>
+                                    <span class="text-slate-500">Hair</span>
                                 </div>
                                 <div class="flex justify-between text-sm text-white">
-                                    <span>1x Chips Masala</span>
-                                    <span class="text-slate-500">Side</span>
+                                    <span>1x Gel manicure</span>
+                                    <span class="text-slate-500">Nails</span>
                                 </div>
                             </div>
                         </div>
@@ -408,7 +408,7 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="text-center mb-24">
                 <h2 class="text-primary font-bold tracking-widest uppercase text-sm mb-4">Workflow</h2>
-                <h3 class="text-4xl md:text-5xl font-display font-bold text-white tracking-tight">From Scan to Savor.</h3>
+                <h3 class="text-4xl md:text-5xl font-display font-bold text-white tracking-tight">From scan to service.</h3>
             </div>
 
             <div class="relative">
@@ -421,23 +421,23 @@
                             <i data-lucide="qr-code" class="w-10 h-10 text-white group-hover:text-primary transition-colors"></i>
                         </div>
                         <h4 class="text-xl font-bold text-white mb-3">1. Scan QR</h4>
-                        <p class="text-slate-400 text-sm px-8">Customer scans the code on the table. No app download needed.</p>
+                        <p class="text-slate-400 text-sm px-8">Client scans the QR on the seat or station. No app download needed.</p>
                     </div>
 
                     <div class="relative z-10 text-center group">
                         <div class="w-24 h-24 mx-auto bg-[#0B0F1A] border border-white/10 rounded-full flex items-center justify-center mb-8 group-hover:border-primary transition-colors shadow-xl">
                             <i data-lucide="smartphone" class="w-10 h-10 text-white group-hover:text-primary transition-colors"></i>
                         </div>
-                        <h4 class="text-xl font-bold text-white mb-3">2. Order & Pay</h4>
-                        <p class="text-slate-400 text-sm px-8">Menu opens in WhatsApp. They order and pay via mobile money.</p>
+                        <h4 class="text-xl font-bold text-white mb-3">2. Book &amp; pay</h4>
+                        <p class="text-slate-400 text-sm px-8">Service list opens in WhatsApp. They book, add retail, and pay via mobile money.</p>
                     </div>
 
                     <div class="relative z-10 text-center group">
                         <div class="w-24 h-24 mx-auto bg-[#0B0F1A] border border-white/10 rounded-full flex items-center justify-center mb-8 group-hover:border-primary transition-colors shadow-xl">
                             <i data-lucide="utensils" class="w-10 h-10 text-white group-hover:text-primary transition-colors"></i>
                         </div>
-                        <h4 class="text-xl font-bold text-white mb-3">3. Enjoy</h4>
-                        <p class="text-slate-400 text-sm px-8">Order is sent to kitchen. Food is served. No waiting.</p>
+                        <h4 class="text-xl font-bold text-white mb-3">3. Glow</h4>
+                        <p class="text-slate-400 text-sm px-8">Your floor display updates instantly. Stylists deliver the service—smooth handoffs.</p>
                     </div>
                 </div>
             </div>
@@ -458,7 +458,7 @@
                     <h4 class="text-lg font-bold text-white mb-2">Starter</h4>
                     <div class="text-3xl font-bold text-white mb-6">Free<span class="text-sm text-slate-500 font-normal"> / 14 days</span></div>
                     <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-center gap-3 text-sm text-slate-300"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Up to 10 Tables</li>
+                        <li class="flex items-center gap-3 text-sm text-slate-300"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Up to 10 seats</li>
                         <li class="flex items-center gap-3 text-sm text-slate-300"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Basic Analytics</li>
                         <li class="flex items-center gap-3 text-sm text-slate-300"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Email Support</li>
                     </ul>
@@ -471,7 +471,7 @@
                     <h4 class="text-lg font-bold text-white mb-2">Business</h4>
                     <div class="text-3xl font-bold text-white mb-6">50k<span class="text-sm text-slate-500 font-normal"> TZS / mo</span></div>
                     <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-center gap-3 text-sm text-white"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Unlimited Tables</li>
+                        <li class="flex items-center gap-3 text-sm text-white"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Unlimited seats</li>
                         <li class="flex items-center gap-3 text-sm text-white"><i data-lucide="check" class="w-4 h-4 text-primary"></i> WhatsApp Bot</li>
                         <li class="flex items-center gap-3 text-sm text-white"><i data-lucide="check" class="w-4 h-4 text-primary"></i> USSD Payments</li>
                         <li class="flex items-center gap-3 text-sm text-white"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Priority Support</li>
@@ -501,7 +501,7 @@
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 <div class="relative z-10">
                     <h2 class="text-4xl md:text-6xl font-display font-bold text-white mb-8 tracking-tight">Ready to upgrade?</h2>
-                    <p class="text-white/80 text-xl mb-12 max-w-2xl mx-auto">Join the digital revolution. Transform your restaurant operations today.</p>
+                    <p class="text-white/80 text-xl mb-12 max-w-2xl mx-auto">Join the digital revolution. Transform your salon operations today.</p>
                     <a href="{{ route('restaurant.register') }}" class="inline-block px-12 py-5 bg-white text-primary rounded-full font-bold text-xl shadow-2xl hover:scale-105 transition-transform">
                         Create Free Account
                     </a>
@@ -522,7 +522,7 @@
                         <span class="text-xl font-display font-bold text-white">TIPTAP</span>
                     </a>
                     <p class="text-slate-500 text-sm max-w-xs">
-                        The operating system for modern dining. Built with ❤️ in Tanzania.
+                        The operating system for modern salons. Built with ❤️ in Tanzania.
                     </p>
                 </div>
                 <div>

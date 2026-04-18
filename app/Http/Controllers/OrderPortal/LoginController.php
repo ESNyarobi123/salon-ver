@@ -52,11 +52,11 @@ class LoginController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Huna ufikiaji wa Order Portal. Wasiliana na manager wako.',
+                    'message' => 'Huna ufikiaji wa service desk. Wasiliana na manager wako.',
                 ], 403);
             }
 
-            return back()->with('error', 'Huna ufikiaji wa Order Portal. Wasiliana na manager wako.');
+            return back()->with('error', 'Huna ufikiaji wa service desk. Wasiliana na manager wako.');
         }
 
         session([

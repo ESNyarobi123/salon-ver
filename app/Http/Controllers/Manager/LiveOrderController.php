@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class LiveOrderController extends Controller
 {
@@ -22,7 +24,7 @@ class LiveOrderController extends Controller
 
         $preparingOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
-            ->where('status', 'preparing')
+            ->whereIn('status', ['preparing', 'ready'])
             ->latest()
             ->get();
 
@@ -72,20 +74,26 @@ class LiveOrderController extends Controller
             ];
         }
 
-        $order = Order::create([
-            'restaurant_id' => auth()->user()->restaurant_id,
-            'table_number' => $request->table_number,
-            'customer_phone' => $request->customer_phone,
-            'customer_name' => $request->customer_name,
-            'total_amount' => $totalAmount,
-            'status' => 'pending',
-        ]);
+        try {
+            DB::transaction(function () use ($request, $orderItems, $totalAmount) {
+                $order = Order::create([
+                    'restaurant_id' => auth()->user()->restaurant_id,
+                    'table_number' => $request->table_number,
+                    'customer_phone' => $request->customer_phone,
+                    'customer_name' => $request->customer_name,
+                    'total_amount' => $totalAmount,
+                    'status' => 'pending',
+                ]);
 
-        foreach ($orderItems as $item) {
-            $order->items()->create($item);
+                foreach ($orderItems as $item) {
+                    $order->items()->create($item);
+                }
+            });
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
-        return redirect()->back()->with('success', 'Order created successfully');
+        return redirect()->back()->with('success', 'Booking created successfully');
     }
 
     public function update(Request $request, $id)
@@ -93,7 +101,7 @@ class LiveOrderController extends Controller
         $order = Order::findOrFail($id);
 
         if ($request->has('status')) {
-            $request->validate(['status' => 'in:pending,preparing,served,paid']);
+            $request->validate(['status' => 'in:pending,preparing,ready,served,paid']);
             $order->update(['status' => $request->status]);
         }
 
@@ -105,7 +113,7 @@ class LiveOrderController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Order updated successfully');
+        return redirect()->back()->with('success', 'Booking updated successfully');
     }
 
     public function destroy($id)
@@ -113,6 +121,6 @@ class LiveOrderController extends Controller
         $order = Order::findOrFail($id);
         $order->delete();
 
-        return redirect()->back()->with('success', 'Order deleted successfully');
+        return redirect()->back()->with('success', 'Booking deleted successfully');
     }
 }

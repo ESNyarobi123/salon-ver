@@ -236,7 +236,7 @@
                     </div>
                     <div class="sidebar-logo-text min-w-0">
                         <span class="text-xl font-black text-white tracking-tight block leading-none hidden">TIP<span class="gradient-text">TAP</span></span>
-                        <span class="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em]">Manager Portal</span>
+                        <span class="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em]">{{ config('salon.manager_portal_subtitle') }}</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
@@ -255,7 +255,7 @@
             <!-- Navigation Links -->
             <nav class="flex-1 py-4 custom-scrollbar overflow-y-auto overflow-x-hidden">
                 <div class="mb-3 px-5 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Main Menu</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.manager_sidebar_section_main') }}</p>
                 </div>
 
                 <a href="{{ route('manager.dashboard') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.dashboard') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -264,7 +264,7 @@
                             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Dashboard</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_dashboard') }}</span>
                 </a>
 
                 <a href="{{ route('manager.orders.live') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.orders.live') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -273,7 +273,7 @@
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Live Orders</span>
+                    <span class="font-medium text-xs">{{ config('salon.live_bookings') }}</span>
                 </a>
 
                 <a href="{{ route('manager.orders.history') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.orders.history') || request()->routeIs('manager.orders.show') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -282,7 +282,7 @@
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Order History</span>
+                    <span class="font-medium text-xs">{{ config('salon.booking_history') }}</span>
                 </a>
 
                 <a href="{{ route('manager.menu.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.menu.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -291,7 +291,7 @@
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Menu</span>
+                    <span class="font-medium text-xs">{{ config('salon.services') }}</span>
                 </a>
 
                 <a href="{{ route('manager.menu-image.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.menu-image.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -300,7 +300,19 @@
                             <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Menu Image</span>
+                    <span class="font-medium text-xs">{{ config('salon.service_menu_image') }}</span>
+                </a>
+
+                <a href="{{ route('manager.stock.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.stock.index', 'manager.stock.update') ? 'sidebar-link-active' : 'text-white/55' }}">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-lime-500/20 to-green-500/20 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ request()->routeIs('manager.stock.index', 'manager.stock.update') ? 'text-lime-400' : 'text-white/50' }}">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-xs flex-1 min-w-0">{{ config('salon.manager_nav_stock') }}</span>
+                    @if(($managerLowStockCount ?? 0) > 0)
+                        <span class="shrink-0 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-amber-500/90 text-[10px] font-bold text-surface-900">{{ $managerLowStockCount > 99 ? '99+' : $managerLowStockCount }}</span>
+                    @endif
                 </a>
 
                 <a href="{{ route('manager.waiters.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.waiters.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -309,7 +321,16 @@
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Waiters & Staff</span>
+                    <span class="font-medium text-xs">{{ config('salon.staff_plural') }}{!! config('salon.manager_nav_staff_team_suffix') !!}</span>
+                </a>
+
+                <a href="{{ route('manager.waiters.history') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.waiters.history') ? 'sidebar-link-active' : 'text-white/55' }}">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ request()->routeIs('manager.waiters.history') ? 'text-indigo-400' : 'text-white/50' }}">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_staff_history') }}</span>
                 </a>
 
                 <a href="{{ route('manager.tables.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.tables.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -318,11 +339,11 @@
                             <rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Tables & QR Codes</span>
+                    <span class="font-medium text-xs">{{ config('salon.seat_plural') }}{!! config('salon.manager_nav_seat_qr_suffix') !!}</span>
                 </a>
 
                 <div class="mt-5 mb-3 px-5 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Finance</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.manager_sidebar_section_finance') }}</p>
                 </div>
 
                 <a href="{{ route('manager.payroll.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.payroll.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -331,7 +352,7 @@
                             <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Payroll</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_payroll') }}</span>
                 </a>
 
                 <a href="{{ route('manager.payroll.history') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.payroll.history') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -340,7 +361,7 @@
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Payroll History</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_payroll_history') }}</span>
                 </a>
 
                 <a href="{{ route('manager.payments.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.payments.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -349,11 +370,11 @@
                             <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Payments</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_payments') }}</span>
                 </a>
 
                 <div class="mt-5 mb-3 px-5 sidebar-label">
-                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">Other</p>
+                    <p class="text-[9px] font-bold text-white/25 uppercase tracking-[0.25em]">{{ config('salon.manager_sidebar_section_insights') }}</p>
                 </div>
 
                 <a href="{{ route('manager.feedback.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.feedback.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -362,7 +383,16 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Customer Feedback</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_customer_feedback') }}</span>
+                </a>
+
+                <a href="{{ route('manager.reports.performance') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.reports.performance') ? 'sidebar-link-active' : 'text-white/55' }}">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ request()->routeIs('manager.reports.performance') ? 'text-orange-400' : 'text-white/50' }}">
+                            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_reports') }}</span>
                 </a>
 
                 <a href="{{ route('manager.api.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.api.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -371,7 +401,7 @@
                             <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">API Settings</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_api') }}</span>
                 </a>
 
                 <a href="{{ route('manager.help.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.help.index') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -380,7 +410,7 @@
                             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Help & Docs</span>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_help') }}</span>
                 </a>
             </nav>
 
@@ -392,7 +422,7 @@
                     </div>
                     <div class="flex-1 min-w-0 sidebar-user-text">
                         <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-[10px] font-medium text-white/40 truncate">Manager Account</p>
+                        <p class="text-[10px] font-medium text-white/40 truncate">{{ config('salon.manager_account_role') }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -432,15 +462,15 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="sidebar-toggle-top-icon"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
                         </button>
                         <div>
-                            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-[0.15em] mb-1">Manager Portal</p>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">{{ $header ?? 'Dashboard' }}</h1>
+                            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-[0.15em] mb-1">{{ config('salon.manager_portal_subtitle') }}</p>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">{{ $header ?? config('salon.manager_nav_dashboard') }}</h1>
                         </div>
                     </div>
                     
                     <div class="flex items-center gap-5">
                         <div class="glass px-4 py-2.5 rounded-xl flex items-center gap-3">
                             <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                            <span class="text-[11px] font-semibold text-white/80 uppercase tracking-wider">System Live</span>
+                            <span class="text-[11px] font-semibold text-white/80 uppercase tracking-wider">{{ config('salon.manager_system_live_badge') }}</span>
                         </div>
                     </div>
                 </div>

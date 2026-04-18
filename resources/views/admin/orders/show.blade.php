@@ -1,16 +1,16 @@
 <x-admin-layout>
     <x-slot name="header">
-        Order Details
+        Booking details
     </x-slot>
 
     <div class="max-w-5xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Order Info -->
+            <!-- Booking info -->
             <div class="lg:col-span-2 space-y-8">
                 <div class="glass-card rounded-2xl p-8">
                     <div class="flex justify-between items-center mb-8">
                         <div>
-                            <h2 class="text-3xl font-black text-white tracking-tight">Order #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</h2>
+                            <h2 class="text-3xl font-black text-white tracking-tight">Booking #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</h2>
                             <p class="text-white/40 font-bold uppercase tracking-widest text-[10px] mt-1">Placed on {{ $order->created_at->format('M d, Y • H:i') }}</p>
                         </div>
                         @php
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="space-y-6">
-                        <h3 class="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-4">Order Items</h3>
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-4">Services &amp; products</h3>
                         <div class="space-y-4">
                             @foreach($order->items as $item)
                             <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/10">
@@ -38,7 +38,7 @@
                                         {{ $item->quantity }}x
                                     </div>
                                     <div>
-                                        <p class="font-bold text-white">{{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom Order') }}</p>
+                                        <p class="font-bold text-white">{{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom item') }}</p>
                                         <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">Tsh {{ number_format($item->price, 0) }} per unit</p>
                                     </div>
                                 </div>
@@ -60,10 +60,10 @@
                     </div>
                 </div>
 
-                <!-- Restaurant & Waiter -->
+                <!-- Saloon & stylist -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="glass-card rounded-2xl p-6">
-                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Restaurant</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">{{ config('salon.entity') }}</p>
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-gradient-to-br from-violet-600 to-cyan-500 rounded-2xl flex items-center justify-center text-white font-black">
                                 {{ substr($order->restaurant->name, 0, 1) }}
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="glass-card rounded-2xl p-6">
-                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Assigned Waiter</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Assigned {{ config('salon.staff') }}</p>
                         @if($order->waiter)
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center font-black border border-orange-500/20">
@@ -84,11 +84,11 @@
                             </div>
                             <div>
                                 <p class="font-bold text-white">{{ $order->waiter->name }}</p>
-                                <p class="text-[10px] text-white/40 font-medium">Staff ID: #{{ $order->waiter->id }}</p>
+                                <p class="text-[10px] text-white/40 font-medium">{{ config('salon.admin_order_stylist_internal_id') }}{{ $order->waiter->id }}</p>
                             </div>
                         </div>
                         @else
-                        <p class="text-sm font-bold text-white/40 italic">No waiter assigned</p>
+                        <p class="text-sm font-bold text-white/40 italic">No {{ strtolower(config('salon.staff')) }} assigned</p>
                         @endif
                     </div>
                 </div>

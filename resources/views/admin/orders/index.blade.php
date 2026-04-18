@@ -1,12 +1,12 @@
 <x-admin-layout>
-    <x-slot name="header">Order Management</x-slot>
+    <x-slot name="header">Booking management</x-slot>
 
     <div class="glass-card rounded-2xl overflow-hidden border border-white/10">
         <div class="p-6 border-b border-white/5">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                    <h2 class="text-xl font-black text-white tracking-tight">All System Orders</h2>
-                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Monitor and manage orders across all restaurants</p>
+                    <h2 class="text-xl font-black text-white tracking-tight">All system bookings</h2>
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Monitor and manage bookings across all {{ config('salon.entity_plural_lower') }}</p>
                 </div>
                 <a href="{{ route('admin.orders.export', request()->query()) }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm border border-white/10 transition-all shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -34,9 +34,9 @@
                     </select>
                 </div>
                 <div class="min-w-[180px]">
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1 block">Restaurant</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1 block">{{ config('salon.entity') }}</label>
                     <select name="restaurant_id" class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white focus:ring-2 focus:ring-violet-500 [&>option]:bg-gray-900">
-                        <option value="">All restaurants</option>
+                        <option value="">All {{ config('salon.entity_plural_lower') }}</option>
                         @foreach($restaurants as $r)
                             <option value="{{ $r->id }}" {{ request('restaurant_id') == $r->id ? 'selected' : '' }}>{{ $r->name }}</option>
                         @endforeach
@@ -64,8 +64,8 @@
             <table class="w-full min-w-[700px]">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Order ID</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Restaurant</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Booking ID</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.entity') }}</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Amount</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Date</th>
@@ -101,7 +101,7 @@
                         <td class="px-6 py-5 text-right">
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="p-2 glass text-white/40 hover:bg-violet-600 hover:text-white rounded-xl transition-all" title="View"><i data-lucide="eye" class="w-4 h-4"></i></a>
-                                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Delete this order?')">
+                                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Delete this booking?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 glass text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -114,7 +114,7 @@
                         <td colspan="6" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center gap-3">
                                 <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/30"><i data-lucide="package" class="w-8 h-8"></i></div>
-                                <p class="text-white font-bold">No orders found</p>
+                                <p class="text-white font-bold">No bookings found</p>
                                 <p class="text-sm text-white/50">Try changing filters or date range.</p>
                                 <a href="{{ route('admin.orders.index') }}" class="text-violet-400 hover:text-violet-300 text-sm font-semibold">Clear filters</a>
                             </div>

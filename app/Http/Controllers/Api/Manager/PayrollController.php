@@ -189,7 +189,7 @@ class PayrollController extends Controller
 
         return response()->streamDownload(function () use ($payments): void {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Period', 'Waiter', 'ID', 'Basic', 'Allowances', 'PAYE', 'NSSF', 'Net Pay', 'Paid At']);
+            fputcsv($out, ['Period', config('salon.staff'), 'ID', 'Basic', 'Allowances', 'PAYE', 'NSSF', 'Net Pay', 'Paid At']);
             foreach ($payments as $p) {
                 fputcsv($out, [
                     $p->period_month,

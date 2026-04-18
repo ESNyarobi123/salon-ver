@@ -30,8 +30,8 @@ class AdminSentNotification extends Model
         return match ($this->target) {
             'all' => 'All Users',
             'managers' => 'All Managers',
-            'waiters' => 'All Waiters',
-            'specific_restaurant' => $this->restaurant?->name ?? 'One Restaurant',
+            'waiters' => 'All '.config('salon.staff_plural'),
+            'specific_restaurant' => $this->restaurant?->name ?? 'One '.config('salon.entity'),
             default => $this->target,
         };
     }

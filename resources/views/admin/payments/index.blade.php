@@ -44,8 +44,8 @@
                 <thead>
                     <tr class="bg-white/5">
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Transaction ID</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Order</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Restaurant</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Booking</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.entity') }}</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Amount</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Method</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>

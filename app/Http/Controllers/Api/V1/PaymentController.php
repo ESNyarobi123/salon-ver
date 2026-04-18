@@ -33,7 +33,7 @@ class PaymentController extends Controller
         if (! $restaurant || ! $restaurant->hasSelcomConfigured()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Payment gateway not configured for this restaurant',
+                'message' => 'Payment gateway not configured for this saloon',
             ], 400);
         }
 
@@ -45,7 +45,7 @@ class PaymentController extends Controller
             'name' => 'Customer',
             'phone' => $validated['phone_number'],
             'amount' => $order->total_amount,
-            'description' => 'Order #'.$order->id,
+            'description' => 'Booking #'.$order->id,
         ]);
 
         if (isset($result['status']) && $result['status'] === 'success') {

@@ -218,7 +218,7 @@
                             <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Restaurants</span>
+                    <span class="font-medium text-xs">{{ config('salon.entity_plural') }}</span>
                 </a>
 
                 <a href="{{ route('admin.users.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-1.5 mx-2 rounded-lg {{ request()->routeIs('admin.users.*') ? 'sidebar-link-active' : 'text-white/55' }}">
@@ -236,7 +236,7 @@
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Waiters</span>
+                    <span class="font-medium text-xs">{{ config('salon.staff_plural') }}</span>
                 </a>
 
                 <div class="mt-5 mb-3 px-4 sidebar-label">
@@ -249,7 +249,7 @@
                             <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                         </svg>
                     </div>
-                    <span class="font-medium text-xs">Orders</span>
+                    <span class="font-medium text-xs">{{ config('salon.booking_plural') }}</span>
                 </a>
 
                 <a href="{{ route('admin.payments.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2 px-3 py-1.5 mx-2 rounded-lg {{ request()->routeIs('admin.payments.*') ? 'sidebar-link-active' : 'text-white/55' }}">

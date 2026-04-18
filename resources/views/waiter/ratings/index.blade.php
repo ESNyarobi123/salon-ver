@@ -1,6 +1,6 @@
 <x-waiter-layout>
     <x-slot name="header">
-        Customer Feedback
+        {{ config('salon.customer') }} feedback
     </x-slot>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -24,7 +24,7 @@
                         <div class="w-10 h-10 glass rounded-xl flex items-center justify-center font-bold text-violet-400 text-sm">
                             #{{ $feedback->order->table_number ?? 'N/A' }}
                         </div>
-                        <p class="text-[11px] font-medium text-white/40 uppercase tracking-wider">Table Number</p>
+                        <p class="text-[11px] font-medium text-white/40 uppercase tracking-wider">{{ config('salon.seat') }} number</p>
                     </div>
                     <div class="w-8 h-8 bg-rose-500/20 rounded-lg flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

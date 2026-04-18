@@ -1,12 +1,12 @@
 <x-admin-layout>
-    <x-slot name="header">Restaurant Partners</x-slot>
+    <x-slot name="header">{{ config('salon.entity') }} partners</x-slot>
 
     <div class="glass-card rounded-2xl overflow-hidden border border-white/10">
         <div class="p-6 border-b border-white/5">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                    <h2 class="text-xl font-black text-white tracking-tight">All Restaurants</h2>
-                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Manage and monitor your restaurant network</p>
+                    <h2 class="text-xl font-black text-white tracking-tight">All {{ config('salon.entity_plural') }}</h2>
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Manage and monitor your salon network</p>
                 </div>
             </div>
 
@@ -36,7 +36,7 @@
             <table class="w-full min-w-[640px]">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Restaurant</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.entity') }}</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Location</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Staff</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
@@ -68,7 +68,7 @@
                                 </div>
                                 <div>
                                     <span class="text-[10px] font-black text-white block">{{ $restaurant->waiters_count ?? 0 }}</span>
-                                    <span class="text-[8px] font-bold text-white/40 uppercase tracking-widest">Waiters</span>
+                                    <span class="text-[8px] font-bold text-white/40 uppercase tracking-widest">{{ config('salon.staff_plural') }}</span>
                                 </div>
                             </div>
                         </td>
@@ -99,7 +99,7 @@
                         <td colspan="5" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center gap-3">
                                 <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/30"><i data-lucide="store" class="w-8 h-8"></i></div>
-                                <p class="text-white font-bold">No restaurants found</p>
+                                <p class="text-white font-bold">No {{ config('salon.entity_plural_lower') }} found</p>
                                 <p class="text-sm text-white/50">Try a different search or status filter.</p>
                                 <a href="{{ route('admin.restaurants.index') }}" class="text-violet-400 hover:text-violet-300 text-sm font-semibold">Clear filters</a>
                             </div>

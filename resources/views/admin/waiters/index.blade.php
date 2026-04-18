@@ -1,12 +1,12 @@
 <x-admin-layout>
-    <x-slot name="header">Waiters & Unique Codes</x-slot>
+    <x-slot name="header">{{ config('salon.staff_plural') }} &amp; unique codes</x-slot>
 
-    <p class="text-white/50 text-sm mb-6 max-w-2xl">Ona waiters wote kwenye mfumo, nambari zao za pekee (TIPTAP-W-xxxxx), na restaurant walizounganishwa. Tafuta kwa jina, barua pepe, au nambari ya pekee.</p>
+    <p class="text-white/50 text-sm mb-6 max-w-2xl">Ona {{ strtolower(config('salon.staff_plural')) }} wote kwenye mfumo, nambari zao za pekee (TIPTAP-W-xxxxx), na {{ strtolower(config('salon.entity_plural')) }} walizounganishwa. Tafuta kwa jina, barua pepe, au nambari ya pekee.</p>
 
     {{-- Search by unique code --}}
     <div class="glass-card rounded-2xl p-6 mb-6 border border-white/10">
         <h3 class="text-lg font-bold text-white mb-1">Tafuta kwa nambari ya pekee</h3>
-        <p class="text-sm text-white/50 mb-4">Ingiza nambari ya waiter (k.m. TIPTAP-W-00001) ili kuona maelezo yake.</p>
+        <p class="text-sm text-white/50 mb-4">Ingiza nambari ya {{ strtolower(config('salon.staff')) }} (k.m. TIPTAP-W-00001) ili kuona maelezo yake.</p>
         <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[200px]">
                 <label for="searchCode" class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Nambari ya pekee</label>
@@ -26,8 +26,8 @@
     <div class="glass-card rounded-2xl overflow-hidden border border-white/10">
         <div class="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
             <div>
-                <h2 class="text-xl font-black text-white tracking-tight">Orodha ya Waiters</h2>
-                <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Jina, barua pepe, unique code, restaurant</p>
+                <h2 class="text-xl font-black text-white tracking-tight">Orodha ya {{ config('salon.staff_plural') }}</h2>
+                <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Jina, barua pepe, unique code, {{ strtolower(config('salon.entity')) }}</p>
             </div>
             <form method="GET" action="{{ route('admin.waiters.index') }}" class="flex gap-3 w-full md:w-auto">
                 <div class="relative flex-1 md:w-64">
@@ -45,10 +45,10 @@
             <table class="w-full min-w-[720px]">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Waiter</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.staff') }}</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Unique Code</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Restaurant</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Waiter Code</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.entity') }}</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Code</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Orders</th>
                         <th class="px-6 py-4 text-right text-[10px] font-black text-white/40 uppercase tracking-widest">Actions</th>
@@ -144,7 +144,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (!data.success) {
-                        errorEl.textContent = data.message || 'Waiter hajapatikana.';
+                        errorEl.textContent = data.message || '{{ config('salon.staff') }} hajapatikana.';
                         errorEl.classList.remove('hidden');
                         return;
                     }
@@ -161,8 +161,8 @@
                                     </div>
                                 </div>
                                 <div class="text-sm text-white/70">
-                                    <p><strong class="text-white/80">Restaurant:</strong> ${w.current_restaurant || '—'}</p>
-                                    <p><strong class="text-white/80">Waiter code:</strong> ${w.waiter_code || '—'}</p>
+                                    <p><strong class="text-white/80">{{ config('salon.entity') }}:</strong> ${w.current_restaurant || '—'}</p>
+                                    <p><strong class="text-white/80">Code:</strong> ${w.waiter_code || '—'}</p>
                                     <p><strong class="text-white/80">Orders:</strong> ${w.orders_count ?? 0} · <strong class="text-white/80">Feedback:</strong> ${w.feedback_count ?? 0}</p>
                                     <p><strong class="text-white/80">Status:</strong> ${w.is_linked ? 'Linked' : 'Not linked'}</p>
                                 </div>

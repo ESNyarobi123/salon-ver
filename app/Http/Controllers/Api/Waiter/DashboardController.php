@@ -47,7 +47,7 @@ class DashboardController extends Controller
                     'total_amount' => $order->total_amount,
                     'created_at' => $order->created_at->toIso8601String(),
                     'items' => $order->items->map(fn ($item) => [
-                        'name' => $item->name ?? ($item->menuItem?->name ?? 'Custom Order'),
+                        'name' => $item->name ?? ($item->menuItem?->name ?? 'Custom item'),
                         'quantity' => $item->quantity,
                     ]),
                 ])
@@ -170,7 +170,7 @@ class DashboardController extends Controller
         if ($order->waiter_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'This order has already been claimed by another waiter.',
+                'message' => 'This booking has already been claimed by another stylist.',
             ], 422);
         }
 
@@ -183,7 +183,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Order #'.$order->id.' is now assigned to you!',
+            'message' => 'Booking #'.$order->id.' is now assigned to you!',
             'data' => [
                 'order_id' => $order->id,
                 'table_number' => $order->table_number,
@@ -201,7 +201,7 @@ class DashboardController extends Controller
         if ($customerRequest->waiter_id !== null && (int) $customerRequest->waiter_id !== (int) $waiter->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'This request is assigned to another waiter.',
+                'message' => 'This request is assigned to another stylist.',
             ], 403);
         }
 
@@ -233,7 +233,7 @@ class DashboardController extends Controller
                 'total_amount' => $order->total_amount,
                 'created_at' => $order->created_at->toIso8601String(),
                 'items' => $order->items->map(fn ($item) => [
-                    'name' => $item->name ?? ($item->menuItem?->name ?? 'Custom Order'),
+                    'name' => $item->name ?? ($item->menuItem?->name ?? 'Custom item'),
                     'quantity' => $item->quantity,
                     'price' => $item->price ?? $item->menuItem?->price,
                 ]),
@@ -320,7 +320,7 @@ class DashboardController extends Controller
             ->where('status', 'pending')
             ->where(fn ($q) => $q->whereNull('waiter_id')->orWhere('waiter_id', $waiter->id))
             ->latest()->get()->map(function ($req) {
-                $typeLabel = $req->type === 'request_bill' ? 'Request Bill' : 'Call Waiter';
+                $typeLabel = $req->type === 'request_bill' ? 'Request bill' : 'Call stylist';
 
                 return [
                     'id' => $req->id,
@@ -368,7 +368,7 @@ class DashboardController extends Controller
                 'status' => $payment->status,
                 'table_number' => $tableNumber,
                 'message' => $tableNumber
-                ? "Payment successful – from Table {$tableNumber}"
+                ? "Payment successful – from seat {$tableNumber}"
                 : 'Payment successful',
                 'created_at' => $payment->created_at->toIso8601String(),
             ];
@@ -437,7 +437,7 @@ class DashboardController extends Controller
         if ($tables->count() !== count($tableIds)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Some tables are not assigned to you.',
+                'message' => 'Some seats are not assigned to you.',
             ], 403);
         }
 
@@ -459,8 +459,8 @@ class DashboardController extends Controller
         return response()->json([
             'success' => true,
             'message' => $targetWaiterId
-                ? 'Tables handed over successfully.'
-                : 'Tables unassigned successfully.',
+                ? 'Seats handed over successfully.'
+                : 'Seats unassigned successfully.',
         ]);
     }
 
@@ -482,7 +482,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $isOnline ? 'You are now online. You will receive calls and orders.' : 'You are now offline. You will not receive new calls or orders.',
+            'message' => $isOnline ? 'You are now online. You will receive client calls and new bookings.' : 'You are now offline. You will not receive new client calls or bookings.',
             'data' => [
                 'is_online' => $waiter->is_online,
                 'last_online_at' => $waiter->last_online_at?->toIso8601String(),

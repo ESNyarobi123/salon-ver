@@ -74,7 +74,15 @@ class OrderController extends Controller
 
         return response()->streamDownload(function () use ($orders): void {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Order ID', 'Restaurant', 'Amount', 'Status', 'Customer', 'Phone', 'Date']);
+            fputcsv($out, [
+                config('salon.booking').' ID',
+                config('salon.entity'),
+                'Amount',
+                'Status',
+                config('salon.customer'),
+                'Phone',
+                'Date',
+            ]);
             foreach ($orders as $o) {
                 fputcsv($out, [
                     '#'.str_pad($o->id, 6, '0', STR_PAD_LEFT),
@@ -117,7 +125,7 @@ class OrderController extends Controller
 
         $order->update($validated);
 
-        return redirect()->route('admin.orders.index')->with('success', 'Order status updated successfully.');
+        return redirect()->route('admin.orders.index')->with('success', 'Booking status updated successfully.');
     }
 
     public function destroy(string $id)
@@ -125,6 +133,6 @@ class OrderController extends Controller
         $order = \App\Models\Order::findOrFail($id);
         $order->delete();
 
-        return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully.');
+        return redirect()->route('admin.orders.index')->with('success', 'Booking deleted successfully.');
     }
 }

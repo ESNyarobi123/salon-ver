@@ -5,7 +5,7 @@
         <div class="p-6 border-b border-white/5">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                    <h2 class="text-xl font-black text-white tracking-tight">Restaurant Withdrawals</h2>
+                    <h2 class="text-xl font-black text-white tracking-tight">{{ config('salon.entity') }} withdrawals</h2>
                     <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Review and process payout requests</p>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <table class="w-full min-w-[700px]">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Restaurant</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">{{ config('salon.entity') }}</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Amount</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Method</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black text-white/40 uppercase tracking-widest">Status</th>

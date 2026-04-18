@@ -1,6 +1,6 @@
 <x-manager-layout>
     <x-slot name="header">
-        Manager Dashboard
+        {{ config('salon.manager_dash_page_title') }}
     </x-slot>
 
     @if(session('info'))
@@ -8,6 +8,8 @@
             <p class="text-sm font-medium text-white/80">{{ session('info') }}</p>
         </div>
     @endif
+
+    @include('manager.partials.quick-links')
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -23,7 +25,7 @@
                     </div>
                     <span class="px-3 py-1.5 bg-violet-500/10 text-violet-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-violet-500/20">Today</span>
                 </div>
-                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Total Orders Today</p>
+                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Bookings today</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-total-orders">{{ number_format($totalOrdersToday) }}</h3>
             </div>
         </div>
@@ -62,7 +64,7 @@
             </div>
         </div>
 
-        <!-- Stat 4: Waiters -->
+        <!-- Stat 4: Stylists -->
         <div class="glass-card rounded-2xl p-6 card-hover relative overflow-hidden group">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
             <div class="relative z-10">
@@ -77,18 +79,18 @@
                         Online
                     </span>
                 </div>
-                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Waiters Online</p>
-                <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-waiters-online">{{ $waitersOnline }} Active</h3>
+                <p class="text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">{{ config('salon.staff_plural') }} online</p>
+                <h3 class="text-3xl font-bold text-white tracking-tight" id="stat-waiters-online">{{ $waitersOnline }} {{ config('salon.manager_staff_online_suffix') }}</h3>
             </div>
         </div>
     </div>
 
-    <!-- Smart Live Order Tracking -->
+    <!-- Smart live booking tracking -->
     <div class="mb-10">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-2xl font-bold text-white tracking-tight">Live Order Tracking</h3>
-                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Real-time kitchen & service status</p>
+                <h3 class="text-2xl font-bold text-white tracking-tight">Live {{ config('salon.booking_plural') }}</h3>
+                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Real-time {{ strtolower(config('salon.floor_display_short')) }} &amp; service status</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="window.location.reload()" class="glass px-4 py-2.5 rounded-xl font-semibold text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 text-sm">
@@ -120,7 +122,7 @@
                     @forelse($pendingOrders->take(3) as $order)
                         <div class="glass p-4 rounded-xl card-hover">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                                <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 <span class="text-[10px] font-medium text-white/40">{{ $order->created_at->diffForHumans() }}</span>
                             </div>
                             <div class="flex -space-x-2 mb-3">
@@ -174,12 +176,12 @@
                     @forelse($preparingOrders->take(3) as $order)
                         <div class="glass p-4 rounded-xl card-hover">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                                <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 <div class="flex items-center gap-1 text-amber-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                                     </svg>
-                                    <span class="text-[10px] font-bold">In Kitchen</span>
+                                    <span class="text-[10px] font-bold">In service</span>
                                 </div>
                             </div>
                             <div class="w-full bg-white/5 h-1.5 rounded-full mb-3 overflow-hidden">
@@ -197,7 +199,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/20 mx-auto mb-2">
                                 <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
                             </svg>
-                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider">Kitchen Empty</p>
+                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider">No active services</p>
                         </div>
                     @endforelse
                 </div>
@@ -216,7 +218,7 @@
                     @forelse($servedOrders->take(3) as $order)
                         <div class="glass p-4 rounded-xl card-hover">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                                <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 <span class="bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border border-emerald-500/20">Ready to Pay</span>
                             </div>
                             <div class="flex items-center gap-3 mb-3">
@@ -239,7 +241,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/20 mx-auto mb-2">
                                 <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>
                             </svg>
-                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider">No Served Orders</p>
+                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider">Nothing ready yet</p>
                         </div>
                     @endforelse
                 </div>
@@ -258,7 +260,7 @@
                     @forelse($paidOrders->take(3) as $order)
                         <div class="glass p-4 rounded-xl opacity-60">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                                <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                                 </svg>
@@ -280,7 +282,7 @@
 
     <!-- Recent Feedback & Messages -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Customer Feedback -->
+        <!-- {{ config('salon.customer') }} feedback -->
         <div class="glass-card p-6 rounded-2xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-white tracking-tight">Recent Feedback</h3>
@@ -323,7 +325,7 @@
                     document.getElementById('stat-total-orders').textContent = new Intl.NumberFormat().format(data.total_orders_today);
                     document.getElementById('stat-revenue-today').textContent = 'Tsh ' + new Intl.NumberFormat().format(data.revenue_today);
                     document.getElementById('stat-avg-rating').textContent = data.avg_rating + '/5.0';
-                    document.getElementById('stat-waiters-online').textContent = data.waiters_online + ' Active';
+                    document.getElementById('stat-waiters-online').textContent = data.waiters_online_label;
                 })
                 .catch(error => console.error('Error fetching stats:', error));
         }, 30000); // 30 seconds

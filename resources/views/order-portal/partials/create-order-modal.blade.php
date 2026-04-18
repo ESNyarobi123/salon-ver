@@ -1,32 +1,32 @@
 <div id="createOrderModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-6">
     <div class="bg-[#0f0a1e] w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 max-h-[92vh] sm:max-h-[90vh] flex flex-col pb-[env(safe-area-inset-bottom)]">
         <div class="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center shrink-0">
-            <h3 class="text-xl font-bold text-white tracking-tight">Create New Order</h3>
+            <h3 class="text-xl font-bold text-white tracking-tight">New booking</h3>
             <button type="button" onclick="closeCreateOrderModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">✕</button>
         </div>
         <form action="{{ route('order-portal.orders.store') }}" method="POST" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6 min-h-0">
             @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Table</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.seat') }}</label>
                     <select name="table_number" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500 [&>option]:text-black">
-                        <option value="">Select Table</option>
+                        <option value="">Select {{ config('salon.seat') }}</option>
                         @foreach($tables as $table)
                             <option value="{{ $table->name }}">{{ $table->name }} ({{ $table->capacity }} pax)</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Name (Optional)</label>
-                    <input type="text" name="customer_name" placeholder="Guest Name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} name (optional)</label>
+                    <input type="text" name="customer_name" placeholder="{{ config('salon.customer') }} name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500">
                 </div>
             </div>
             <div>
-                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Phone (Optional)</label>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} phone (optional)</label>
                 <input type="text" name="customer_phone" placeholder="07XXXXXXXX" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500">
             </div>
             <div>
-                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Menu Items</label>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.services') }} &amp; products</label>
                 <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                     @foreach($menuItems as $item)
                         <div class="flex items-center justify-between glass p-3 rounded-xl">
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="pt-4 border-t border-white/10">
-                <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg transition-all">Create Order</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg transition-all">Create booking</button>
             </div>
         </form>
     </div>

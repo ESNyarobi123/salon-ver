@@ -3,7 +3,7 @@
 
     <div class="mb-8">
         <h2 class="text-3xl font-bold text-white tracking-tight">User Guide</h2>
-        <p class="text-white/50 font-medium mt-1">How to use the Payroll system and confirm waiter payments.</p>
+        <p class="text-white/50 font-medium mt-1">How to use Payroll and confirm {{ strtolower(config('salon.staff')) }} payments.</p>
     </div>
 
     <div class="glass-card rounded-2xl p-6 border border-white/10 space-y-6">
@@ -12,9 +12,9 @@
             <ol class="list-decimal list-inside space-y-2 text-white/80 text-sm">
                 <li>Go to the <strong class="text-white">Payroll</strong> menu in the sidebar (under Finance).</li>
                 <li>Select the <strong class="text-white">month</strong> you want to process (dropdown at the top right).</li>
-                <li>For each waiter, fill in the amounts: <strong class="text-white">Basic Salary</strong>, <strong class="text-white">Allowances</strong>, <strong class="text-white">PAYE</strong>, <strong class="text-white">NSSF</strong>.</li>
-                <li>Click <strong class="text-white">Confirm Payment</strong> after paying the waiter (cash).</li>
-                <li>The waiter will receive a notification on their dashboard and can view and download their salary slip for that month.</li>
+                <li>For each {{ strtolower(config('salon.staff')) }}, fill in the amounts: <strong class="text-white">Basic Salary</strong>, <strong class="text-white">Allowances</strong>, <strong class="text-white">PAYE</strong>, <strong class="text-white">NSSF</strong>.</li>
+                <li>Click <strong class="text-white">Confirm Payment</strong> after paying the {{ strtolower(config('salon.staff')) }} (cash).</li>
+                <li>The {{ strtolower(config('salon.staff')) }} will receive a notification on their dashboard and can view and download their salary slip for that month.</li>
             </ol>
         </section>
         <section>

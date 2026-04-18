@@ -205,7 +205,7 @@
             <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;">
                 <div>
                     <h1 style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin:0 0 4px;">Payroll</h1>
-                    <p style="color:rgba(255,255,255,.42);font-size:14px;margin:0;line-height:1.6;">Click waiter → fill amounts → confirm. Simple.</p>
+                    <p style="color:rgba(255,255,255,.42);font-size:14px;margin:0;line-height:1.6;">Click {{ strtolower(config('salon.staff')) }} → fill amounts → confirm. Simple.</p>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;">
                     <form method="GET" action="{{ route('manager.payroll.index') }}" style="display:flex;align-items:center;gap:8px;">
@@ -232,7 +232,7 @@
                 <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                     <div class="stat-chip chip-n">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        {{ $waiters->count() }} waiters
+                        {{ $waiters->count() }} {{ strtolower(config('salon.staff_plural')) }}
                     </div>
                     <div class="stat-chip chip-p">
                         <span style="width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px rgba(16,185,129,.7);"></span>
@@ -257,10 +257,10 @@
                 <div style="width:68px;height:68px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:rgba(255,255,255,.25)"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
-                <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff;margin:0 0 7px;">No linked waiters</h3>
-                <p style="color:rgba(255,255,255,.38);font-size:14px;max-width:300px;margin:0 auto 20px;line-height:1.6;">Link waiters in Waiters &amp; Staff first.</p>
+                <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff;margin:0 0 7px;">No linked {{ strtolower(config('salon.staff_plural')) }}</h3>
+                <p style="color:rgba(255,255,255,.38);font-size:14px;max-width:300px;margin:0 auto 20px;line-height:1.6;">Link {{ strtolower(config('salon.staff_plural')) }} under {{ config('salon.staff_plural') }} &amp; team first.</p>
                 <a href="{{ route('manager.waiters.index') }}" style="display:inline-flex;align-items:center;gap:7px;padding:11px 22px;background:linear-gradient(135deg,#7c3aed,#0891b2);color:#fff;border-radius:13px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-decoration:none;">
-                    Go to Waiters &amp; Staff
+                    Go to {{ config('salon.staff_plural') }} &amp; team
                 </a>
             </div>
 
@@ -270,7 +270,7 @@
             <div class="toolbar">
                 <div class="search-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="waiter-search" class="search-input" placeholder="Search waiter name…" autocomplete="off">
+                    <input type="text" id="waiter-search" class="search-input" placeholder="Search {{ strtolower(config('salon.staff')) }} name…" autocomplete="off">
                 </div>
                 <button class="filter-btn f-all" data-filter="all" onclick="setFilter('all')">
                     All <span class="mono" style="font-size:11px;opacity:.6;" id="cnt-all">{{ $waiters->count() }}</span>
@@ -431,7 +431,7 @@
 
             <div class="no-results" id="no-results">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:10px;color:rgba(255,255,255,.2);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <p style="margin:0;">No matching waiters.</p>
+                <p style="margin:0;">No matching {{ strtolower(config('salon.staff_plural')) }}.</p>
             </div>
 
             <p style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.28);">

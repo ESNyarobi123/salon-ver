@@ -30,13 +30,13 @@ class EnsureOrderPortalAuthenticated
 
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'Ingia kwanza kwenye TIPTAP ORDER.',
+                    'message' => 'Ingia kwanza kwenye service desk (TIPTAP).',
                     'error' => 'unauthenticated',
                 ], 401);
             }
 
             return redirect()->route('order-portal.login')
-                ->with('error', 'Ingia kwanza kwenye TIPTAP ORDER.');
+                ->with('error', 'Ingia kwanza kwenye service desk (TIPTAP).');
         }
 
         return $next($request);

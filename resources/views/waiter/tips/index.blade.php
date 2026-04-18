@@ -24,7 +24,7 @@
                 <thead>
                     <tr class="bg-white/[0.02]">
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Order ID</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">{{ config('salon.booking') }} ID</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Amount</th>
                     </tr>
                 </thead>

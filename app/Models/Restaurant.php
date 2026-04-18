@@ -11,6 +11,8 @@ class Restaurant extends Model
         'location',
         'phone',
         'support_phone',
+        'guest_wifi_ssid',
+        'guest_wifi_password',
         'logo',
         'menu_image',
         'is_active',

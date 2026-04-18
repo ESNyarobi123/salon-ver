@@ -1,12 +1,12 @@
 <x-manager-layout>
     <x-slot name="header">
-        Live Orders
+        {{ config('salon.live_bookings') }}
     </x-slot>
 
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h2 class="text-3xl font-bold text-white tracking-tight">Live Orders</h2>
-            <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Real-time order management</p>
+            <h2 class="text-3xl font-bold text-white tracking-tight">{{ config('salon.live_bookings') }}</h2>
+            <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Real-time service &amp; retail bookings</p>
         </div>
         <div class="flex gap-3">
             <button onclick="openCreateOrderModal()" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-violet-600/20">
@@ -14,7 +14,7 @@
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                Create Order
+                New booking
             </button>
             <div class="flex items-center gap-2 glass px-4 py-2.5 rounded-xl">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
@@ -45,7 +45,7 @@
                     <div class="glass p-4 rounded-xl card-hover group">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex flex-col gap-1">
-                                <span class="bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-rose-500/20">Table #{{ $order->table_number }}</span>
+                                <span class="bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-rose-500/20">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 @if($order->waiter)
                                     <span class="text-[10px] font-medium text-cyan-400">{{ $order->waiter->name }}</span>
                                 @else
@@ -57,7 +57,7 @@
                         <div class="space-y-1.5 mb-4">
                             @foreach($order->items as $item)
                                 <div class="flex justify-between text-sm">
-                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom Order') }}</span>
+                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom item') }}</span>
                                     <span class="text-white/40">Tsh {{ number_format($item->total) }}</span>
                                 </div>
                             @endforeach
@@ -65,17 +65,17 @@
                         <div class="flex items-center justify-between pt-3 border-t border-white/5">
                             <span class="font-bold text-white">Tsh {{ number_format($order->total_amount) }}</span>
                             <div class="flex gap-2">
-                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this order?')">
+                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this booking?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete Order">
+                                    <button type="submit" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete booking">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                         </svg>
                                     </button>
                                 </form>
-                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit Order">
+                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit booking">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -95,7 +95,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8">No pending orders</p>
+                    <p class="text-sm text-white/30 text-center py-8">No pending bookings</p>
                 @endforelse
             </div>
         </div>
@@ -105,7 +105,7 @@
             <div class="flex items-center justify-between mb-5 px-1">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                    <h4 class="font-bold text-white uppercase tracking-wider text-[11px]">Preparing</h4>
+                    <h4 class="font-bold text-white uppercase tracking-wider text-[11px]">{{ config('salon.order_column_in_progress') }}</h4>
                 </div>
                 <span class="bg-amber-500/20 text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-amber-500/20">{{ $preparingOrders->count() }}</span>
             </div>
@@ -114,7 +114,7 @@
                     <div class="glass p-4 rounded-xl card-hover">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex flex-col gap-1">
-                                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">Table #{{ $order->table_number }}</span>
+                                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 @if($order->waiter)
                                     <span class="text-[10px] font-medium text-cyan-400">{{ $order->waiter->name }}</span>
                                 @else
@@ -126,28 +126,28 @@
                         <div class="space-y-1.5 mb-4">
                             @foreach($order->items as $item)
                                 <div class="flex justify-between text-sm">
-                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom Order') }}</span>
+                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom item') }}</span>
                                     <span class="text-white/40">Tsh {{ number_format($item->total) }}</span>
                                 </div>
                             @endforeach
                         </div>
                         <div class="flex items-center justify-between pt-3 border-t border-white/5">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping"></span>
-                                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">In Kitchen</span>
+                                <span class="w-1.5 h-1.5 {{ $order->status === 'ready' ? 'bg-emerald-400' : 'bg-amber-400' }} rounded-full {{ $order->status === 'ready' ? '' : 'animate-ping' }}"></span>
+                                <span class="text-[10px] font-bold {{ $order->status === 'ready' ? 'text-emerald-400' : 'text-amber-400' }} uppercase tracking-wider">{{ $order->status === 'ready' ? 'Ready (floor)' : 'In progress' }}</span>
                             </div>
                             <div class="flex gap-2">
-                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this order?')">
+                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this booking?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete Order">
+                                    <button type="submit" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete booking">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                         </svg>
                                     </button>
                                 </form>
-                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit Order">
+                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit booking">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -167,7 +167,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8">No orders in kitchen</p>
+                    <p class="text-sm text-white/30 text-center py-8">Nothing on {{ strtolower(config('salon.floor_display_short')) }} yet</p>
                 @endforelse
             </div>
         </div>
@@ -186,7 +186,7 @@
                     <div class="glass p-4 rounded-xl card-hover">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex flex-col gap-1">
-                                <span class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">Table #{{ $order->table_number }}</span>
+                                <span class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 @if($order->waiter)
                                     <span class="text-[10px] font-medium text-cyan-400">{{ $order->waiter->name }}</span>
                                 @else
@@ -198,7 +198,7 @@
                         <div class="space-y-1.5 mb-4">
                             @foreach($order->items as $item)
                                 <div class="flex justify-between text-sm">
-                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom Order') }}</span>
+                                    <span class="font-semibold text-white">{{ $item->quantity }}x {{ $item->name ?? ($item->menuItem ? $item->menuItem->name : 'Custom item') }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -211,21 +211,21 @@
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="status" value="paid">
-                                <button type="submit" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm border border-emerald-500/30 transition-all" title="Customer paid outside (WhatsApp/cash)">
+                                <button type="submit" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm border border-emerald-500/30 transition-all" title="{{ config('salon.customer') }} paid outside (WhatsApp/cash)">
                                     Confirm paid
                                 </button>
                             </form>
-                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this order?')" class="inline">
+                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this booking?')" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="h-full px-3 rounded-xl hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete Order">
+                                    <button type="submit" class="h-full px-3 rounded-xl hover:bg-white/10 text-white/40 hover:text-rose-400 transition-all" title="Delete booking">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                         </svg>
                                     </button>
                                 </form>
-                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="h-full px-3 rounded-xl hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit Order">
+                                <button onclick="openEditOrderModal({{ $order->id }}, '{{ $order->table_number }}', '{{ $order->customer_phone }}', '{{ $order->customer_name }}')" class="h-full px-3 rounded-xl hover:bg-white/10 text-white/40 hover:text-violet-400 transition-all" title="Edit booking">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -234,7 +234,7 @@
                             </div>
                     </div>
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8">No served orders</p>
+                    <p class="text-sm text-white/30 text-center py-8">No served bookings</p>
                 @endforelse
             </div>
         </div>
@@ -253,7 +253,7 @@
                     <div class="glass p-4 rounded-xl">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex flex-col gap-1">
-                                <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                                <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                                 @if($order->waiter)
                                     <span class="text-[10px] font-medium text-cyan-400">{{ $order->waiter->name }}</span>
                                 @else
@@ -264,7 +264,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                                 </svg>
-                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this order?')">
+                                <form action="{{ route('manager.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this booking?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-white/40 hover:text-rose-400 transition-all">
@@ -279,17 +279,17 @@
                         <p class="text-[11px] font-medium text-white/40">Tsh {{ number_format($order->total_amount) }} • Paid</p>
                     </div>
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8">No completed orders today</p>
+                    <p class="text-sm text-white/30 text-center py-8">No completed bookings today</p>
                 @endforelse
             </div>
         </div>
     </div>
 
-    <!-- Create Order Modal -->
+    <!-- Create booking modal -->
     <div id="createOrderModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-6">
         <div class="bg-surface-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 max-h-[90vh] flex flex-col">
             <div class="p-6 border-b border-white/10 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white tracking-tight">Create New Order</h3>
+                <h3 class="text-xl font-bold text-white tracking-tight">Create new booking</h3>
                 <button onclick="closeCreateOrderModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -302,27 +302,27 @@
                 @csrf
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Table</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.seat') }}</label>
                         <select name="table_number" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all [&>option]:text-black">
-                            <option value="">Select Table</option>
+                            <option value="">Select {{ config('salon.seat') }}</option>
                             @foreach($tables as $table)
                                 <option value="{{ $table->name }}">{{ $table->name }} ({{ $table->capacity }} pax)</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Name (Optional)</label>
-                        <input type="text" name="customer_name" placeholder="Guest Name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} name (optional)</label>
+                        <input type="text" name="customer_name" placeholder="{{ config('salon.customer') }} name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Phone (Optional)</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} phone (optional)</label>
                     <input type="text" name="customer_phone" placeholder="07XXXXXXXX" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Menu Items</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.services') }} &amp; products</label>
                     <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                         @foreach($menuItems as $item)
                             <div class="flex items-center justify-between glass p-3 rounded-xl">
@@ -345,7 +345,7 @@
 
                 <div class="pt-4 border-t border-white/10">
                     <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-violet-500/25 transition-all">
-                        Create Order
+                        Create booking
                     </button>
                 </div>
             </form>
@@ -356,7 +356,7 @@
     <div id="editOrderModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-6">
         <div class="bg-surface-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-white/10">
             <div class="p-6 border-b border-white/10 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white tracking-tight">Edit Order</h3>
+                <h3 class="text-xl font-bold text-white tracking-tight">Edit booking</h3>
                 <button onclick="closeEditOrderModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -369,7 +369,7 @@
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Table</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.seat') }}</label>
                     <select name="table_number" id="edit_table_number" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500 transition-all [&>option]:text-black">
                         @foreach($tables as $table)
                             <option value="{{ $table->name }}">{{ $table->name }}</option>
@@ -377,11 +377,11 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Name</label>
-                    <input type="text" name="customer_name" id="edit_customer_name" placeholder="Guest Name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 transition-all">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} name</label>
+                    <input type="text" name="customer_name" id="edit_customer_name" placeholder="{{ config('salon.customer') }} name" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 transition-all">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Phone</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} phone</label>
                     <input type="text" name="customer_phone" id="edit_customer_phone" placeholder="07XXXXXXXX" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 transition-all">
                 </div>
                 <div class="pt-4">
@@ -417,12 +417,12 @@
                 <form id="selcomPayForm" class="space-y-4">
                     <input type="hidden" id="modalOrderId">
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Phone (07XXXXXXXX)</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} phone (07XXXXXXXX)</label>
                         <input type="text" id="customerPhone" required placeholder="e.g. 0744963858" 
                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Name</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} name</label>
                         <input type="text" id="customerName" required placeholder="e.g. John Doe" 
                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                     </div>

@@ -1,5 +1,5 @@
 <x-manager-layout>
-    <x-slot name="header">Waiters & Staff</x-slot>
+    <x-slot name="header">{{ config('salon.staff_plural') }} &amp; team</x-slot>
 
     @if (session('success') && !session('order_portal_password_generated'))
         <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">{{ session('success') }}</div>
@@ -10,21 +10,21 @@
     @if (session('order_portal_password_generated'))
         <div class="mb-6 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-sm">
             {{ session('success') }}
-            <p class="mt-2 font-semibold">Password ya Order Portal (onyesha waiter mara moja):</p>
+            <p class="mt-2 font-semibold">Nenosiri la Service desk (onyesha {{ strtolower(config('salon.staff')) }} mara moja):</p>
             <p class="mt-1 font-mono text-lg tracking-wider bg-black/20 px-3 py-2 rounded-lg inline-block">{{ session('order_portal_password_generated') }}</p>
-            <p class="mt-2 text-white/70">Waiter: <strong>{{ session('order_portal_waiter_name') }}</strong> · Nambari: <code>{{ session('order_portal_waiter_number') }}</code></p>
+            <p class="mt-2 text-white/70">{{ config('salon.staff') }}: <strong>{{ session('order_portal_waiter_name') }}</strong> · Nambari: <code>{{ session('order_portal_waiter_number') }}</code></p>
             <p class="mt-1 text-white/50 text-xs">Login: <a href="{{ $orderPortalLoginUrl ?? route('order-portal.login') }}" class="text-cyan-400 underline" target="_blank">{{ $orderPortalLoginUrl ?? url('/order-portal/login') }}</a></p>
         </div>
     @endif
 
-    <!-- Link Waiter Card -->
+    <!-- Link stylist card -->
     <div class="glass-card rounded-2xl p-6 mb-8 border border-white/10">
-        <h3 class="text-lg font-bold text-white mb-1">Link Waiter</h3>
-        <p class="text-sm text-white/50 mb-2">Waiter anajisajili kwenye web, kisha anakupa nambari yake ya pekee (TIPTAP-W-xxxxx). Tafuta hapa na uunganishe na restaurant yako.</p>
+        <h3 class="text-lg font-bold text-white mb-1">Unganisha {{ config('salon.staff') }}</h3>
+        <p class="text-sm text-white/50 mb-2">{{ config('salon.staff') }} anajisajili kwenye wavuti, kisha anakupa nambari yake ya pekee (TIPTAP-W-xxxxx). Tafuta hapa na uunganishe na {{ strtolower(config('salon.entity')) }} yako.</p>
         <p class="text-xs text-white/40 mb-4">Chagua <strong class="text-white/60">Muda mrefu</strong> (permanent) au <strong class="text-white/60">Show-time</strong> (muda maalum – weka tarehe ya mwisho).</p>
         <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[200px]">
-                <label for="searchCode" class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Nambari ya pekee ya waiter</label>
+                <label for="searchCode" class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Nambari ya pekee ya {{ strtolower(config('salon.staff')) }}</label>
                 <input type="text" id="searchCode" placeholder="TIPTAP-W-00001"
                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-mono text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent">
             </div>
@@ -59,7 +59,7 @@
                 </button>
                 <select id="sortBy" onchange="filterWaiters()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent">
                     <option value="name">Sort: Name</option>
-                    <option value="orders">Sort: Orders</option>
+                    <option value="orders">Sort: {{ config('salon.booking_plural') }}</option>
                     <option value="recent">Sort: Recently Added</option>
                 </select>
                 <a href="{{ route('manager.waiters.history') }}" class="inline-flex items-center gap-2 px-4 py-2 glass rounded-lg border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all text-sm font-medium">
@@ -73,7 +73,7 @@
         <div x-show="filterOpen" x-transition class="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-3">
             <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="statusFilter" value="all" checked onchange="filterWaiters()" class="text-violet-600 focus:ring-violet-500">
-                <span class="text-sm text-white/70">All Waiters</span>
+                <span class="text-sm text-white/70">All {{ config('salon.staff_plural') }}</span>
             </label>
             <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="statusFilter" value="online" onchange="filterWaiters()" class="text-violet-600 focus:ring-violet-500">
@@ -170,7 +170,7 @@
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($waiter->waiter_qr_url) }}" alt="QR" class="w-16 h-16">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-[10px] text-white/40 mb-2 truncate">Scan to order with {{ explode(' ', $waiter->name)[0] }}</p>
+                            <p class="text-[10px] text-white/40 mb-2 truncate">Scan to book with {{ explode(' ', $waiter->name)[0] }}</p>
                             <div class="flex gap-2">
                                 <a href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={{ urlencode($waiter->waiter_qr_url) }}" download="waiter-{{ $waiter->waiter_code }}-qr.png" target="_blank" class="flex-1 px-3 py-2 bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg text-center transition-colors">Download</a>
                                 <button onclick="copyToClipboard('{{ $waiter->waiter_qr_url }}', this)" class="px-3 py-2 glass hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors">Copy Link</button>
@@ -183,7 +183,7 @@
                 <!-- Mini Stats -->
                 <div class="grid grid-cols-3 gap-2 mb-3">
                     <div class="bg-white/5 p-2 rounded-lg border border-white/10">
-                        <p class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Orders</p>
+                        <p class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-0.5">{{ config('salon.booking_plural') }}</p>
                         <p class="text-lg font-bold text-white">{{ $waiter->orders_count }}</p>
                         <p class="text-[8px] text-white/30">All time</p>
                     </div>
@@ -236,7 +236,7 @@
                             </svg>
                         </button>
                     </form>
-                    <form action="{{ route('manager.waiters.unlink', $waiter) }}" method="POST" onsubmit="return confirm('Unlink waiter huyu? History itabaki.');" class="flex-1">
+                    <form action="{{ route('manager.waiters.unlink', $waiter) }}" method="POST" onsubmit="return confirm('Unlink {{ strtolower(config('salon.staff')) }} huyu? History itabaki.');" class="flex-1">
                         @csrf
                         <button type="submit" class="w-full px-3 py-2 glass text-rose-400 rounded-lg hover:bg-rose-500/20 transition-all text-xs" title="Unlink">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto">
@@ -253,8 +253,8 @@
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">Hakuna waiters waliounganishwa</h3>
-                <p class="text-white/40">Tumia "Link Waiter" hapo juu kwa nambari ya pekee ya waiter.</p>
+                <h3 class="text-xl font-bold text-white mb-2">Hakuna {{ strtolower(config('salon.staff_plural')) }} waliounganishwa</h3>
+                <p class="text-white/40">Tumia "Unganisha {{ config('salon.staff') }}" hapo juu kwa nambari ya pekee.</p>
             </div>
         @endforelse
     </div>
@@ -265,7 +265,7 @@
             <div class="p-6">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h3 class="text-xl font-bold text-white tracking-tight">Waiter Profile</h3>
+                        <h3 class="text-xl font-bold text-white tracking-tight">{{ config('salon.staff') }} profile</h3>
                         <p class="text-sm font-medium text-white/40">Staff details and performance</p>
                     </div>
                     <button onclick="closeViewWaiterModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
@@ -304,7 +304,7 @@
 
                 <div class="grid grid-cols-3 gap-3 mb-6">
                     <div class="bg-violet-500/10 p-3 rounded-xl border border-violet-500/20">
-                        <p class="text-[9px] font-bold text-violet-300 uppercase tracking-wider mb-1">Orders</p>
+                        <p class="text-[9px] font-bold text-violet-300 uppercase tracking-wider mb-1">{{ config('salon.booking_plural') }}</p>
                         <p class="text-xl font-bold text-white" id="viewWaiterOrders">0</p>
                     </div>
                     <div class="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
@@ -347,7 +347,7 @@
                     if (!data.success) {
                         resultEl.classList.add('hidden');
                         resultEl.innerHTML = '';
-                        errorEl.textContent = data.message || 'Waiter hajapatikana.';
+                        errorEl.textContent = data.message || '{{ config('salon.staff') }} hajapatikana.';
                         errorEl.classList.remove('hidden');
                         return;
                     }
@@ -364,7 +364,7 @@
                     html += '<p class="text-sm text-white/60">Simu: ' + (w.phone || '—') + '</p>';
                     if (w.location) html += '<p class="text-sm text-white/60">Mahali: ' + w.location + '</p>';
                     html += '<p class="text-sm font-mono text-cyan-400 mt-2">' + (w.global_waiter_number || '') + '</p>';
-                    html += '<p class="text-xs text-white/40 mt-2">Orders: ' + (w.orders_count || 0) + ' · Ratings: ' + (w.feedback_count || 0) + '</p></div></div>';
+                    html += '<p class="text-xs text-white/40 mt-2">{{ config('salon.booking_plural') }}: ' + (w.orders_count || 0) + ' · Ratings: ' + (w.feedback_count || 0) + '</p></div></div>';
 
                     if (w.work_history && w.work_history.length > 0) {
                         html += '<div class="pt-3 border-t border-white/10">';
@@ -384,7 +384,7 @@
                     }
 
                     if (w.is_linked && w.current_restaurant) {
-                        html += '<p class="text-amber-400 text-sm mt-2">Tayari ameunganishwa na: ' + w.current_restaurant + '. Manager wa restaurant ile anafaa kum-unlink kwanza.</p>';
+                        html += '<p class="text-amber-400 text-sm mt-2">Tayari ameunganishwa na: ' + w.current_restaurant + '. Manager wa {{ strtolower(config('salon.entity')) }} ile anafaa kum-unlink kwanza.</p>';
                     } else {
                         var token = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
                         var linkUrl = '{{ url("manager/waiters") }}/' + w.id + '/link';
@@ -398,7 +398,7 @@
                         html += '<div id="linkUntilWrap" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1 block">Mpaka tarehe</label>';
                         html += '<input type="date" name="linked_until" id="linkUntilInput" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" min="' + new Date().toISOString().slice(0,10) + '"></div>';
                         html += '</div>';
-                        html += '<button type="submit" class="px-4 py-2 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">Link Waiter</button>';
+                        html += '<button type="submit" class="px-4 py-2 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">Unganisha {{ config('salon.staff') }}</button>';
                         html += '</form>';
                     }
                     html += '</div>';

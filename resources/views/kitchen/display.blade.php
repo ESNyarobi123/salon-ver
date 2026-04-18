@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Kitchen Display - {{ $restaurant->name }}</title>
+    <title>{{ config('salon.floor_display') }} · {{ $restaurant->name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
@@ -56,7 +56,7 @@
         .card.vip .table-num{background:linear-gradient(135deg,var(--warning) 0%,var(--danger) 100%)}
         .compact-info{flex:1;min-width:0}
         .compact-info h4{font-size:0.9rem;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .compact-info .waiter-name{font-size:0.75rem;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:4px}
+        .compact-info .staff-line{font-size:0.75rem;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:4px}
         .item-summary{font-size:0.7rem;color:rgba(255,255,255,0.5);margin-top:2px}
         .compact-right{text-align:right;flex-shrink:0}
         .timer-compact{font-size:1.1rem;font-weight:800;line-height:1}
@@ -128,9 +128,9 @@
     <header class="header">
         <div class="header-content">
             <div class="brand">
-                <div class="brand-icon">🍳</div>
+                <div class="brand-icon">💅</div>
                 <div>
-                    <h1>Kitchen Display</h1>
+                    <h1>{{ config('salon.floor_display') }}</h1>
                     <span>{{ $restaurant->name }}</span>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                 </div>
                 <div class="stat active" id="stat-preparing">
                     <div class="stat-icon">🔥</div>
-                    <div><div class="stat-value" id="preparing-count">0</div><div class="stat-label">Cooking</div></div>
+                    <div><div class="stat-value" id="preparing-count">0</div><div class="stat-label">In service</div></div>
                 </div>
                 <div class="stat pending" id="stat-pending">
                     <div class="stat-icon">⏳</div>
@@ -161,20 +161,20 @@
         <!-- Tab Navigation -->
         <div class="tabs" style="display:flex;gap:8px;margin-bottom:20px;max-width:1920px;margin:0 auto 20px;padding:0 24px">
             <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">
-                🔥 Active Orders
+                🔥 Active bookings
             </button>
             <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
-                📜 Order History
+                📜 Booking history
             </button>
         </div>
         
-        <!-- Active Orders View -->
+        <!-- Active bookings view -->
         <div id="view-active" class="view active">
             <div class="grid">
                 <div id="orders-container">
                     <div class="section" id="urgent-section" style="display:none">
                         <div class="section-header">
-                            <span class="section-title" style="color:var(--danger)">⚠️ Urgent Orders</span>
+                            <span class="section-title" style="color:var(--danger)">⚠️ Urgent</span>
                             <span class="section-count" style="background:rgba(239,68,68,0.2);color:#fca5a5" id="urgent-count">0</span>
                         </div>
                         <div class="orders-row" id="urgent-orders"></div>
@@ -182,7 +182,7 @@
                     
                     <div class="section" id="cooking-section">
                         <div class="section-header">
-                            <span class="section-title" style="color:var(--warning)">🔥 Now Cooking</span>
+                            <span class="section-title" style="color:var(--warning)">🔥 In progress</span>
                             <span class="section-count" style="background:rgba(245,158,11,0.2);color:#fcd34d" id="cooking-count">0</span>
                         </div>
                         <div class="orders-row" id="cooking-orders"></div>
@@ -190,7 +190,7 @@
                     
                     <div class="section" id="pending-section">
                         <div class="section-header">
-                            <span class="section-title">📋 Pending Orders</span>
+                            <span class="section-title">📋 Pending</span>
                             <span class="section-count" id="pending-count-display">0</span>
                         </div>
                         <div class="orders-row" id="pending-orders"></div>
@@ -198,17 +198,17 @@
                     
                     <div class="empty" id="empty-state">
                         <div class="empty-icon">🍽️</div>
-                        <h2>No Active Orders</h2>
-                        <p>New orders appear automatically</p>
+                        <h2>No active bookings</h2>
+                        <p>New bookings appear automatically</p>
                     </div>
                 </div>
                 
                 <div class="sidebar">
                     <div class="ready-box">
-                        <h2>Ready to Serve</h2>
+                        <h2>Ready for service</h2>
                         <div id="ready-list">
                             <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4)">
-                                <p style="font-size:0.85rem">No orders ready yet</p>
+                                <p style="font-size:0.85rem">No bookings ready yet</p>
                             </div>
                         </div>
                     </div>
@@ -216,7 +216,7 @@
             </div>
         </div>
         
-        <!-- Order History View -->
+        <!-- Booking history view -->
         <div id="view-history" class="view" style="display:block">
             <div style="max-width:1920px;margin:0 auto;padding:0 24px">
                 <!-- Filter Bar -->
@@ -241,9 +241,9 @@
                     </div>
                     
                     <div style="display:flex;align-items:center;gap:8px">
-                        <span style="font-size:0.8rem;color:rgba(255,255,255,0.6)">🪑 Table:</span>
+                        <span style="font-size:0.8rem;color:rgba(255,255,255,0.6)">🪑 {{ config('salon.seat') }}:</span>
                         <select id="history-table" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:white;font-size:0.85rem;cursor:pointer" onchange="fetchHistory()">
-                            <option value="all">All Tables</option>
+                            <option value="all">All {{ config('salon.seat_plural') }}</option>
                         </select>
                     </div>
                     
@@ -258,7 +258,7 @@
                 <!-- History Stats -->
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
                     <div class="stat-card" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:4px">Total Orders</div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:4px">Total bookings</div>
                         <div id="stat-total" style="font-size:1.5rem;font-weight:800">0</div>
                     </div>
                     <div class="stat-card" style="background:linear-gradient(135deg,rgba(245,158,11,0.15) 0%,rgba(245,158,11,0.05) 100%);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px;text-align:center">
@@ -279,7 +279,7 @@
                 <div id="history-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:16px">
                     <div class="empty" style="grid-column:1/-1">
                         <div class="empty-icon">📜</div>
-                        <h2>Loading History...</h2>
+                        <h2>Loading history…</h2>
                         <p id="history-debug">Please wait...</p>
                     </div>
                 </div>
@@ -300,7 +300,7 @@
     
     <div class="toast" id="toast">
         <span>🔔</span>
-        <span id="toast-message">New order!</span>
+        <span id="toast-message">New booking!</span>
     </div>
     
     <script>
@@ -360,8 +360,8 @@
                 if(data.success){
                     renderHistory(data.orders,data.stats);
                     updateTableFilter(data.tables);
-                    console.log(`Loaded ${data.orders.length} orders from history`);
-                    if(debugMsg)debugMsg.textContent=`Loaded ${data.orders.length} orders`;
+                    console.log(`Loaded ${data.orders.length} bookings from history`);
+                    if(debugMsg)debugMsg.textContent=`Loaded ${data.orders.length} bookings`;
                 }else{
                     console.error('History fetch failed:', data);
                     if(debugMsg)debugMsg.textContent='Failed: ' + (data.message || 'Unknown error');
@@ -376,8 +376,8 @@
         }
 
         function renderHistory(orders,stats){
-            console.log('renderHistory called with', orders.length, 'orders');
-            console.log('First order:', orders[0]);
+            console.log('renderHistory called with', orders.length, 'bookings');
+            console.log('First booking:', orders[0]);
             
             document.getElementById('stat-total').textContent=stats.total;
             document.getElementById('stat-ready').textContent=stats.ready;
@@ -394,15 +394,15 @@
             if(orders.length===0){
                 container.innerHTML=`<div class="empty" style="grid-column:1/-1">
                     <div class="empty-icon">📜</div>
-                    <h2>No Order History</h2>
-                    <p>No orders found for selected filters</p>
+                        <h2>No booking history</h2>
+                    <p>No bookings found for selected filters</p>
                 </div>`;
                 return;
             }
             
             try {
                 const html = orders.map((order, index)=>{
-                    console.log(`Processing order ${index}:`, order.id, order.table_number);
+                    console.log(`Processing booking ${index}:`, order.id, order.table_number);
                     
                     // Handle items - could be array or object
                     let items = [];
@@ -416,7 +416,7 @@
                     const itemCount = items.length;
                     
                     const safeTable = order.table_number || 'N/A';
-                    const safeWaiter = order.waiter_name || 'Unknown';
+                    const safeWaiter = order.waiter_name || 'Stylist';
                     const safeStatus = order.status || 'unknown';
                     const safeAmount = order.total_amount || 0;
                     const safeTime = order.completed_at || 'N/A';
@@ -427,7 +427,7 @@
                             <div style="display:flex;align-items:center;gap:12px">
                                 <div class="history-table">${safeTable}</div>
                                 <div>
-                                    <div style="font-size:0.9rem;font-weight:700">Table ${safeTable}</div>
+                                    <div style="font-size:0.9rem;font-weight:700">Seat ${safeTable}</div>
                                     <div style="font-size:0.75rem;color:rgba(255,255,255,0.5)">👤 ${safeWaiter}</div>
                                 </div>
                             </div>
@@ -461,11 +461,11 @@
         function updateTableFilter(tables){
             const select=document.getElementById('history-table');
             const currentValue=select.value;
-            select.innerHTML='<option value="all">All Tables</option>';
+            select.innerHTML='<option value="all">All seats</option>';
             tables.forEach(table=>{
                 const option=document.createElement('option');
                 option.value=table;
-                option.textContent=`Table ${table}`;
+                option.textContent=`Seat ${table}`;
                 select.appendChild(option);
             });
             select.value=currentValue;
@@ -503,7 +503,7 @@
             const currentIds=orders.map(o=>o.id);
             const newOrders=currentIds.filter(id=>!previousOrderIds.includes(id));
             if(newOrders.length>0&&previousOrderIds.length>0){
-                showToast(`${newOrders.length} new order${newOrders.length>1?'s':''}!`);
+                showToast(`${newOrders.length} new booking${newOrders.length>1?'s':''}!`);
             }
             previousOrderIds=currentIds;
 
@@ -522,7 +522,7 @@
 
             document.getElementById('ready-list').innerHTML=ready.length
                 ?ready.map(o=>renderReady(o)).join('')
-                :'<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4)"><p style="font-size:0.85rem">No orders ready yet</p></div>';
+                :'<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4)"><p style="font-size:0.85rem">No bookings ready yet</p></div>';
         }
 
         function renderCard(order,isUrgent=false){
@@ -536,7 +536,7 @@
             // Summary text
             let summary=[];
             if(pendingItems>0)summary.push(`${pendingItems} pending`);
-            if(cookingItems>0)summary.push(`${cookingItems} cooking`);
+            if(cookingItems>0)summary.push(`${cookingItems} in progress`);
             if(readyItems>0)summary.push(`${readyItems} ready`);
             
             return `<div class="card compact ${cardClass}" id="card-${order.id}" data-order-id="${order.id}">
@@ -544,9 +544,9 @@
                     <div class="compact-left">
                         <div class="table-num">${order.table_number}</div>
                         <div class="compact-info">
-                            <h4>Table ${order.table_number}</h4>
-                            <div class="waiter-name">
-                                👤 ${order.waiter_name||'Unassigned'}
+                            <h4>Seat ${order.table_number}</h4>
+                            <div class="staff-line">
+                                👤 ${order.waiter_name||'No stylist'}
                             </div>
                             <div class="item-summary">
                                 ${totalItems} items • ${summary.join(' • ')||'All pending'}
@@ -560,7 +560,7 @@
                 </div>
                 
                 <div class="card-body" id="body-${order.id}">
-                    ${order.is_vip?`<div class="vip-badge" style="margin-bottom:10px">⭐ VIP Priority</div>`:''}
+                    ${order.is_vip?`<div class="vip-badge" style="margin-bottom:10px">⭐ VIP booking</div>`:''}
                     <div class="items-list">
                         ${order.items.map(item=>`<div class="item ${item.status}" onclick="toggleItemStatus('${item.id}','${item.status}')">
                             <div class="item-qty">${item.quantity}</div>
@@ -586,7 +586,7 @@
             return `<div class="ready-item" onclick="updateOrderStatus(${order.id},'served')">
                 <div class="ready-table">${order.table_number}</div>
                 <div class="ready-info">
-                    <h4>Table ${order.table_number}</h4>
+                    <h4>Seat ${order.table_number}</h4>
                     <span>${order.items.length} items</span>
                 </div>
                 <div class="ready-time">${order.elapsed_time}</div>
@@ -609,7 +609,7 @@
                 const data=await response.json();
                 if(data.success){
                     fetchOrders();
-                    showToast(`Order ${status}!`);
+                    showToast(`Booking ${status}!`);
                 }
             }catch(error){}
         }

@@ -47,7 +47,7 @@
                         <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
                     </svg>
                 </div>
-                <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-1">Avg. Tip per Order</p>
+                <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-1">Avg. tip per booking</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight">Tsh {{ number_format($avgTip) }}</h3>
             </div>
         </div>
@@ -60,13 +60,13 @@
                         <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
                     </svg>
                 </div>
-                <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-1">Top Waiter Today</p>
+                <p class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-1">Top {{ strtolower(config('salon.staff')) }} today</p>
                 <h3 class="text-3xl font-bold text-white tracking-tight">{{ $topWaiter->name ?? 'None' }}</h3>
             </div>
         </div>
     </div>
 
-    <!-- Waiter Performance Table -->
+    <!-- Staff tip table -->
     <div class="glass-card rounded-2xl overflow-hidden">
         <div class="p-6 border-b border-white/5 flex justify-between items-center">
             <h3 class="text-xl font-bold text-white tracking-tight">Staff Tip Performance</h3>
@@ -82,7 +82,7 @@
                 <thead>
                     <tr class="bg-white/[0.02]">
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Staff Member</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Total Orders</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Total bookings</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Total Tips</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Action</th>
                     </tr>

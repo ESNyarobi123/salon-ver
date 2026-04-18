@@ -2,8 +2,8 @@
     <x-slot name="header">History</x-slot>
 
     <div class="mb-8">
-        <h2 class="text-3xl font-bold text-white tracking-tight">Historia yangu ya Restaurants</h2>
-        <p class="text-white/50 font-medium mt-1">Restaurants ulizofanya kazi na muda uliounganishwa na kutolewa.</p>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Historia yangu ya {{ config('salon.entity_plural') }}</h2>
+        <p class="text-white/50 font-medium mt-1">{{ config('salon.entity_plural') }} ulizofanya kazi na muda uliounganishwa na kutolewa.</p>
     </div>
 
     @if($assignments->isEmpty())
@@ -14,7 +14,7 @@
                 </svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">Bado hakuna historia</h3>
-            <p class="text-white/40">Utakapounganishwa na restaurant (na manager akikutolea), matukio yataonekana hapa.</p>
+            <p class="text-white/40">{{ config('salon.stylist_history_empty_hint_sw') }}</p>
         </div>
     @else
         <div class="space-y-4">
@@ -22,7 +22,7 @@
                 <div class="glass-card rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="min-w-0">
-                            <h3 class="text-lg font-bold text-white truncate">{{ $a->restaurant?->name ?? 'Restaurant' }}</h3>
+                            <h3 class="text-lg font-bold text-white truncate">{{ $a->restaurant?->name ?? config('salon.entity') }}</h3>
                             @if($a->restaurant?->location)
                                 <p class="text-sm text-white/50 mt-1 flex items-center gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>

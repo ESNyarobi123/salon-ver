@@ -1,22 +1,22 @@
 <x-manager-layout>
     <x-slot name="header">
-        Table Management
+        {{ config('salon.seat_management_title') }}
     </x-slot>
 
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h2 class="text-3xl font-bold text-white tracking-tight">Table Management</h2>
-            <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Manage your tables and QR codes</p>
+            <h2 class="text-3xl font-bold text-white tracking-tight">{{ config('salon.seat_management_title') }}</h2>
+            <p class="text-sm font-medium text-white/40 uppercase tracking-wider">{{ config('salon.seat_management_subtitle') }}</p>
         </div>
         <button type="button" onclick="openAddTableModal()" class="min-h-[44px] inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-[#0f0a1e]">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"/><path d="M12 5v14"/>
             </svg>
-            Add New Table
+            Add {{ config('salon.seat') }}
         </button>
     </div>
 
-    <!-- Official Restaurant QR -->
+    <!-- Official saloon QR -->
     <div class="glass-card rounded-2xl p-8 mb-12 border-violet-500/30 bg-violet-500/5 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
             <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-violet-400">
@@ -31,10 +31,10 @@
             
             <div class="flex-1 text-center md:text-left">
                 <div class="inline-flex items-center px-3 py-1 rounded-full bg-violet-500/20 text-violet-400 text-[10px] font-bold uppercase tracking-widest mb-4">
-                    Official Restaurant QR
+                    {{ config('salon.official_saloon_qr') }}
                 </div>
-                <h3 class="text-3xl font-black text-white mb-4 tracking-tight">Main Entrance QR Code</h3>
-                <p class="text-white/50 max-w-xl mb-8 font-medium">This is your restaurant's official QR code. Place this at the entrance or on marketing materials. When scanned, it opens the WhatsApp bot directly to your restaurant's menu.</p>
+                <h3 class="text-3xl font-black text-white mb-4 tracking-tight">{{ config('salon.saloon_entrance_qr') }}</h3>
+                <p class="text-white/50 max-w-xl mb-8 font-medium">{{ config('salon.saloon_qr_help') }}</p>
                 
                 <div class="flex flex-wrap justify-center md:justify-start gap-4">
                     <a href="https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data={{ urlencode(Auth::user()->restaurant->whatsapp_qr_url) }}" download="official-qr.png" target="_blank" class="px-8 py-4 bg-violet-600 text-white rounded-2xl font-bold shadow-xl shadow-violet-600/20 hover:bg-violet-500 transition-all flex items-center gap-3">
@@ -55,8 +55,8 @@
     </div>
 
     <div class="mb-8">
-        <h3 class="text-xl font-bold text-white">Table Specific QR Codes</h3>
-        <p class="text-sm text-white/40">QR codes for individual tables to track orders automatically.</p>
+        <h3 class="text-xl font-bold text-white">{{ config('salon.seat') }}-specific QR codes</h3>
+        <p class="text-sm text-white/40">QR codes for each {{ strtolower(config('salon.seat')) }} to track bookings automatically.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @forelse($tables as $table)
@@ -86,7 +86,7 @@
                     <h4 class="text-lg font-bold text-white mb-1">{{ $table->name }}</h4>
                     <p class="text-sm font-medium text-white/40">{{ $table->capacity }} Seats</p>
                     @if($table->waiter)
-                    <p class="text-xs font-medium text-violet-400/80">Waiter: {{ $table->waiter->name }}</p>
+                    <p class="text-xs font-medium text-violet-400/80">{{ config('salon.staff') }}: {{ $table->waiter->name }}</p>
                     @endif
                 </div>
                 
@@ -130,8 +130,8 @@
                         <rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">No tables found</h3>
-                <p class="text-white/40">Start by adding your first table.</p>
+                <h3 class="text-xl font-bold text-white mb-2">No {{ strtolower(config('salon.seat_plural')) }} found</h3>
+                <p class="text-white/40">Start by adding your first {{ strtolower(config('salon.seat')) }}.</p>
             </div>
         @endforelse
 
@@ -142,7 +142,7 @@
                     <path d="M5 12h14"/><path d="M12 5v14"/>
                 </svg>
             </div>
-            <span class="font-semibold text-white/40 group-hover:text-violet-400 uppercase tracking-wider text-sm">Add New Table</span>
+            <span class="font-semibold text-white/40 group-hover:text-violet-400 uppercase tracking-wider text-sm">Add new {{ strtolower(config('salon.seat')) }}</span>
         </button>
     </div>
 
@@ -151,7 +151,7 @@
         <div class="bg-surface-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-white/10">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 id="modalTitle" class="text-xl font-bold text-white">Add New Table</h3>
+                    <h3 id="modalTitle" class="text-xl font-bold text-white">Add new {{ config('salon.seat') }}</h3>
                     <button onclick="closeTableModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -164,8 +164,8 @@
                     <input type="hidden" name="_method" id="formMethod" value="POST">
                     
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Table Name</label>
-                        <input type="text" name="name" id="tableName" required placeholder="e.g. Table 1" 
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.seat') }} name</label>
+                        <input type="text" name="name" id="tableName" required placeholder="e.g. Seat 1" 
                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                     </div>
                     
@@ -176,7 +176,7 @@
                     </div>
 
                     <div id="waiterSelectWrap" class="hidden">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Assigned Waiter (Link table → waiter)</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Assigned {{ config('salon.staff') }} (link {{ strtolower(config('salon.seat')) }} → {{ strtolower(config('salon.staff')) }})</label>
                         <select name="waiter_id" id="tableWaiterId" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                             <option value="">— None —</option>
                             @foreach($waiters as $w)
@@ -194,7 +194,7 @@
                     </div>
 
                     <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all mt-2">
-                        Save Table
+                        Save {{ config('salon.seat') }}
                     </button>
                 </form>
             </div>
@@ -203,7 +203,7 @@
 
     <script>
         function openAddTableModal() {
-            document.getElementById('modalTitle').innerText = 'Add New Table';
+            document.getElementById('modalTitle').innerText = @json('Add new '.config('salon.seat'));
             document.getElementById('tableForm').action = '{{ route("manager.tables.store") }}';
             document.getElementById('formMethod').value = 'POST';
             document.getElementById('tableName').value = '';
@@ -217,7 +217,7 @@
         }
 
         function openEditTableModal(table) {
-            document.getElementById('modalTitle').innerText = 'Edit Table';
+            document.getElementById('modalTitle').innerText = @json('Edit '.config('salon.seat'));
             document.getElementById('tableForm').action = `/manager/tables/${table.id}`;
             document.getElementById('formMethod').value = 'PUT';
             document.getElementById('tableName').value = table.name;

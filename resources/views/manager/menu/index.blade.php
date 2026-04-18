@@ -1,13 +1,13 @@
 <x-manager-layout>
     <x-slot name="header">
-        Menu Management
+        {{ config('salon.service_catalog_title') }}
     </x-slot>
 
     <div x-data="{ selectedCategory: 'all' }">
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-white tracking-tight">Menu Management</h2>
-                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Manage your categories and dishes</p>
+                <h2 class="text-3xl font-bold text-white tracking-tight">{{ config('salon.service_catalog_title') }}</h2>
+                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">{{ config('salon.service_catalog_subtitle') }}</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="openCategoriesModal()" class="glass px-5 py-3 rounded-xl font-semibold text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
@@ -20,14 +20,14 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12h14"/><path d="M12 5v14"/>
                     </svg>
-                    Add New Item
+                    {{ config('salon.add_service_item') }}
                 </button>
             </div>
         </div>
 
         <!-- Categories Tabs -->
         <div class="flex gap-3 mb-8 overflow-x-auto pb-2 hide-scrollbar">
-            <button @click="selectedCategory = 'all'" :class="selectedCategory === 'all' ? 'bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20' : 'glass text-white/60 hover:text-white hover:bg-white/10'" class="px-5 py-2.5 rounded-xl font-semibold transition-all">All Items</button>
+            <button @click="selectedCategory = 'all'" :class="selectedCategory === 'all' ? 'bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20' : 'glass text-white/60 hover:text-white hover:bg-white/10'" class="px-5 py-2.5 rounded-xl font-semibold transition-all">{{ config('salon.all_service_items') }}</button>
             @foreach($categories as $category)
                 <button @click="selectedCategory = {{ $category->id }}" :class="selectedCategory === {{ $category->id }} ? 'bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20' : 'glass text-white/60 hover:text-white hover:bg-white/10'" class="px-5 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap">{{ $category->name }}</button>
             @endforeach
@@ -96,8 +96,8 @@
                         <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">No menu items found</h3>
-                <p class="text-white/40">Start by adding your first dish to the menu.</p>
+                <h3 class="text-xl font-bold text-white mb-2">No services or products found</h3>
+                <p class="text-white/40">Start by adding your first service or product to the catalog.</p>
             </div>
         @endforelse
 
@@ -108,7 +108,7 @@
                     <path d="M5 12h14"/><path d="M12 5v14"/>
                 </svg>
             </div>
-            <span class="font-semibold text-white/40 group-hover:text-violet-400 uppercase tracking-wider text-sm">Add New Dish</span>
+            <span class="font-semibold text-white/40 group-hover:text-violet-400 uppercase tracking-wider text-sm">{{ config('salon.add_service_item') }}</span>
         </button>
     </div>
 
@@ -118,8 +118,8 @@
             <div class="p-6">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h3 id="modalTitle" class="text-xl font-bold text-white tracking-tight">Add New Dish</h3>
-                        <p class="text-sm font-medium text-white/40">Enter dish details below</p>
+                        <h3 id="modalTitle" class="text-xl font-bold text-white tracking-tight">{{ config('salon.add_service_item') }}</h3>
+                        <p class="text-sm font-medium text-white/40">Enter item details below</p>
                     </div>
                     <button onclick="closeMenuModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,8 +134,8 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Dish Name</label>
-                            <input type="text" name="name" id="menuName" required placeholder="e.g. Grilled Chicken" 
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Item name</label>
+                            <input type="text" name="name" id="menuName" required placeholder="e.g. Silk press, hair oil" 
                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                         </div>
                         <div>
@@ -153,7 +153,7 @@
                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Prep Time (min)</label>
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Duration (min)</label>
                             <input type="number" name="preparation_time" id="menuPrepTime" placeholder="e.g. 15" 
                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                         </div>
@@ -162,11 +162,11 @@
                     <div class="space-y-4">
                         <div>
                             <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Description</label>
-                            <textarea name="description" id="menuDescription" rows="4" placeholder="Describe the dish..." 
+                            <textarea name="description" id="menuDescription" rows="4" placeholder="Describe this service or product…" 
                                       class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all resize-none"></textarea>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Dish Image</label>
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.service_menu_image') }}</label>
                             <div class="relative group">
                                 <input type="file" name="image" id="menuImage" class="hidden" onchange="previewImage(this)">
                                 <div onclick="document.getElementById('menuImage').click()" class="w-full h-28 bg-white/5 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center cursor-pointer group-hover:border-violet-500 transition-all overflow-hidden">
@@ -191,7 +191,7 @@
 
                     <div class="col-span-full mt-4">
                         <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all">
-                            Save Menu Item
+                            Save service / product
                         </button>
                     </div>
                 </form>
@@ -205,7 +205,7 @@
             <div class="p-6 border-b border-white/5 flex justify-between items-center">
                 <div>
                     <h3 class="text-xl font-bold text-white tracking-tight">Manage Categories</h3>
-                    <p class="text-sm font-medium text-white/40">Add or edit menu categories</p>
+                    <p class="text-sm font-medium text-white/40">Add or edit catalog categories</p>
                 </div>
                 <button onclick="closeCategoriesModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -310,7 +310,7 @@
 
     <script>
         function openAddMenuModal() {
-            document.getElementById('modalTitle').innerText = 'Add New Dish';
+            document.getElementById('modalTitle').innerText = @json(config('salon.add_service_item'));
             document.getElementById('menuForm').action = '{{ route("manager.menu.store") }}';
             document.getElementById('formMethod').value = 'POST';
             document.getElementById('menuName').value = '';
@@ -326,7 +326,7 @@
         }
 
         function openEditMenuModal(item) {
-            document.getElementById('modalTitle').innerText = 'Edit Dish';
+            document.getElementById('modalTitle').innerText = @json(config('salon.edit_service_item'));
             document.getElementById('menuForm').action = `/manager/menu/${item.id}`;
             document.getElementById('formMethod').value = 'PUT';
             document.getElementById('menuName').value = item.name;

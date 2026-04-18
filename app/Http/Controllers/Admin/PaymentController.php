@@ -46,7 +46,15 @@ class PaymentController extends Controller
 
         return response()->streamDownload(function () use ($payments): void {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Transaction ID', 'Order ID', 'Restaurant', 'Amount', 'Method', 'Status', 'Date']);
+            fputcsv($out, [
+                'Transaction ID',
+                config('salon.booking').' ID',
+                config('salon.entity'),
+                'Amount',
+                'Method',
+                'Status',
+                'Date',
+            ]);
             foreach ($payments as $p) {
                 fputcsv($out, [
                     $p->transaction_id ?? '',

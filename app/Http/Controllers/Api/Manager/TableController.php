@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api\Manager;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Table;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TableController extends Controller
 {
@@ -16,9 +15,10 @@ class TableController extends Controller
     public function index()
     {
         $tables = Table::all();
+
         return response()->json([
             'success' => true,
-            'data' => $tables
+            'data' => $tables,
         ]);
     }
 
@@ -33,7 +33,7 @@ class TableController extends Controller
         ]);
 
         $restaurant = Auth::user()->restaurant;
-        
+
         $table = Table::create([
             'restaurant_id' => $restaurant->id,
             'name' => $request->name,
@@ -43,16 +43,16 @@ class TableController extends Controller
 
         // Generate QR Code content (e.g., URL to order page with table ID)
         // You can customize this URL structure
-        $qrContent = config('app.url') . "/menu/" . $restaurant->id . "?table=" . $table->id;
-        
+        $qrContent = config('app.url').'/menu/'.$restaurant->id.'?table='.$table->id;
+
         // In a real app, you might generate and save the QR image to storage
         // For now, we'll just save the content string
         $table->update(['qr_code' => $qrContent]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Table created successfully',
-            'data' => $table
+            'message' => 'Seat created successfully',
+            'data' => $table,
         ], 201);
     }
 
@@ -63,7 +63,7 @@ class TableController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $table
+            'data' => $table,
         ]);
     }
 
@@ -82,8 +82,8 @@ class TableController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Table updated successfully',
-            'data' => $table
+            'message' => 'Seat updated successfully',
+            'data' => $table,
         ]);
     }
 
@@ -96,7 +96,7 @@ class TableController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Table deleted successfully'
+            'message' => 'Seat deleted successfully',
         ]);
     }
 }

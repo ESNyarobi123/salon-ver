@@ -15,11 +15,11 @@
             <form id="selcomPayForm" class="space-y-4">
                 <input type="hidden" id="modalOrderId">
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Phone (07XXXXXXXX)</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} phone (07XXXXXXXX)</label>
                     <input type="text" id="customerPhone" required placeholder="e.g. 0744963858" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Customer Name</label>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.customer') }} name</label>
                     <input type="text" id="customerName" required placeholder="e.g. John Doe" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500">
                 </div>
                 <button type="submit" id="payButton" class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">Send USSD Push</button>

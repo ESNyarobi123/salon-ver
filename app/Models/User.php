@@ -150,8 +150,9 @@ class User extends Authenticatable
         $botNumber = \App\Models\Setting::get('whatsapp_bot_number', '255794321510');
         $cleanNumber = preg_replace('/[^0-9]/', '', $botNumber);
 
-        // Format: START_{restaurant_id}_W{waiter_id}
-        $message = 'START_'.$this->restaurant_id.'_W'.$this->id;
+        // WhatsApp prefill: S = stylist user id (avoids mixing with saloon tags PREFIX-W##).
+        // Legacy START_{id}_W{user} is still accepted in parseEntry for old printed QRs.
+        $message = 'START_'.$this->restaurant_id.'_S'.$this->id;
 
         return 'https://wa.me/'.$cleanNumber.'?text='.urlencode($message);
     }

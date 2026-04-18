@@ -8,8 +8,8 @@
 {{-- Header: title + actions --}}
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 sm:mb-6">
     <div>
-        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">Live Orders</h1>
-        <p class="text-xs sm:text-sm font-medium text-white/40 uppercase tracking-wider mt-0.5">Pending → Preparing → Served → Completed</p>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">{{ config('salon.live_bookings') }}</h1>
+        <p class="text-xs sm:text-sm font-medium text-white/40 uppercase tracking-wider mt-0.5">Pending → {{ config('salon.order_column_in_progress') }} → Served → Paid</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
         <span class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-white/80">
@@ -20,7 +20,7 @@
         </button>
         <button type="button" onclick="openCreateOrderModal()" class="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-violet-500/25 transition-all touch-action-manipulation">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
-            Create Order
+            New booking
         </button>
     </div>
 </div>
@@ -53,7 +53,7 @@
             <div class="flex items-center justify-between mb-4 shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" aria-hidden="true"></span>
-                    <h2 class="font-bold text-white uppercase tracking-wider text-xs">Preparing</h2>
+                    <h2 class="font-bold text-white uppercase tracking-wider text-xs">{{ config('salon.order_column_in_progress') }}</h2>
                 </div>
                 <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/20">{{ $preparingOrders->count() }}</span>
             </div>
@@ -61,7 +61,7 @@
                 @forelse($preparingOrders as $order)
                     @include('order-portal.partials.order-card', ['order' => $order, 'status' => 'preparing'])
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8 md:py-10">No orders in kitchen</p>
+                    <p class="text-sm text-white/30 text-center py-8 md:py-10">Nothing on {{ strtolower(config('salon.floor_display_short')) }} yet</p>
                 @endforelse
             </div>
         </div>
@@ -101,7 +101,7 @@
                 @forelse($paidOrders as $order)
                     <div class="glass p-4 rounded-xl">
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-sm font-bold text-white">Table #{{ $order->table_number }}</span>
+                            <span class="text-sm font-bold text-white">{{ config('salon.seat') }} #{{ $order->table_number }}</span>
                             <span class="text-xs font-medium text-white/50 shrink-0">Tsh {{ number_format($order->total_amount) }}</span>
                         </div>
                     </div>

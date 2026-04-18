@@ -35,7 +35,7 @@ class NotificationController extends Controller
         if ($validated['target'] === 'specific_restaurant' && empty($validated['restaurant_id'])) {
             return back()
                 ->withInput()
-                ->withErrors(['restaurant_id' => 'Chagua restaurant unapotuma kwa restaurant maalum.']);
+                ->withErrors(['restaurant_id' => 'Chagua saloon unapotuma kwa saloon maalum.']);
         }
 
         AdminSentNotification::create([

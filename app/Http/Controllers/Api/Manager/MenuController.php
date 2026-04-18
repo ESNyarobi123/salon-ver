@@ -17,6 +17,7 @@ class MenuController extends Controller
     {
         $menuItems = MenuItem::with('category')->latest()->get()->map(function ($item) {
             $item->imageUrl = $item->imageUrl();
+
             return $item;
         });
 
@@ -55,7 +56,7 @@ class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Menu item created successfully',
+            'message' => 'Service / product created successfully',
             'data' => $menuItem,
         ], 201);
     }
@@ -67,7 +68,7 @@ class MenuController extends Controller
     {
         $menuItem->load('category');
         $menuItem->imageUrl = $menuItem->imageUrl();
-        
+
         return response()->json([
             'success' => true,
             'data' => $menuItem,
@@ -107,7 +108,7 @@ class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Menu item updated successfully',
+            'message' => 'Service / product updated successfully',
             'data' => $menuItem,
         ]);
     }
@@ -124,7 +125,7 @@ class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Menu item deleted successfully',
+            'message' => 'Service / product deleted successfully',
         ]);
     }
 }

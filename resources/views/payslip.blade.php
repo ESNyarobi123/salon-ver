@@ -38,7 +38,7 @@
         <span class="label">ID: {{ $waiterId }}</span>
     </div>
     <div class="row">
-        <span class="label">Position: Waiter</span>
+        <span class="label">Position: {{ config('salon.staff') }}</span>
     </div>
 
     <div class="sep"></div>

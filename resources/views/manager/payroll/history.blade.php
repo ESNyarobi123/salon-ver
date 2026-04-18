@@ -31,7 +31,7 @@
                 </svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">No payments yet</h3>
-            <p class="text-white/50 max-w-sm mx-auto mb-6">Confirm payments for waiters on the Payroll page, then history will appear here.</p>
+            <p class="text-white/50 max-w-sm mx-auto mb-6">Confirm payments for {{ strtolower(config('salon.staff_plural')) }} on the Payroll page, then history will appear here.</p>
             <a href="{{ route('manager.payroll.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all">
                 Go to Payroll
             </a>
@@ -73,7 +73,7 @@
                         <table class="w-full text-left min-w-[640px]">
                             <thead>
                                 <tr class="border-b border-white/10 bg-white/5">
-                                    <th class="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-white/50">Waiter</th>
+                                    <th class="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-white/50">{{ config('salon.staff') }}</th>
                                     <th class="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-white/50">ID</th>
                                     <th class="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-white/50 text-right">Basic</th>
                                     <th class="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-white/50 text-right">Allowances</th>

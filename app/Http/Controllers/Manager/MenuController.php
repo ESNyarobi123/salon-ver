@@ -41,7 +41,7 @@ class MenuController extends Controller
 
         MenuItem::create($data);
 
-        return back()->with('success', 'Menu item added successfully!');
+        return back()->with('success', 'Service / product added successfully!');
     }
 
     public function update(Request $request, MenuItem $menuItem)
@@ -68,7 +68,7 @@ class MenuController extends Controller
 
         $menuItem->update($data);
 
-        return back()->with('success', 'Menu item updated successfully!');
+        return back()->with('success', 'Service / product updated successfully!');
     }
 
     public function destroy(MenuItem $menuItem)
@@ -78,6 +78,6 @@ class MenuController extends Controller
         }
         $menuItem->delete();
 
-        return back()->with('success', 'Menu item deleted successfully!');
+        return back()->with('success', 'Service / product deleted successfully!');
     }
 }

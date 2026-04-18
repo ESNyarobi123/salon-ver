@@ -134,7 +134,7 @@
             <p class="text-xs text-cyan-400 font-semibold">{{ $tips->count() }} tips</p>
         </div>
         <div class="glass-card p-6 rounded-2xl">
-            <p class="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">Avg Order Value</p>
+            <p class="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">Avg booking value</p>
             <p class="text-3xl font-bold text-white mb-1">Tsh {{ number_format($avgOrderValue) }}</p>
             <p class="text-xs text-violet-400 font-semibold">Per transaction</p>
         </div>
@@ -297,7 +297,7 @@
                     <tr class="bg-white/[0.02]">
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Date</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Order</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Waiter</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">{{ config('salon.staff') }}</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Method</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Amount</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-wider">Status</th>
@@ -307,7 +307,7 @@
                     @forelse($payments as $payment)
                         <tr class="hover:bg-white/[0.02] transition-colors">
                             <td class="px-6 py-5 text-sm text-white/60">{{ $payment->created_at->format('M d, H:i') }}</td>
-                            <td class="px-6 py-5 font-semibold text-white">Table #{{ $payment->order?->table_number ?? 'N/A' }}</td>
+                            <td class="px-6 py-5 font-semibold text-white">{{ config('salon.seat') }} #{{ $payment->order?->table_number ?? 'N/A' }}</td>
                             <td class="px-6 py-5 text-sm text-cyan-400">{{ $payment->waiter?->name ?? 'Unassigned' }}</td>
                             <td class="px-6 py-5">
                                 <span class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase border border-cyan-500/20">{{ $payment->method }}</span>

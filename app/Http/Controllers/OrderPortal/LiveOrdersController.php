@@ -14,6 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class LiveOrdersController extends Controller
@@ -54,7 +56,7 @@ class LiveOrdersController extends Controller
             ->get();
 
         $preparingOrders = $this->orderQuery()->with('items.menuItem')
-            ->where('status', 'preparing')
+            ->whereIn('status', ['preparing', 'ready'])
             ->latest()
             ->get();
 
@@ -163,30 +165,45 @@ class LiveOrdersController extends Controller
             ];
         }
 
-        $order = Order::withoutGlobalScopes()->create([
-            'restaurant_id' => $restaurantId,
-            'waiter_id' => $this->waiterId(),
-            'table_number' => $request->table_number,
-            'customer_phone' => $request->customer_phone ?? '',
-            'customer_name' => $request->customer_name ?? '',
-            'total_amount' => $totalAmount,
-            'status' => 'pending',
-        ]);
+        try {
+            $order = DB::transaction(function () use ($restaurantId, $request, $totalAmount, $orderItems) {
+                $order = Order::withoutGlobalScopes()->create([
+                    'restaurant_id' => $restaurantId,
+                    'waiter_id' => $this->waiterId(),
+                    'table_number' => $request->table_number,
+                    'customer_phone' => $request->customer_phone ?? '',
+                    'customer_name' => $request->customer_name ?? '',
+                    'total_amount' => $totalAmount,
+                    'status' => 'pending',
+                ]);
 
-        foreach ($orderItems as $item) {
-            $order->items()->create($item);
+                foreach ($orderItems as $item) {
+                    $order->items()->create($item);
+                }
+
+                return $order;
+            });
+        } catch (ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => collect($e->errors())->flatten()->first(),
+                    'errors' => $e->errors(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
         if ($request->expectsJson()) {
             $order->load('items.menuItem');
 
             return response()->json([
-                'message' => 'Order created successfully.',
+                'message' => 'Booking created successfully.',
                 'data' => $this->orderToArray($order),
             ], Response::HTTP_CREATED);
         }
 
-        return redirect()->back()->with('success', 'Order created successfully.');
+        return redirect()->back()->with('success', 'Booking created successfully.');
     }
 
     public function update(Request $request, int $order): RedirectResponse|JsonResponse
@@ -194,7 +211,7 @@ class LiveOrdersController extends Controller
         $orderModel = $this->orderQuery()->findOrFail($order);
 
         if ($request->has('status')) {
-            $request->validate(['status' => 'in:pending,preparing,served,paid']);
+            $request->validate(['status' => 'in:pending,preparing,ready,served,paid']);
             $orderModel->update(['status' => $request->status]);
         }
 
@@ -213,40 +230,53 @@ class LiveOrdersController extends Controller
                 'items.*.quantity' => 'required|integer|min:0',
             ]);
             $restaurantId = $this->restaurantId();
-            $totalAmount = 0;
-            $orderModel->items()->delete();
-            foreach ($request->items as $itemData) {
-                $qty = (int) ($itemData['quantity'] ?? 0);
-                if ($qty < 1) {
-                    continue;
+            try {
+                DB::transaction(function () use ($request, $orderModel, $restaurantId) {
+                    $totalAmount = 0;
+                    $orderModel->items()->delete();
+                    foreach ($request->items as $itemData) {
+                        $qty = (int) ($itemData['quantity'] ?? 0);
+                        if ($qty < 1) {
+                            continue;
+                        }
+                        $menuItem = MenuItem::withoutGlobalScopes()->findOrFail($itemData['id']);
+                        if ($menuItem->restaurant_id != $restaurantId) {
+                            continue;
+                        }
+                        $subtotal = $menuItem->price * $qty;
+                        $totalAmount += $subtotal;
+                        $orderModel->items()->create([
+                            'menu_item_id' => $menuItem->id,
+                            'name' => $menuItem->name,
+                            'quantity' => $qty,
+                            'price' => $menuItem->price,
+                            'total' => $subtotal,
+                        ]);
+                    }
+                    $orderModel->update(['total_amount' => $totalAmount]);
+                });
+            } catch (ValidationException $e) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => collect($e->errors())->flatten()->first(),
+                        'errors' => $e->errors(),
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
-                $menuItem = MenuItem::withoutGlobalScopes()->findOrFail($itemData['id']);
-                if ($menuItem->restaurant_id != $restaurantId) {
-                    continue;
-                }
-                $subtotal = $menuItem->price * $qty;
-                $totalAmount += $subtotal;
-                $orderModel->items()->create([
-                    'menu_item_id' => $menuItem->id,
-                    'name' => $menuItem->name,
-                    'quantity' => $qty,
-                    'price' => $menuItem->price,
-                    'total' => $subtotal,
-                ]);
+
+                return redirect()->back()->withErrors($e->errors())->withInput();
             }
-            $orderModel->update(['total_amount' => $totalAmount]);
         }
 
         if ($request->expectsJson()) {
             $orderModel->load('items.menuItem');
 
             return response()->json([
-                'message' => 'Order updated successfully.',
+                'message' => 'Booking updated successfully.',
                 'data' => $this->orderToArray($orderModel),
             ]);
         }
 
-        return redirect()->back()->with('success', 'Order updated successfully.');
+        return redirect()->back()->with('success', 'Booking updated successfully.');
     }
 
     public function destroy(int $order): RedirectResponse|JsonResponse
@@ -256,11 +286,11 @@ class LiveOrdersController extends Controller
 
         if (request()->expectsJson()) {
             return response()->json([
-                'message' => 'Order deleted.',
+                'message' => 'Booking deleted.',
             ]);
         }
 
-        return redirect()->back()->with('success', 'Order deleted.');
+        return redirect()->back()->with('success', 'Booking deleted.');
     }
 
     public function paymentInitiate(Request $request, SelcomService $selcom): JsonResponse
@@ -286,10 +316,10 @@ class LiveOrdersController extends Controller
         $result = $selcom->initiatePayment($restaurant->getSelcomCredentials(), [
             'order_id' => $transactionId,
             'email' => 'customer@taptap.co.tz',
-            'name' => $request->name ?? 'Customer',
+            'name' => $request->name ?? 'Client',
             'phone' => $request->phone,
             'amount' => $order->total_amount,
-            'description' => 'Order #'.$order->id,
+            'description' => 'Booking #'.$order->id,
         ]);
 
         if (isset($result['status']) && $result['status'] === 'success') {

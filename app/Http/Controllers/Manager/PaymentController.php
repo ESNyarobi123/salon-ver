@@ -22,11 +22,11 @@ class PaymentController extends Controller
     public function index(Request $request)
     {
         $restaurant = Auth::user()->restaurant;
-        
+
         $period = $request->get('period', 'month');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
-        
+
         [$start, $end] = $this->getDateRange($period, $startDate, $endDate);
 
         // Get payments for this restaurant only
@@ -103,31 +103,32 @@ class PaymentController extends Controller
     private function getDailyRevenue($restaurantId, $start, $end, $period)
     {
         $dailyRevenue = [];
-        
+
         // Calculate number of days in range
         $daysDiff = $start->diffInDays($end);
-        
+
         // For periods longer than 31 days, show weekly data instead
         if ($daysDiff > 31) {
             $weeks = ceil($daysDiff / 7);
             for ($i = $weeks - 1; $i >= 0; $i--) {
                 $weekStart = $end->copy()->subWeeks($i + 1)->startOfWeek();
                 $weekEnd = $end->copy()->subWeeks($i)->startOfWeek();
-                
+
                 $revenue = Payment::where('restaurant_id', $restaurantId)
                     ->whereIn('status', ['paid', 'completed'])
                     ->whereBetween('created_at', [$weekStart, $weekEnd])
                     ->sum('amount');
-                    
+
                 $dailyRevenue[] = [
                     'date' => $weekStart->format('M d'),
                     'revenue' => $revenue,
-                    'label' => 'Week of ' . $weekStart->format('M d')
+                    'label' => 'Week of '.$weekStart->format('M d'),
                 ];
             }
+
             return $dailyRevenue;
         }
-        
+
         // For shorter periods, show daily breakdown
         $current = $start->copy();
         while ($current <= $end) {
@@ -135,16 +136,16 @@ class PaymentController extends Controller
                 ->whereIn('status', ['paid', 'completed'])
                 ->whereDate('created_at', $current)
                 ->sum('amount');
-                
+
             $dailyRevenue[] = [
                 'date' => $current->format('M d'),
                 'revenue' => $revenue,
-                'label' => $current->format('D, M d')
+                'label' => $current->format('D, M d'),
             ];
-            
+
             $current->addDay();
         }
-        
+
         return $dailyRevenue;
     }
 
@@ -178,7 +179,7 @@ class PaymentController extends Controller
             'name' => $request->name ?? 'Customer',
             'phone' => $request->phone,
             'amount' => $order->total_amount,
-            'description' => 'Order #'.$order->id,
+            'description' => 'Booking #'.$order->id,
         ]);
 
         if (isset($result['status']) && $result['status'] === 'success') {
@@ -272,11 +273,11 @@ class PaymentController extends Controller
     public function export(Request $request)
     {
         $restaurant = Auth::user()->restaurant;
-        
+
         $period = $request->get('period', 'today');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
-        
+
         [$start, $end] = $this->getDateRange($period, $startDate, $endDate);
 
         $payments = Payment::where('restaurant_id', $restaurant->id)
@@ -291,20 +292,20 @@ class PaymentController extends Controller
             ->with('waiter')
             ->get();
 
-        $filename = 'revenue_report_' . date('Y-m-d_His') . '.csv';
-        
+        $filename = 'revenue_report_'.date('Y-m-d_His').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
-        
-        $callback = function() use ($payments, $tips) {
+
+        $callback = function () use ($payments, $tips) {
             $file = fopen('php://output', 'w');
-            
+
             // Payments section
             fputcsv($file, ['PAYMENTS']);
-            fputcsv($file, ['Date', 'Order ID', 'Waiter', 'Amount (Tsh)', 'Method', 'Status']);
-            
+            fputcsv($file, ['Date', config('salon.booking').' ID', config('salon.staff'), 'Amount (Tsh)', 'Method', 'Status']);
+
             foreach ($payments as $payment) {
                 fputcsv($file, [
                     $payment->created_at->format('Y-m-d H:i'),
@@ -315,14 +316,14 @@ class PaymentController extends Controller
                     ucfirst($payment->status),
                 ]);
             }
-            
+
             // Empty row
             fputcsv($file, []);
-            
+
             // Tips section
             fputcsv($file, ['TIPS']);
-            fputcsv($file, ['Date', 'Order ID', 'Waiter', 'Amount (Tsh)']);
-            
+            fputcsv($file, ['Date', config('salon.booking').' ID', config('salon.staff'), 'Amount (Tsh)']);
+
             foreach ($tips as $tip) {
                 fputcsv($file, [
                     $tip->created_at->format('Y-m-d H:i'),
@@ -331,17 +332,17 @@ class PaymentController extends Controller
                     number_format($tip->amount, 2),
                 ]);
             }
-            
+
             // Summary
             fputcsv($file, []);
             fputcsv($file, ['SUMMARY']);
             fputcsv($file, ['Total Revenue', number_format($payments->sum('amount'), 2)]);
             fputcsv($file, ['Total Tips', number_format($tips->sum('amount'), 2)]);
             fputcsv($file, ['Total Transactions', $payments->count()]);
-            
+
             fclose($file);
         };
-        
+
         return response()->stream($callback, 200, $headers);
     }
 
@@ -357,7 +358,7 @@ class PaymentController extends Controller
             case 'custom':
                 return [
                     Carbon::parse($startDate)->startOfDay(),
-                    Carbon::parse($endDate)->endOfDay()
+                    Carbon::parse($endDate)->endOfDay(),
                 ];
             default:
                 return [Carbon::today(), Carbon::now()];

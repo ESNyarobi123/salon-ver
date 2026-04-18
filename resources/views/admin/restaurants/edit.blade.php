@@ -1,12 +1,12 @@
 <x-admin-layout>
     <x-slot name="header">
-        Edit Restaurant
+        Edit {{ config('salon.entity') }}
     </x-slot>
 
     <div class="max-w-3xl mx-auto">
         <div class="glass-card rounded-2xl p-8">
             <div class="mb-8">
-                <h3 class="text-2xl font-black text-white tracking-tight">Restaurant Settings</h3>
+                <h3 class="text-2xl font-black text-white tracking-tight">{{ config('salon.entity') }} settings</h3>
                 <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Update restaurant profile and configuration</p>
             </div>
 
@@ -16,7 +16,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Restaurant Name</label>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">{{ config('salon.entity') }} name</label>
                         <input type="text" name="name" value="{{ old('name', $restaurant->name) }}" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all" required>
                         @error('name') <p class="text-rose-400 text-[10px] font-bold mt-1">{{ $message }}</p> @enderror
                     </div>

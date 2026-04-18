@@ -180,6 +180,8 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
     Route::post('/menu', [\App\Http\Controllers\Manager\MenuController::class, 'store'])->name('menu.store');
     Route::put('/menu/{menuItem}', [\App\Http\Controllers\Manager\MenuController::class, 'update'])->name('menu.update');
     Route::delete('/menu/{menuItem}', [\App\Http\Controllers\Manager\MenuController::class, 'destroy'])->name('menu.destroy');
+    Route::get('/stock', [\App\Http\Controllers\Manager\StockController::class, 'index'])->name('stock.index');
+    Route::put('/stock/{menuItem}', [\App\Http\Controllers\Manager\StockController::class, 'update'])->name('stock.update');
 
     // Categories
     Route::post('/categories', [\App\Http\Controllers\Manager\CategoryController::class, 'store'])->name('categories.store');
@@ -205,6 +207,7 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
     Route::post('/api/selcom', [\App\Http\Controllers\Manager\ApiController::class, 'updateSelcomCredentials'])->name('api.selcom.update');
     Route::post('/api/selcom/test', [\App\Http\Controllers\Manager\ApiController::class, 'testSelcomConnection'])->name('api.selcom.test');
     Route::post('/api/support-phone', [\App\Http\Controllers\Manager\ApiController::class, 'updateSupportPhone'])->name('api.support-phone.update');
+    Route::post('/api/guest-wifi', [\App\Http\Controllers\Manager\ApiController::class, 'updateGuestWifi'])->name('api.guest-wifi.update');
 
     // Menu Image Upload
     Route::get('/menu-image', [\App\Http\Controllers\Manager\MenuImageController::class, 'index'])->name('menu-image.index');
@@ -213,9 +216,13 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
 
     Route::resource('tables', \App\Http\Controllers\Manager\TableController::class);
     Route::get('/help', [\App\Http\Controllers\Manager\HelpController::class, 'index'])->name('help.index');
-    
+
     Route::get('/reports/performance', [\App\Http\Controllers\Manager\ReportController::class, 'performance'])->name('reports.performance');
     Route::get('/reports/export-performance', [\App\Http\Controllers\Manager\ReportController::class, 'exportPerformance'])->name('reports.export-performance');
+
+    // Kitchen / floor display token (KDS)
+    Route::post('/kitchen/generate-token', [\App\Http\Controllers\KitchenController::class, 'generateToken'])->name('kitchen.generate');
+    Route::post('/kitchen/revoke-token', [\App\Http\Controllers\KitchenController::class, 'revokeToken'])->name('kitchen.revoke');
 });
 
 // Waiter Portal (dashboard allowed when not linked; other routes require linked restaurant)
@@ -251,12 +258,6 @@ Route::prefix('kitchen')->name('kitchen.')->group(function () {
     Route::get('/api/{token}/history', [\App\Http\Controllers\KitchenController::class, 'getOrderHistory'])->name('api.history');
     Route::post('/api/{token}/order/status', [\App\Http\Controllers\KitchenController::class, 'updateStatus'])->name('api.order.status');
     Route::post('/api/{token}/item/status', [\App\Http\Controllers\KitchenController::class, 'updateItemStatus'])->name('api.item.status');
-});
-
-// Manager KDS Token Management
-Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')->group(function () {
-    Route::post('/kitchen/generate-token', [\App\Http\Controllers\KitchenController::class, 'generateToken'])->name('kitchen.generate');
-    Route::post('/kitchen/revoke-token', [\App\Http\Controllers\KitchenController::class, 'revokeToken'])->name('kitchen.revoke');
 });
 
 // TIPTAP ORDER Portal (waiter login with manager-generated password)

@@ -41,14 +41,14 @@
                     </div>
 
                     <div>
-                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Associated Restaurant</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Associated {{ config('salon.entity') }}</p>
                         @if($user->restaurant)
                             <a href="{{ route('admin.restaurants.show', $user->restaurant) }}" class="text-white font-bold hover:text-violet-400 transition-all flex items-center gap-2">
                                 {{ $user->restaurant->name }}
                                 <i data-lucide="external-link" class="w-3 h-3"></i>
                             </a>
                         @else
-                            <p class="text-white font-bold">System Wide (No Restaurant)</p>
+                            <p class="text-white font-bold">System wide (no {{ strtolower(config('salon.entity')) }})</p>
                         @endif
                     </div>
                 </div>

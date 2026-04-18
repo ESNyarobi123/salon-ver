@@ -1,7 +1,7 @@
 <div id="editItemsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-6">
     <div class="bg-[#0f0a1e] w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 max-h-[92vh] flex flex-col pb-[env(safe-area-inset-bottom)]">
         <div class="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center shrink-0">
-            <h3 class="text-xl font-bold text-white tracking-tight">Edit Order (Menu Items)</h3>
+            <h3 class="text-xl font-bold text-white tracking-tight">Edit booking ({{ config('salon.services') }})</h3>
             <button type="button" onclick="closeEditItemsModal()" class="p-2 hover:bg-white/10 rounded-xl text-white/40 hover:text-white">✕</button>
         </div>
         <form id="editItemsForm" method="POST" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 min-h-0">

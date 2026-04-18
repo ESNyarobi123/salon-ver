@@ -7,7 +7,7 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-3xl font-bold text-white tracking-tight">Performance Report</h2>
-                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">Restaurant & Waiter Performance Metrics</p>
+                <p class="text-sm font-medium text-white/40 uppercase tracking-wider">{{ config('salon.entity') }} &amp; {{ config('salon.staff') }} performance</p>
             </div>
             <a href="{{ route('manager.reports.export-performance', ['period' => $period, 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <h3 class="text-3xl font-bold text-white mb-1">{{ number_format($totalOrders) }}</h3>
-                <p class="text-sm text-white/40 font-medium uppercase tracking-wider">Total Orders</p>
+                <p class="text-sm text-white/40 font-medium uppercase tracking-wider">Total bookings</p>
             </div>
 
             <div class="glass-card p-6 rounded-2xl">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="flex-1">
                     <h4 class="text-xl font-bold text-white mb-1">Top Performer</h4>
-                    <p class="text-white/60">{{ $topPerformer['name'] }} - {{ $topPerformer['orders_count'] }} orders handled</p>
+                    <p class="text-white/60">{{ $topPerformer['name'] }} — {{ $topPerformer['orders_count'] }} bookings handled</p>
                 </div>
                 <div class="text-right">
                     <div class="text-2xl font-bold text-violet-400">{{ number_format($topPerformer['tips_earned']) }} Tsh</div>
@@ -105,24 +105,24 @@
         </div>
         @endif
 
-        <!-- Waiter Performance Table -->
+        <!-- Stylist performance -->
         <div class="glass-card rounded-2xl overflow-hidden">
             <div class="p-6 border-b border-white/5">
-                <h3 class="text-xl font-bold text-white">Waiter Performance</h3>
-                <p class="text-sm text-white/40">Detailed metrics for each waiter</p>
+                <h3 class="text-xl font-bold text-white">{{ config('salon.staff') }} performance</h3>
+                <p class="text-sm text-white/40">Detailed metrics for each {{ strtolower(config('salon.staff')) }}</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full" id="performanceTable">
                     <thead>
                         <tr class="border-b border-white/5">
                             <th class="text-left p-4 text-[10px] font-bold uppercase tracking-wider text-white/40 cursor-pointer hover:text-white/60" onclick="sortTable(0)">
-                                Waiter Name
+                                {{ config('salon.staff') }} name
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-1">
                                     <path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
                                 </svg>
                             </th>
                             <th class="text-left p-4 text-[10px] font-bold uppercase tracking-wider text-white/40 cursor-pointer hover:text-white/60" onclick="sortTable(1)">
-                                Orders Handled
+                                Bookings handled
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-1">
                                     <path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
                                 </svg>
@@ -172,7 +172,7 @@
                         @empty
                         <tr>
                             <td colspan="4" class="p-8 text-center text-white/40">
-                                No waiter data available for this period
+                                No {{ strtolower(config('salon.staff')) }} data for this period
                             </td>
                         </tr>
                         @endforelse

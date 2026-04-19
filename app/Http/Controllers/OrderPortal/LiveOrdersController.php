@@ -43,7 +43,8 @@ class LiveOrdersController extends Controller
     {
         return Order::withoutGlobalScopes()
             ->where('restaurant_id', $this->restaurantId())
-            ->where('waiter_id', $this->waiterId());
+            ->where('waiter_id', $this->waiterId())
+            ->where('order_kind', Order::KIND_BOOKING);
     }
 
     public function index(): View|JsonResponse
@@ -98,6 +99,26 @@ class LiveOrdersController extends Controller
             ])->values()->all(),
         ])->values()->all();
 
+        $productCategories = Category::withoutGlobalScopes()
+            ->where('restaurant_id', $restaurantId)
+            ->where('catalog_kind', Category::CATALOG_KIND_PRODUCT)
+            ->with(['menuItems' => fn ($q) => $q->where('is_available', true)->orderBy('name')])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn (Category $c) => $c->menuItems->isNotEmpty());
+
+        $productCategoriesPayload = $productCategories->map(fn (Category $c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'items' => $c->menuItems->map(fn (MenuItem $m) => [
+                'id' => $m->id,
+                'name' => $m->name,
+                'price' => $m->price,
+                'image_url' => $m->image ? $m->imageUrl() : null,
+            ])->values()->all(),
+        ])->values()->all();
+
         if (request()->expectsJson()) {
             return response()->json([
                 'data' => [
@@ -115,6 +136,7 @@ class LiveOrdersController extends Controller
                         'image_url' => $m->image ? $m->imageUrl() : null,
                     ]),
                     'booking_categories' => $bookingCategoriesPayload,
+                    'product_categories' => $productCategoriesPayload,
                     'restaurant' => [
                         'id' => $restaurant->id,
                         'name' => $restaurant->name,
@@ -216,6 +238,7 @@ class LiveOrdersController extends Controller
             $order = DB::transaction(function () use ($restaurantId, $request, $totalAmount, $orderItems, $scheduledAt) {
                 $order = Order::withoutGlobalScopes()->create([
                     'restaurant_id' => $restaurantId,
+                    'order_kind' => Order::KIND_BOOKING,
                     'waiter_id' => $this->waiterId(),
                     'table_number' => $request->table_number,
                     'customer_phone' => $request->customer_phone ?? '',

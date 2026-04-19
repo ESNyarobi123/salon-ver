@@ -213,5 +213,10 @@ Route::prefix('order-portal')->middleware('web')->group(function () {
         Route::delete('/orders/{order}', [\App\Http\Controllers\OrderPortal\LiveOrdersController::class, 'destroy']);
         Route::post('/payments/selcom/initiate', [\App\Http\Controllers\OrderPortal\LiveOrdersController::class, 'paymentInitiate']);
         Route::get('/payments/selcom/status/{order}', [\App\Http\Controllers\OrderPortal\LiveOrdersController::class, 'paymentStatus']);
+        Route::get('/product-sales', [\App\Http\Controllers\OrderPortal\ProductSalesController::class, 'index']);
+        Route::post('/product-sales', [\App\Http\Controllers\OrderPortal\ProductSalesController::class, 'store']);
+        Route::delete('/product-sales/{order}', [\App\Http\Controllers\OrderPortal\ProductSalesController::class, 'destroy']);
+        Route::post('/product-sales/{order}/payments/selcom/initiate', [\App\Http\Controllers\OrderPortal\ProductSalesController::class, 'initiatePush']);
+        Route::get('/product-sales/{order}/payments/selcom/status', [\App\Http\Controllers\OrderPortal\ProductSalesController::class, 'paymentStatus']);
     });
 });

@@ -33,17 +33,25 @@ class DashboardController extends Controller
 
         // Orders Stats
         // 1. My Active Orders (Assigned to me)
-        $myActiveOrders = Order::where('waiter_id', $waiter->id)->whereIn('status', ['pending', 'preparing', 'ready'])->count();
+        $myActiveOrders = Order::where('waiter_id', $waiter->id)
+            ->where('order_kind', Order::KIND_BOOKING)
+            ->whereIn('status', ['pending', 'preparing', 'ready'])
+            ->count();
 
         // 2. All Active Restaurant Orders (To show workload)
-        $restaurantActiveOrders = Order::whereIn('status', ['pending', 'preparing', 'ready'])->count();
+        $restaurantActiveOrders = Order::where('order_kind', Order::KIND_BOOKING)
+            ->whereIn('status', ['pending', 'preparing', 'ready'])
+            ->count();
 
         // 3. Orders Ready to Serve (High priority)
-        $readyToServeOrders = Order::where('status', 'ready')->count();
+        $readyToServeOrders = Order::where('order_kind', Order::KIND_BOOKING)
+            ->where('status', 'ready')
+            ->count();
 
         // 4. Unassigned Orders (only visible to online waiters)
         $unassignedOrders = $waiter->is_online
             ? Order::with('items.menuItem')
+                ->where('order_kind', Order::KIND_BOOKING)
                 ->whereNull('waiter_id')
                 ->whereIn('status', ['pending', 'preparing', 'ready'])
                 ->latest()
@@ -166,8 +174,13 @@ class DashboardController extends Controller
 
         $stats = [
             'tips_today' => Tip::where('waiter_id', $waiter->id)->whereDate('created_at', $today)->sum('amount'),
-            'my_active_orders' => Order::where('waiter_id', $waiter->id)->whereIn('status', ['pending', 'preparing', 'ready'])->count(),
-            'ready_to_serve' => Order::where('status', 'ready')->count(),
+            'my_active_orders' => Order::where('waiter_id', $waiter->id)
+                ->where('order_kind', Order::KIND_BOOKING)
+                ->whereIn('status', ['pending', 'preparing', 'ready'])
+                ->count(),
+            'ready_to_serve' => Order::where('order_kind', Order::KIND_BOOKING)
+                ->where('status', 'ready')
+                ->count(),
             'pending_requests' => $waiter->is_online ? CustomerRequest::where('status', 'pending')->count() : 0,
         ];
 

@@ -13,10 +13,14 @@ class PaymentScreen extends StatefulWidget {
   final Order order;
   final VoidCallback onPaid;
 
+  /// Retail product sale (uses `/product-sales/.../payments/selcom/*`).
+  final bool isProductSale;
+
   const PaymentScreen({
     super.key,
     required this.order,
     required this.onPaid,
+    this.isProductSale = false,
   });
 
   @override
@@ -70,11 +74,17 @@ class _PaymentScreenState extends State<PaymentScreen>
     HapticFeedback.lightImpact();
 
     try {
-      final result = await _api.initiatePayment(
-        orderId: widget.order.id,
-        phone: _phoneController.text.trim(),
-        name: widget.order.customerName,
-      );
+      final result = widget.isProductSale
+          ? await _api.initiateProductPayment(
+              orderId: widget.order.id,
+              phone: _phoneController.text.trim(),
+              name: widget.order.customerName,
+            )
+          : await _api.initiatePayment(
+              orderId: widget.order.id,
+              phone: _phoneController.text.trim(),
+              name: widget.order.customerName,
+            );
 
       if (mounted) {
         if (result['status'] == 'success') {
@@ -128,7 +138,9 @@ class _PaymentScreenState extends State<PaymentScreen>
       _pollCount++;
 
       try {
-        final result = await _api.getPaymentStatus(widget.order.id);
+        final result = widget.isProductSale
+            ? await _api.getProductPaymentStatus(widget.order.id)
+            : await _api.getPaymentStatus(widget.order.id);
         final status = result['status'] as String? ?? 'pending';
 
         if (mounted) {
@@ -204,7 +216,8 @@ class _PaymentScreenState extends State<PaymentScreen>
       backgroundColor: AppTheme.bg,
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
-        title: Text('${SalonStrings.paymentAppBar} #${widget.order.id}',
+        title: Text(
+            '${widget.isProductSale ? SalonStrings.paymentAppBarProduct : SalonStrings.paymentAppBar} #${widget.order.id}',
             style: GoogleFonts.poppins(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -245,7 +258,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                 const SizedBox(height: 24),
 
                 // Cash confirm
-                if (widget.order.status == 'served')
+                if (!widget.isProductSale && widget.order.status == 'served')
                   _buildCashOption().animate().fadeIn(delay: 300.ms),
               ],
             ),
@@ -272,8 +285,11 @@ class _PaymentScreenState extends State<PaymentScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    SalonStrings.bookingSeatLine(
-                        widget.order.id, widget.order.tableNumber),
+                    widget.isProductSale
+                        ? SalonStrings.productSaleLine(
+                            widget.order.id, widget.order.tableNumber)
+                        : SalonStrings.bookingSeatLine(
+                            widget.order.id, widget.order.tableNumber),
                     style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,

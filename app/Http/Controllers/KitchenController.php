@@ -29,6 +29,7 @@ class KitchenController extends Controller
 
         $orders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurant->id)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->whereIn('status', ['pending', 'confirmed', 'preparing'])
             ->orderByRaw("CASE 
                 WHEN status = 'pending' THEN 1 

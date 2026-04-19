@@ -583,7 +583,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
             const SizedBox(height: 16),
             if (widget.tables.isNotEmpty)
               DropdownButtonFormField<String>(
-                value: _selectedSeat,
+                initialValue: _selectedSeat,
                 dropdownColor: AppTheme.surfaceVariant,
                 style: GoogleFonts.poppins(
                     color: AppTheme.textPrimary, fontSize: 14),
@@ -1023,7 +1023,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
       child: Row(
         children: [
           if (_step > 0)
-            TextButton(onPressed: _goBack, child: Text(SalonStrings.stepBack)),
+            TextButton(onPressed: _goBack, child: const Text(SalonStrings.stepBack)),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: _isLoading || _cart.isEmpty ? null : _submit,
@@ -1061,7 +1061,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
           if (_step > 0)
             TextButton(
               onPressed: _goBack,
-              child: Text(SalonStrings.stepBack),
+              child: const Text(SalonStrings.stepBack),
             ),
           const Spacer(),
           if (_step < 2)
@@ -1073,7 +1073,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
                 _goNext();
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-              label: Text(SalonStrings.stepContinue),
+              label: const Text(SalonStrings.stepContinue),
             ),
           if (_step == 2 && _cart.isEmpty)
             Flexible(
@@ -1126,7 +1126,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
               ],
             ),
           ),
-          TextButton(onPressed: _goBack, child: Text(SalonStrings.stepBack)),
+          TextButton(onPressed: _goBack, child: const Text(SalonStrings.stepBack)),
           const SizedBox(width: 8),
           SizedBox(
             height: 48,

@@ -240,6 +240,115 @@ class ApiService {
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
+  // ─── Product sales (retail; not shown on live bookings) ─────────────────
+
+  Future<ProductSalesData> getProductSales() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/product-sales'),
+      headers: await _headers(withAuth: true),
+    );
+
+    if (response.statusCode == 401) throw UnauthorizedException();
+    if (response.statusCode != 200) {
+      throw ApiException(
+          '${SalonStrings.apiLoadProductSalesFailed} (${response.statusCode})');
+    }
+
+    return ProductSalesData.fromJson(jsonDecode(response.body));
+  }
+
+  Future<ProductSaleRecord> createProductSale({
+    String? tableNumber,
+    String? customerPhone,
+    String? customerName,
+    required List<Map<String, int>> items,
+    required String payment,
+    String? pushPhone,
+  }) async {
+    final body = <String, dynamic>{
+      'items': items,
+      'payment': payment,
+    };
+    if (tableNumber != null && tableNumber.isNotEmpty) {
+      body['table_number'] = tableNumber;
+    }
+    if (customerPhone != null && customerPhone.isNotEmpty) {
+      body['customer_phone'] = customerPhone;
+    }
+    if (customerName != null && customerName.isNotEmpty) {
+      body['customer_name'] = customerName;
+    }
+    if (payment == 'push' &&
+        pushPhone != null &&
+        pushPhone.trim().isNotEmpty) {
+      body['push_phone'] = pushPhone.trim();
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/product-sales'),
+      headers: await _headers(withAuth: true),
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 401) throw UnauthorizedException();
+
+    final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
+
+    if (response.statusCode == 201) {
+      return ProductSaleRecord.fromJson(
+          responseBody['data'] as Map<String, dynamic>);
+    }
+
+    final message = responseBody['message'];
+    throw ApiException(
+      message is String ? message : SalonStrings.apiCreateProductSaleFailed,
+    );
+  }
+
+  Future<void> cancelProductSale(int orderId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/product-sales/$orderId'),
+      headers: await _headers(withAuth: true),
+    );
+
+    if (response.statusCode == 401) throw UnauthorizedException();
+    if (response.statusCode != 200) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>?;
+      throw ApiException(
+          body?['message']?.toString() ?? SalonStrings.apiCancelProductSaleFailed);
+    }
+  }
+
+  Future<Map<String, dynamic>> initiateProductPayment({
+    required int orderId,
+    required String phone,
+    String? name,
+  }) async {
+    final body = <String, dynamic>{'phone': phone};
+    if (name != null && name.isNotEmpty) body['name'] = name;
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/product-sales/$orderId/payments/selcom/initiate'),
+      headers: await _headers(withAuth: true),
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 401) throw UnauthorizedException();
+
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getProductPaymentStatus(int orderId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/product-sales/$orderId/payments/selcom/status'),
+      headers: await _headers(withAuth: true),
+    );
+
+    if (response.statusCode == 401) throw UnauthorizedException();
+
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
   // ─── Auth Check ─────────────────────────────────────────────────────────
 
   Future<bool> isLoggedIn() async {

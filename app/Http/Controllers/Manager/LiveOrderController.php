@@ -20,24 +20,28 @@ class LiveOrderController extends Controller
 
         $pendingOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->where('status', 'pending')
             ->latest()
             ->get();
 
         $preparingOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->whereIn('status', ['preparing', 'ready'])
             ->latest()
             ->get();
 
         $servedOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->where('status', 'served')
             ->latest()
             ->get();
 
         $paidOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->where('status', 'paid')
             ->whereDate('created_at', $today)
             ->latest()
@@ -148,6 +152,7 @@ class LiveOrderController extends Controller
             DB::transaction(function () use ($request, $orderItems, $totalAmount, $waiterId, $scheduledAt) {
                 $order = Order::create([
                     'restaurant_id' => auth()->user()->restaurant_id,
+                    'order_kind' => Order::KIND_BOOKING,
                     'waiter_id' => $waiterId,
                     'table_number' => $request->table_number,
                     'customer_phone' => $request->customer_phone,

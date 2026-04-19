@@ -25,6 +25,35 @@ abstract final class SalonStrings {
   static const tryAgain = 'Jaribu Tena';
 
   static const fabNewBooking = 'Booking mpya';
+  static const sellProductsCta = 'Uza bidhaa';
+  static const menuProductSalesHistory = 'Mauzo ya bidhaa & mapato';
+  static const productSalesTitle = 'Mauzo ya bidhaa';
+  static const productSalesSubtitle =
+      'Haijaonyeshwa kwenye live bookings. Cash au push → malipo kamili.';
+  static const newProductSaleTitle = 'Uza bidhaa';
+  static const newProductSaleSubtitle =
+      'Hatua 2: chagua bidhaa → malipo (cash au USSD).';
+  static const stepProductsRetail = 'Bidhaa';
+  static const stepPayRetail = 'Malipo';
+  static const menuSearchProductsHint = 'Tafuta bidhaa…';
+  static const noRetailProducts =
+      'Hakuna bidhaa za kuuza. Weka bidhaa chini ya kategoria ya Product kwenye menyu.';
+  static const payCashInstant = 'Cash (kamilika mara moja)';
+  static const payPushSelcom = 'USSD Push (Selcom)';
+  static const pushPhoneLabel = 'Simu ya push *';
+  static const completeProductCash = 'Kamilisha (cash)';
+  static const continueWithPush = 'Endelea na push';
+  static const snackProductSaleRecorded = 'Mauzo ya bidhaa yamesajiliwa ✓';
+  static const paymentAppBarProduct = 'Malipo – bidhaa';
+  static String productSaleLine(int id, String ref) => 'Uzoaji #$id – $ref';
+  static const revenueTodayLabel = 'Mapato leo';
+  static const revenue30dLabel = 'Mapato siku 30';
+  static const salesCountToday = 'Mauzo leo';
+  static const statusAwaitingPush = 'Inasubiri push';
+  static const cancelPendingProductTitle = 'Ghairi uzoaji usiolipwa?';
+  static const cancelPendingProductBody =
+      'Uzoaji huu bado haujalipwa. Unaweza kuughairi na kuuza tena.';
+  static const dialogCancelSale = 'Ghhairi';
 
   static const loginFailed = 'Kuingia kumeshindikana. Jaribu tena.';
   static const loginConnectionError =
@@ -36,6 +65,9 @@ abstract final class SalonStrings {
   static const apiCreateBookingFailed = 'Imeshindwa kusajili booking';
   static const apiUpdateBookingFailed = 'Imeshindwa kusasisha booking';
   static const apiDeleteBookingFailed = 'Imeshindwa kufuta booking';
+  static const apiLoadProductSalesFailed = 'Imeshindwa kupakia mauzo ya bidhaa';
+  static const apiCreateProductSaleFailed = 'Imeshindwa kusajili mauzo ya bidhaa';
+  static const apiCancelProductSaleFailed = 'Imeshindwa kughairi uzoaji';
 
   // Order detail
   static const labelSeat = 'Kiti';

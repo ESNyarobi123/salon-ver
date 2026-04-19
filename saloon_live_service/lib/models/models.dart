@@ -16,7 +16,7 @@ class OrderItem {
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-        id: json['id'] ?? 0,
+        id: (json['id'] as num?)?.toInt() ?? 0,
         menuItemId: json['menu_item_id'] ?? 0,
         name: json['name'] ?? '',
         quantity: json['quantity'] ?? 0,
@@ -141,6 +141,100 @@ class Restaurant {
       Restaurant(id: json['id'] ?? 0, name: json['name'] ?? '');
 }
 
+class ProductSalesSummary {
+  final double totalAmountToday;
+  final int countToday;
+  final double totalAmountLast30Days;
+  final int countLast30Days;
+
+  ProductSalesSummary({
+    required this.totalAmountToday,
+    required this.countToday,
+    required this.totalAmountLast30Days,
+    required this.countLast30Days,
+  });
+
+  factory ProductSalesSummary.fromJson(Map<String, dynamic> json) =>
+      ProductSalesSummary(
+        totalAmountToday:
+            double.tryParse(json['total_amount_today']?.toString() ?? '') ?? 0,
+        countToday: json['count_today'] ?? 0,
+        totalAmountLast30Days: double.tryParse(
+                json['total_amount_last_30_days']?.toString() ?? '') ??
+            0,
+        countLast30Days: json['count_last_30_days'] ?? 0,
+      );
+}
+
+/// Retail product sale (not a service booking).
+class ProductSaleRecord {
+  final int id;
+  final String tableNumber;
+  final String? customerPhone;
+  final String? customerName;
+  final double totalAmount;
+  final String status;
+  final DateTime createdAt;
+  final List<OrderItem> items;
+
+  ProductSaleRecord({
+    required this.id,
+    required this.tableNumber,
+    this.customerPhone,
+    this.customerName,
+    required this.totalAmount,
+    required this.status,
+    required this.createdAt,
+    required this.items,
+  });
+
+  factory ProductSaleRecord.fromJson(Map<String, dynamic> json) =>
+      ProductSaleRecord(
+        id: json['id'] ?? 0,
+        tableNumber: json['table_number'] ?? '',
+        customerPhone: json['customer_phone']?.toString(),
+        customerName: json['customer_name']?.toString(),
+        totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0,
+        status: json['status'] ?? '',
+        createdAt:
+            DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+        items: (json['items'] as List? ?? [])
+            .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+
+  /// Same payload shape as [Order] for payment / summary UI.
+  Order toOrderForPaymentUi() => Order(
+        id: id,
+        tableNumber: tableNumber,
+        customerPhone: customerPhone,
+        customerName: customerName,
+        scheduledAt: null,
+        totalAmount: totalAmount,
+        status: status,
+        createdAt: createdAt,
+        items: items,
+      );
+}
+
+class ProductSalesData {
+  final List<ProductSaleRecord> sales;
+  final ProductSalesSummary summary;
+
+  ProductSalesData({required this.sales, required this.summary});
+
+  factory ProductSalesData.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>? ?? {};
+    final summaryJson = data['summary'] as Map<String, dynamic>? ?? {};
+    return ProductSalesData(
+      sales: (data['sales'] as List? ?? [])
+          .map((e) => ProductSaleRecord.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      summary: ProductSalesSummary.fromJson(summaryJson),
+    );
+  }
+}
+
 class OrdersData {
   final List<Order> pending;
   final List<Order> preparing;
@@ -149,6 +243,7 @@ class OrdersData {
   final List<TableInfo> tables;
   final List<MenuItem> menuItems;
   final List<BookingCategory> bookingCategories;
+  final List<BookingCategory> productCategories;
   final Restaurant? restaurant;
 
   OrdersData({
@@ -159,6 +254,7 @@ class OrdersData {
     required this.tables,
     required this.menuItems,
     required this.bookingCategories,
+    required this.productCategories,
     this.restaurant,
   });
 
@@ -177,6 +273,9 @@ class OrdersData {
         BookingCategory(id: 0, name: 'Huduma', items: menuItems),
       ];
     }
+    final productCategories = (meta['product_categories'] as List? ?? [])
+        .map((e) => BookingCategory.fromJson(e as Map<String, dynamic>))
+        .toList();
     return OrdersData(
       pending: (data['pending'] as List? ?? [])
           .map((e) => Order.fromJson(e as Map<String, dynamic>))
@@ -194,6 +293,7 @@ class OrdersData {
           .toList(),
       menuItems: menuItems,
       bookingCategories: categories,
+      productCategories: productCategories,
       restaurant: meta['restaurant'] != null
           ? Restaurant.fromJson(meta['restaurant'] as Map<String, dynamic>)
           : null,

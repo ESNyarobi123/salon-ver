@@ -6,13 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['restaurant_id', 'waiter_id', 'table_number', 'customer_phone', 'customer_name', 'scheduled_at', 'status', 'payment_reference', 'total_amount', 'notes', 'is_vip'];
+    public const KIND_BOOKING = 'booking';
+
+    public const KIND_PRODUCT_SALE = 'product_sale';
+
+    /** Product retail sale awaiting USSD (no order_items yet — stock applied after payment). */
+    public const STATUS_PAYMENT_PENDING = 'payment_pending';
+
+    protected $fillable = [
+        'restaurant_id',
+        'order_kind',
+        'waiter_id',
+        'table_number',
+        'customer_phone',
+        'customer_name',
+        'scheduled_at',
+        'status',
+        'payment_reference',
+        'total_amount',
+        'notes',
+        'is_vip',
+        'pending_line_items',
+    ];
 
     protected function casts(): array
     {
         return [
             'scheduled_at' => 'datetime',
             'is_vip' => 'boolean',
+            'pending_line_items' => 'array',
         ];
     }
 

@@ -11,7 +11,9 @@ import '../widgets/order_card.dart';
 import '../widgets/stat_chip.dart';
 import 'login_screen.dart';
 import 'new_order_screen.dart';
+import 'new_product_sale_screen.dart';
 import 'order_detail_screen.dart';
+import 'product_sales_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -200,6 +202,33 @@ class _OrdersScreenState extends State<OrdersScreen>
     );
   }
 
+  void _openProductSalesHistory() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ProductSalesScreen()),
+    );
+  }
+
+  void _openNewProductSale() {
+    if (_data == null) return;
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => NewProductSaleScreen(
+          tables: _data!.tables,
+          productCategories: _data!.productCategories,
+          onDone: () => _loadData(showLoading: false),
+        ),
+        transitionsBuilder: (_, anim, __, child) => SlideTransition(
+          position: Tween(
+            begin: const Offset(0.0, 1.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+          child: child,
+        ),
+        transitionDuration: const Duration(milliseconds: 350),
+      ),
+    );
+  }
+
   void _openNewOrder() {
     if (_data == null) return;
     Navigator.of(context).push(
@@ -264,19 +293,59 @@ class _OrdersScreenState extends State<OrdersScreen>
         ],
         body: _buildBody(isTablet),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _data != null ? _openNewOrder : null,
-        backgroundColor: AppTheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          SalonStrings.fabNewBooking,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-      )
-          .animate()
-          .scale(delay: 800.ms, duration: 400.ms, curve: Curves.elasticOut),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Material(
+            color: AppTheme.surfaceVariant,
+            elevation: 2,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              onTap: _data != null ? _openNewProductSale : null,
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.shopping_bag_outlined,
+                        color: AppTheme.textPrimary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      SalonStrings.sellProductsCta,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+              .animate()
+              .fadeIn(delay: 600.ms, duration: 350.ms)
+              .slideX(begin: 0.08),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            onPressed: _data != null ? _openNewOrder : null,
+            backgroundColor: AppTheme.primary,
+            foregroundColor: Colors.white,
+            elevation: 4,
+            icon: const Icon(Icons.add_rounded),
+            label: Text(
+              SalonStrings.fabNewBooking,
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+          )
+              .animate()
+              .scale(delay: 800.ms, duration: 400.ms, curve: Curves.elasticOut),
+        ],
+      ),
     );
   }
 
@@ -376,13 +445,28 @@ class _OrdersScreenState extends State<OrdersScreen>
                     color: AppTheme.textSecondary),
                 onSelected: (value) {
                   HapticFeedback.lightImpact();
-                  if (value == 'refresh') {
+                  if (value == 'product_sales') {
+                    _openProductSalesHistory();
+                  } else if (value == 'refresh') {
                     _loadData();
                   } else if (value == 'logout') {
                     _logout();
                   }
                 },
                 itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'product_sales',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.shopping_bag_outlined,
+                            color: AppTheme.success, size: 20),
+                        const SizedBox(width: 10),
+                        Text(SalonStrings.menuProductSalesHistory,
+                            style: GoogleFonts.poppins(
+                                color: AppTheme.textPrimary, fontSize: 13)),
+                      ],
+                    ),
+                  ),
                   PopupMenuItem(
                     value: 'refresh',
                     child: Row(
@@ -584,7 +668,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       backgroundColor: AppTheme.surface,
       onRefresh: () => _loadData(showLoading: false),
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
         itemCount: orders.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, i) => OrderCard(

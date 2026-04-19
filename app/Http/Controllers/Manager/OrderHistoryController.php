@@ -21,9 +21,10 @@ class OrderHistoryController extends Controller
         $dateTo = $request->get('date_to');
         $search = $request->get('search');
 
-        // Build query
+        // Build query (service bookings only — retail product sales use Product sales page)
         $query = Order::with(['items.menuItem', 'waiter', 'payments'])
-            ->where('restaurant_id', $restaurantId);
+            ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING);
 
         // Apply filters
         if ($status !== 'all') {
@@ -54,9 +55,9 @@ class OrderHistoryController extends Controller
         $orders = $query->latest()->paginate(20);
 
         // Get statistics
-        $totalOrders = Order::where('restaurant_id', $restaurantId)->count();
-        $completedOrders = Order::where('restaurant_id', $restaurantId)->where('status', 'paid')->count();
-        $totalRevenue = Order::where('restaurant_id', $restaurantId)->where('status', 'paid')->sum('total_amount');
+        $totalOrders = Order::where('restaurant_id', $restaurantId)->where('order_kind', Order::KIND_BOOKING)->count();
+        $completedOrders = Order::where('restaurant_id', $restaurantId)->where('order_kind', Order::KIND_BOOKING)->where('status', 'paid')->count();
+        $totalRevenue = Order::where('restaurant_id', $restaurantId)->where('order_kind', Order::KIND_BOOKING)->where('status', 'paid')->sum('total_amount');
         $avgOrderValue = $completedOrders > 0 ? $totalRevenue / $completedOrders : 0;
 
         // Get waiters for filter dropdown
@@ -86,6 +87,7 @@ class OrderHistoryController extends Controller
 
         $order = Order::with(['items.menuItem', 'waiter', 'payments', 'feedback', 'tip'])
             ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
             ->findOrFail($id);
 
         return view('manager.orders.show', compact('order'));
@@ -101,7 +103,8 @@ class OrderHistoryController extends Controller
         $dateTo = $request->get('date_to');
 
         $query = Order::with(['items.menuItem', 'waiter', 'payments'])
-            ->where('restaurant_id', $restaurantId);
+            ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING);
 
         if ($status !== 'all') {
             $query->where('status', $status);

@@ -510,7 +510,7 @@ class _NewProductSaleScreenState extends State<NewProductSaleScreen> {
             onPressed: _cart.isEmpty
                 ? null
                 : () => setState(() => _step = 1),
-            child: Text(SalonStrings.stepContinue),
+            child: const Text(SalonStrings.stepContinue),
           ),
         ),
       ],
@@ -523,7 +523,7 @@ class _NewProductSaleScreenState extends State<NewProductSaleScreen> {
       children: [
         if (widget.tables.isNotEmpty)
           DropdownButtonFormField<String>(
-            value: _selectedSeat,
+            initialValue: _selectedSeat,
             decoration: const InputDecoration(labelText: SalonStrings.labelSeatStar),
             items: widget.tables
                 .map((t) => DropdownMenuItem(value: t.name, child: Text(t.name)))
@@ -667,7 +667,7 @@ class _NewProductSaleScreenState extends State<NewProductSaleScreen> {
               onPressed: _cart.isEmpty
                   ? null
                   : () => setState(() => _step = 1),
-              child: Text(SalonStrings.stepContinue),
+              child: const Text(SalonStrings.stepContinue),
             )
           else
             ElevatedButton(

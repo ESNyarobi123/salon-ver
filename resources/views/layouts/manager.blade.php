@@ -276,6 +276,15 @@
                     <span class="font-medium text-xs">{{ config('salon.live_bookings') }}</span>
                 </a>
 
+                <a href="{{ route('manager.product-sales.index') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.product-sales.index') ? 'sidebar-link-active' : 'text-white/55' }}">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-lime-500/20 to-emerald-500/20 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ request()->routeIs('manager.product-sales.index') ? 'text-lime-400' : 'text-white/50' }}">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-xs">{{ config('salon.manager_nav_product_sales') }}</span>
+                </a>
+
                 <a href="{{ route('manager.orders.history') }}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg {{ request()->routeIs('manager.orders.history') || request()->routeIs('manager.orders.show') ? 'sidebar-link-active' : 'text-white/55' }}">
                     <div class="w-7 h-7 rounded-md bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ request()->routeIs('manager.orders.history') || request()->routeIs('manager.orders.show') ? 'text-cyan-400' : 'text-white/50' }}">

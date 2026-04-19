@@ -8,15 +8,21 @@
 # CLI examples (from repo root, after .env exists):
 #   docker compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES;"'
 #   docker compose exec -T mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" DATABASE_NAME' < backup.sql
+#
+# WhatsApp bot (24/7): fill saloonbot/.env (API_BASE_URL, BOT_TOKEN), then:
+#   docker compose up -d --build saloonbot
+#   docker compose logs -f saloonbot
 
 services:
   traefik:
-    image: traefik:v3.2
+    image: traefik:v3.4
     restart: unless-stopped
     command:
       - --api.dashboard=false
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
+      # Docker Engine 29+ rejects Traefik's embedded Docker API client — use file provider instead.
+      - --providers.docker=false
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.watch=true
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
@@ -29,7 +35,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
       - traefik_acme:/letsencrypt
     networks:
       - web
@@ -70,20 +76,13 @@ services:
         condition: service_healthy
     networks:
       - web
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.laravel.rule=Host(`sln.tiptapafrica.co.tz`)
-      - traefik.http.routers.laravel.entrypoints=websecure
-      - traefik.http.routers.laravel.tls.certresolver=myresolver
-      - traefik.http.routers.laravel.priority=10
-      - traefik.http.services.laravel.loadbalancer.server.port=80
 
   phpmyadmin:
     image: phpmyadmin:5
     restart: unless-stopped
     environment:
       PMA_HOST: mysql
-      PMA_ABSOLUTE_URI: https://sln.tiptapafrica.co.tz/database/
+      PMA_ABSOLUTE_URI: https://${APP_HOST:-sln.tiptapafrica.co.tz}/database/
       UPLOAD_LIMIT: 512M
       MEMORY_LIMIT: 512M
       # Allow any host user (e.g. root) — full server admin from UI when logged in as root
@@ -93,15 +92,18 @@ services:
         condition: service_healthy
     networks:
       - web
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.pma.rule=Host(`sln.tiptapafrica.co.tz`) && PathPrefix(`/database`)
-      - traefik.http.routers.pma.entrypoints=websecure
-      - traefik.http.routers.pma.tls.certresolver=myresolver
-      - traefik.http.routers.pma.priority=100
-      - traefik.http.middlewares.pma-stripprefix.stripprefix.prefixes=/database
-      - traefik.http.routers.pma.middlewares=pma-stripprefix
-      - traefik.http.services.pma.loadbalancer.server.port=80
+
+  saloonbot:
+    build:
+      context: ./saloonbot
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    volumes:
+      - ./saloonbot/.env:/app/.env:ro
+      - saloonbot_auth:/app/auth_info_baileys
+    networks:
+      - web
 
 networks:
   web:
@@ -109,3 +111,4 @@ networks:
 volumes:
   traefik_acme:
   mysql_data:
+  saloonbot_auth:

@@ -27,4 +27,6 @@ done
 
 php artisan migrate --force --no-interaction
 
+php artisan storage:link --force --no-interaction
+
 exec docker-php-entrypoint "$@"

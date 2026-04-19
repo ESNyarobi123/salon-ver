@@ -1,8 +1,22 @@
+// Node 18: Baileys calls bare `crypto.subtle` (Web Crypto). Node 19+ sets global crypto; polyfill for 18.x.
+(function initWebCryptoGlobal() {
+    const { webcrypto } = require('node:crypto');
+    if (!webcrypto) {
+        return;
+    }
+    if (typeof globalThis.crypto === 'undefined') {
+        globalThis.crypto = webcrypto;
+    }
+    if (typeof global.crypto === 'undefined') {
+        global.crypto = webcrypto;
+    }
+})();
+
 const {
     default: makeWASocket,
     useMultiFileAuthState,
     DisconnectReason,
-    fetchLatestBaileysVersion
+    fetchLatestBaileysVersion,
 } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
 const pino = require('pino');

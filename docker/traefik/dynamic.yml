@@ -1,0 +1,36 @@
+# Routes for the internal Docker network (no Docker socket required — works with Docker Engine 29+).
+# Change the Host() value if APP_HOST / DNS differs.
+http:
+  routers:
+    pma:
+      rule: Host(`sln.tiptapafrica.co.tz`) && PathPrefix(`/database`)
+      entryPoints:
+        - websecure
+      middlewares:
+        - pma-stripprefix
+      service: pma
+      tls:
+        certResolver: myresolver
+      priority: 100
+    laravel:
+      rule: Host(`sln.tiptapafrica.co.tz`)
+      entryPoints:
+        - websecure
+      service: laravel
+      tls:
+        certResolver: myresolver
+      priority: 10
+  middlewares:
+    pma-stripprefix:
+      stripPrefix:
+        prefixes:
+          - /database
+  services:
+    laravel:
+      loadBalancer:
+        servers:
+          - url: http://app:80
+    pma:
+      loadBalancer:
+        servers:
+          - url: http://phpmyadmin:80

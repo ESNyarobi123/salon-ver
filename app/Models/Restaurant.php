@@ -166,7 +166,14 @@ class Restaurant extends Model
             return null;
         }
 
-        return route('storage.serve', ['path' => $this->menu_image]);
+        $rel = route('storage.serve', ['path' => $this->menu_image], false);
+
+        // Web + bots need an absolute URL; fall back to APP_URL for console/queue.
+        if (! app()->runningInConsole() && request()?->getSchemeAndHttpHost()) {
+            return rtrim(request()->getSchemeAndHttpHost(), '/').$rel;
+        }
+
+        return rtrim((string) config('app.url'), '/').$rel;
     }
 
     /**

@@ -89,6 +89,7 @@ class MenuItem extends Model
             return null;
         }
 
-        return route('storage.serve', ['path' => $this->image]);
+        // Path-only URL: always resolves to the current site (avoids wrong host from APP_URL in <img src>).
+        return route('storage.serve', ['path' => $this->image], false);
     }
 }

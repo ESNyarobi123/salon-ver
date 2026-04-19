@@ -45,10 +45,10 @@ class User extends Authenticatable
             return null;
         }
 
-        $url = route('storage.serve', ['path' => $this->profile_photo_path]);
+        $path = route('storage.serve', ['path' => $this->profile_photo_path], false);
         $ts = $this->updated_at?->timestamp ?? '';
 
-        return $ts ? $url.'?v='.$ts : $url;
+        return $ts ? $path.'?v='.$ts : $path;
     }
 
     /**

@@ -1,10 +1,13 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
+
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-
 ENV NODE_ENV=production
-CMD ["npm","start"]
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY src ./src
+
+# Process cwd = /app → auth_info_baileys & .env paths in code match /app/...
+CMD ["node", "src/index.js"]

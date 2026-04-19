@@ -48,6 +48,6 @@ class Category extends Model
             return null;
         }
 
-        return route('storage.serve', ['path' => $this->image]);
+        return route('storage.serve', ['path' => $this->image], false);
     }
 }

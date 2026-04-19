@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -15,10 +16,14 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'catalog_kind' => ['nullable', Rule::in([Category::CATALOG_KIND_SERVICE, Category::CATALOG_KIND_PRODUCT])],
         ]);
 
-        $data = $request->all();
-        $data['restaurant_id'] = Auth::user()->restaurant_id;
+        $data = [
+            'name' => $request->input('name'),
+            'restaurant_id' => Auth::user()->restaurant_id,
+            'catalog_kind' => $request->input('catalog_kind', Category::CATALOG_KIND_SERVICE),
+        ];
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categories', 'public');
@@ -34,9 +39,13 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'catalog_kind' => ['required', Rule::in([Category::CATALOG_KIND_SERVICE, Category::CATALOG_KIND_PRODUCT])],
         ]);
 
-        $data = $request->all();
+        $data = [
+            'name' => $request->input('name'),
+            'catalog_kind' => $request->input('catalog_kind'),
+        ];
 
         if ($request->hasFile('image')) {
             if ($category->image) {
@@ -46,6 +55,10 @@ class CategoryController extends Controller
         }
 
         $category->update($data);
+
+        if ($category->wasChanged('catalog_kind')) {
+            $category->menuItems()->update(['stock_tracked' => $category->isProductCatalog()]);
+        }
 
         return back()->with('success', 'Category updated successfully!');
     }

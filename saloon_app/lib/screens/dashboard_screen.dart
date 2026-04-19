@@ -243,7 +243,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
-                                Icons.storefront_rounded,
+                                Icons.spa_rounded,
                                 color: AppTheme.primary,
                                 size: 20,
                               ),
@@ -255,7 +255,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    (user.restaurantName ?? 'Restaurant')
+                                    (user.restaurantName ??
+                                            SalonStrings.meDefaultRestaurant)
                                         .toUpperCase(),
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
@@ -930,7 +931,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: _statPill(
                     '${stats.myActiveOrders}',
                     SalonStrings.dashStatActive,
-                    Icons.restaurant_rounded,
+                    Icons.brush_rounded,
                     const LinearGradient(
                       colors: [Color(0xFF06B6D4), Color(0xFF3B82F6)],
                       begin: Alignment.topLeft,
@@ -1173,7 +1174,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Row(
           children: [
-            Icon(Icons.shopping_bag_rounded, color: AppTheme.primary, size: 20),
+            Icon(Icons.event_seat_rounded, color: AppTheme.primary, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

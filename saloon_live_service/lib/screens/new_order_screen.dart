@@ -7,16 +7,17 @@ import '../models/models.dart';
 import '../salon_strings.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/booking_time_format.dart';
 
 class NewOrderScreen extends StatefulWidget {
   final List<TableInfo> tables;
-  final List<MenuItem> menuItems;
+  final List<BookingCategory> bookingCategories;
   final VoidCallback onCreated;
 
   const NewOrderScreen({
     super.key,
     required this.tables,
-    required this.menuItems,
+    required this.bookingCategories,
     required this.onCreated,
   });
 
@@ -32,9 +33,46 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
   final _nameController = TextEditingController();
   final _searchController = TextEditingController();
 
-  final Map<int, int> _cart = {}; // menuItemId -> quantity
+  int _step = 0;
+  late DateTime _appointmentDate;
+  late TimeOfDay _appointmentTime;
+  String? _selectedSeat;
+
+  final Map<int, int> _cart = {};
   bool _isLoading = false;
   String _search = '';
+
+  Iterable<MenuItem> get _allItems sync* {
+    for (final c in widget.bookingCategories) {
+      yield* c.items;
+    }
+  }
+
+  double get _totalAmount => _cart.entries.fold(0.0, (sum, entry) {
+        MenuItem? found;
+        for (final m in _allItems) {
+          if (m.id == entry.key) {
+            found = m;
+            break;
+          }
+        }
+        if (found == null) return sum;
+        return sum + found.price * entry.value;
+      });
+
+  int get _cartCount => _cart.values.fold(0, (s, v) => s + v);
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _appointmentDate = DateTime(now.year, now.month, now.day);
+    _appointmentTime = TimeOfDay.fromDateTime(now);
+    if (widget.tables.isNotEmpty) {
+      _selectedSeat = widget.tables.first.name;
+      _tableController.text = _selectedSeat!;
+    }
+  }
 
   @override
   void dispose() {
@@ -44,20 +82,6 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     _searchController.dispose();
     super.dispose();
   }
-
-  List<MenuItem> get _filteredItems => widget.menuItems
-      .where((m) => m.name.toLowerCase().contains(_search.toLowerCase()))
-      .toList();
-
-  double get _totalAmount => _cart.entries.fold(0, (sum, entry) {
-        final item = widget.menuItems.firstWhere(
-          (m) => m.id == entry.key,
-          orElse: () => MenuItem(id: 0, name: '', price: 0),
-        );
-        return sum + item.price * entry.value;
-      });
-
-  int get _cartCount => _cart.values.fold(0, (s, v) => s + v);
 
   void _addToCart(MenuItem item) {
     HapticFeedback.selectionClick();
@@ -75,8 +99,103 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     });
   }
 
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _appointmentDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: AppTheme.primary,
+            surface: AppTheme.surface,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _appointmentDate = picked);
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _appointmentTime,
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: AppTheme.primary,
+            surface: AppTheme.surface,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _appointmentTime = picked);
+  }
+
+  bool _validateStep1() {
+    if (widget.tables.isNotEmpty) {
+      if (_selectedSeat == null || _selectedSeat!.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(SalonStrings.seatRequired,
+                style: GoogleFonts.poppins()),
+            backgroundColor: AppTheme.error.withOpacity(0.9),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+        return false;
+      }
+      _tableController.text = _selectedSeat!;
+      return true;
+    }
+    if (_tableController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(SalonStrings.seatRequired,
+              style: GoogleFonts.poppins()),
+          backgroundColor: AppTheme.error.withOpacity(0.9),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _goNext() {
+    if (_step == 0) {
+      setState(() => _step = 1);
+      return;
+    }
+    if (_step == 1) {
+      if (!_validateStep1()) return;
+      if (widget.bookingCategories.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(SalonStrings.noBookableServices,
+                style: GoogleFonts.poppins()),
+            backgroundColor: AppTheme.error.withOpacity(0.9),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+        return;
+      }
+      setState(() => _step = 2);
+    }
+  }
+
+  void _goBack() {
+    if (_step > 0) setState(() => _step--);
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_validateStep1()) return;
     if (_cart.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -85,8 +204,6 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
           backgroundColor: AppTheme.error.withOpacity(0.9),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;
@@ -95,9 +212,17 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     setState(() => _isLoading = true);
     HapticFeedback.lightImpact();
 
+    final dateStr = DateFormat('yyyy-MM-dd').format(_appointmentDate);
+    final timeStr = formatApiTime(_appointmentTime);
+    final table = widget.tables.isNotEmpty
+        ? _selectedSeat!.trim()
+        : _tableController.text.trim();
+
     try {
       await _api.createOrder(
-        tableNumber: _tableController.text.trim(),
+        tableNumber: table,
+        scheduledDate: dateStr,
+        scheduledTime: timeStr,
         customerPhone: _phoneController.text.trim(),
         customerName: _nameController.text.trim(),
         items: _cart.entries
@@ -116,8 +241,8 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
             backgroundColor: AppTheme.success.withOpacity(0.9),
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -130,8 +255,6 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
             backgroundColor: AppTheme.error.withOpacity(0.9),
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -151,14 +274,21 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(SalonStrings.newBookingTitle,
-                style: GoogleFonts.poppins(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary)),
-            Text(SalonStrings.newBookingSubtitle,
-                style: GoogleFonts.poppins(
-                    fontSize: 12, color: AppTheme.textSecondary)),
+            Text(
+              SalonStrings.newBookingTitle,
+              style: GoogleFonts.poppins(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            Text(
+              SalonStrings.newBookingSubtitleSteps,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: AppTheme.textSecondary,
+              ),
+            ),
           ],
         ),
         leading: IconButton(
@@ -200,66 +330,313 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
           child: Container(height: 1, color: AppTheme.border),
         ),
       ),
-      body:
-          isTablet ? _buildTabletLayout(currency) : _buildPhoneLayout(currency),
-      bottomNavigationBar: _buildBottomBar(currency),
+      body: Column(
+        children: [
+          _buildStepIndicator(),
+          Expanded(
+            child: isTablet
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(flex: 3, child: _buildStepBody(currency)),
+                      Container(width: 1, color: AppTheme.border),
+                      Expanded(flex: 2, child: _buildCartSidebar(currency)),
+                    ],
+                  )
+                : _buildStepBody(currency),
+          ),
+        ],
+      ),
+      bottomNavigationBar: isTablet
+          ? (_step == 2 ? _buildTabletActions(currency) : _buildStepNav())
+          : (_step == 2 && _cart.isNotEmpty
+              ? _buildBottomBar(currency)
+              : _buildStepNav()),
     );
   }
 
-  Widget _buildTabletLayout(NumberFormat currency) {
-    return Row(
-      children: [
-        // Left: Menu
-        Expanded(
-          flex: 3,
-          child: _buildMenuSection(),
-        ),
-        Container(width: 1, color: AppTheme.border),
-        // Right: Form + Cart
-        Expanded(
-          flex: 2,
-          child: _buildFormAndCart(currency),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPhoneLayout(NumberFormat currency) {
-    return Column(
-      children: [
-        // Details form (collapsed)
-        _buildOrderDetailsForm(),
-        Expanded(child: _buildMenuSection()),
-      ],
-    );
-  }
-
-  Widget _buildOrderDetailsForm() {
+  Widget _buildStepIndicator() {
+    final labels = [
+      SalonStrings.stepWhen,
+      SalonStrings.stepDetails,
+      SalonStrings.stepServices,
+    ];
     return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       color: AppTheme.surface,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Row(
+        children: List.generate(3, (i) {
+          final active = _step == i;
+          final done = _step > i;
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: i == 0 ? 0 : 6),
+              child: Column(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: active
+                          ? AppTheme.primary.withOpacity(0.15)
+                          : done
+                              ? AppTheme.success.withOpacity(0.1)
+                              : AppTheme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: active
+                            ? AppTheme.primary.withOpacity(0.5)
+                            : done
+                                ? AppTheme.success.withOpacity(0.35)
+                                : AppTheme.border,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        labels[i],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: active
+                              ? AppTheme.primary
+                              : done
+                                  ? AppTheme.success
+                                  : AppTheme.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${i + 1}/3',
+                    style: GoogleFonts.poppins(
+                      fontSize: 9,
+                      color: AppTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildStepBody(NumberFormat currency) {
+    return IndexedStack(
+      index: _step,
+      children: [
+        _buildStepWhen(),
+        _buildStepDetails(),
+        _buildStepServices(currency),
+      ],
+    );
+  }
+
+  Widget _buildStepWhen() {
+    final df = DateFormat('EEE, d MMM yyyy');
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            SalonStrings.stepWhenTitle,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            SalonStrings.stepWhenHint,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Material(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              onTap: _pickDate,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month_rounded,
+                        color: AppTheme.primary.withOpacity(0.9)),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            SalonStrings.labelAppointmentDate,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: AppTheme.textMuted,
+                            ),
+                          ),
+                          Text(
+                            df.format(_appointmentDate),
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded,
+                        color: AppTheme.textMuted),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Material(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              onTap: _pickTime,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.schedule_rounded,
+                        color: AppTheme.info.withOpacity(0.9)),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            SalonStrings.labelAppointmentTime,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: AppTheme.textMuted,
+                            ),
+                          ),
+                          Text(
+                            formatApiTime(_appointmentTime),
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textPrimary,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded,
+                        color: AppTheme.textMuted),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepDetails() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
       child: Form(
         key: _formKey,
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: _buildTableField(),
+            Text(
+              SalonStrings.stepDetailsTitle,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                style:
-                    const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+            const SizedBox(height: 16),
+            if (widget.tables.isNotEmpty)
+              DropdownButtonFormField<String>(
+                value: _selectedSeat,
+                dropdownColor: AppTheme.surfaceVariant,
+                style: GoogleFonts.poppins(
+                    color: AppTheme.textPrimary, fontSize: 14),
                 decoration: const InputDecoration(
-                  labelText: SalonStrings.labelPhoneOptional,
-                  hintText: SalonStrings.hintPhoneShort,
-                  prefixIcon: Icon(Icons.phone_outlined,
-                      size: 18, color: AppTheme.textSecondary),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  labelText: SalonStrings.labelSeatStar,
+                  prefixIcon: Icon(Icons.table_restaurant_outlined,
+                      size: 20, color: AppTheme.textSecondary),
                 ),
+                items: widget.tables
+                    .map((t) =>
+                        DropdownMenuItem(value: t.name, child: Text(t.name)))
+                    .toList(),
+                onChanged: (v) => setState(() => _selectedSeat = v),
+                validator: (v) => (v == null || v.isEmpty)
+                    ? SalonStrings.seatRequired
+                    : null,
+              )
+            else
+              TextFormField(
+                controller: _tableController,
+                style: const TextStyle(
+                    color: AppTheme.textPrimary, fontSize: 14),
+                decoration: const InputDecoration(
+                  labelText: SalonStrings.labelSeatStar,
+                  hintText: SalonStrings.seatHint,
+                  prefixIcon: Icon(Icons.table_restaurant_outlined,
+                      size: 20, color: AppTheme.textSecondary),
+                ),
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? SalonStrings.seatRequired
+                    : null,
+              ),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+              decoration: const InputDecoration(
+                labelText: SalonStrings.labelPhoneOptional,
+                hintText: SalonStrings.hintPhoneLong,
+                prefixIcon: Icon(Icons.phone_outlined,
+                    size: 20, color: AppTheme.textSecondary),
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _nameController,
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+              decoration: const InputDecoration(
+                labelText: SalonStrings.clientNameOptional,
+                hintText: SalonStrings.clientNameExampleHint,
+                prefixIcon: Icon(Icons.person_outline_rounded,
+                    size: 20, color: AppTheme.textSecondary),
               ),
             ),
           ],
@@ -268,60 +645,34 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     );
   }
 
-  Widget _buildTableField() {
-    if (widget.tables.isNotEmpty) {
-      return DropdownButtonFormField<String>(
-        initialValue: _tableController.text.isEmpty ? null : _tableController.text,
-        dropdownColor: AppTheme.surfaceVariant,
-        style: GoogleFonts.poppins(color: AppTheme.textPrimary, fontSize: 14),
-        decoration: const InputDecoration(
-          labelText: SalonStrings.labelSeatStar,
-          prefixIcon: Icon(Icons.table_restaurant_outlined,
-              size: 18, color: AppTheme.textSecondary),
-          fillColor: AppTheme.surfaceVariant,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  Widget _buildStepServices(NumberFormat currency) {
+    if (widget.bookingCategories.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            SalonStrings.noBookableServices,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: AppTheme.textSecondary,
+              height: 1.5,
+            ),
+          ),
         ),
-        items: widget.tables
-            .map((t) => DropdownMenuItem(value: t.name, child: Text(t.name)))
-            .toList(),
-        onChanged: (v) {
-          if (v != null) _tableController.text = v;
-        },
-        validator: (v) =>
-            (v == null || v.isEmpty) ? SalonStrings.seatRequired : null,
       );
     }
 
-    return TextFormField(
-      controller: _tableController,
-      style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
-      decoration: const InputDecoration(
-        labelText: SalonStrings.labelSeatStar,
-        hintText: SalonStrings.seatHint,
-        prefixIcon: Icon(Icons.table_restaurant_outlined,
-            size: 18, color: AppTheme.textSecondary),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      ),
-      validator: (v) => (v == null || v.trim().isEmpty)
-          ? SalonStrings.seatRequired
-          : null,
-    );
-  }
-
-  Widget _buildMenuSection() {
     return Column(
       children: [
-        // Search
-        Container(
-          color: AppTheme.bg,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: TextField(
             controller: _searchController,
             style: const TextStyle(color: AppTheme.textPrimary),
             onChanged: (v) => setState(() => _search = v),
             decoration: InputDecoration(
-              hintText: SalonStrings.menuSearchHintShort,
+              hintText: SalonStrings.menuSearchServicesHint,
               prefixIcon: const Icon(Icons.search_rounded,
                   color: AppTheme.textSecondary),
               suffixIcon: _search.isNotEmpty
@@ -334,43 +685,101 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
                       },
                     )
                   : null,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
           ),
         ),
-
         Expanded(
-          child: _filteredItems.isEmpty
-              ? Center(
-                  child: Text(SalonStrings.menuEmptyState,
-                      style: GoogleFonts.poppins(color: AppTheme.textMuted)),
-                )
-              : GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 180,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    mainAxisExtent: 170,
-                  ),
-                  itemCount: _filteredItems.length,
-                  itemBuilder: (_, i) {
-                    final item = _filteredItems[i];
-                    final qty = _cart[item.id] ?? 0;
-                    return _buildMenuCard(item, qty)
-                        .animate()
-                        .fadeIn(delay: (i * 40).ms, duration: 300.ms)
-                        .slideY(begin: 0.1);
-                  },
-                ),
+          child: _buildCategorizedServiceList(currency),
         ),
       ],
     );
   }
 
-  Widget _buildMenuCard(MenuItem item, int qty) {
-    final currency = NumberFormat('#,##0', 'en_US');
+  Widget _buildCategorizedServiceList(NumberFormat currency) {
+    final q = _search.toLowerCase();
+    int animIndex = 0;
+    final children = <Widget>[];
+
+    for (final cat in widget.bookingCategories) {
+      final items =
+          cat.items.where((m) => m.name.toLowerCase().contains(q)).toList();
+      if (items.isEmpty) continue;
+
+      children.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              Container(
+                width: 3,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  cat.name,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      children.add(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final cross = constraints.maxWidth > 520 ? 3 : 2;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: cross,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                mainAxisExtent: 172,
+              ),
+              itemCount: items.length,
+              itemBuilder: (_, i) {
+                final item = items[i];
+                final qty = _cart[item.id] ?? 0;
+                final idx = animIndex++;
+                return _buildMenuCard(item, qty, currency)
+                    .animate()
+                    .fadeIn(delay: (idx * 25).ms, duration: 260.ms);
+              },
+            );
+          },
+        ),
+      );
+    }
+
+    if (children.isEmpty) {
+      return Center(
+        child: Text(
+          SalonStrings.menuEmptyState,
+          style: GoogleFonts.poppins(color: AppTheme.textMuted),
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
+      children: children,
+    );
+  }
+
+  Widget _buildMenuCard(MenuItem item, int qty, NumberFormat currency) {
     return GestureDetector(
       onTap: () => _addToCart(item),
       child: AnimatedContainer(
@@ -387,7 +796,6 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image / placeholder
             Expanded(
               child: ClipRRect(
                 borderRadius:
@@ -411,7 +819,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textPrimary,
                 ),
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -484,12 +892,12 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.restaurant_rounded,
+            const Icon(Icons.spa_rounded,
                 color: AppTheme.textMuted, size: 28),
             const SizedBox(height: 4),
             Text(
-              item.name.length > 8
-                  ? '${item.name.substring(0, 8)}...'
+              item.name.length > 10
+                  ? '${item.name.substring(0, 10)}…'
                   : item.name,
               style:
                   GoogleFonts.poppins(fontSize: 9, color: AppTheme.textMuted),
@@ -501,106 +909,189 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     );
   }
 
-  Widget _buildFormAndCart(NumberFormat currency) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(SalonStrings.bookingDetails,
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                    fontSize: 15)),
-            const SizedBox(height: 12),
-            _buildTableField(),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: const InputDecoration(
-                labelText: SalonStrings.labelPhoneOptional,
-                hintText: SalonStrings.hintPhoneLong,
-                prefixIcon:
-                    Icon(Icons.phone_outlined, color: AppTheme.textSecondary),
-              ),
+  Widget _buildCartSidebar(NumberFormat currency) {
+    if (_cart.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            SalonStrings.tapServicesToAdd,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _nameController,
-              style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: const InputDecoration(
-                labelText: SalonStrings.clientNameOptional,
-                hintText: SalonStrings.clientNameExampleHint,
-                prefixIcon: Icon(Icons.person_outline_rounded,
-                    color: AppTheme.textSecondary),
-              ),
-            ),
-            if (_cart.isNotEmpty) ...[
-              const SizedBox(height: 20),
-              Text(SalonStrings.cart,
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
-                      fontSize: 15)),
-              const SizedBox(height: 8),
-              ..._cart.entries.map((entry) {
-                final m = widget.menuItems.firstWhere((m) => m.id == entry.key,
-                    orElse: () =>
-                        MenuItem(id: 0, name: SalonStrings.unknownItem, price: 0));
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(m.name,
-                            style: GoogleFonts.poppins(
-                                fontSize: 13, color: AppTheme.textPrimary)),
-                      ),
-                      Text('x${entry.value}',
-                          style: GoogleFonts.poppins(
-                              fontSize: 13, color: AppTheme.textSecondary)),
-                      const SizedBox(width: 8),
-                      Text('TZS ${currency.format(m.price * entry.value)}',
-                          style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.primary)),
-                    ],
-                  ),
-                );
-              }),
-              const Divider(color: AppTheme.border),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(SalonStrings.total,
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
-                          fontSize: 15)),
-                  Text(
-                    'TZS ${currency.format(_totalAmount)}',
+          ),
+        ),
+      );
+    }
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          SalonStrings.cart,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimary,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ..._cart.entries.map((entry) {
+          MenuItem? m;
+          for (final c in widget.bookingCategories) {
+            for (final i in c.items) {
+              if (i.id == entry.key) {
+                m = i;
+                break;
+              }
+            }
+            if (m != null) break;
+          }
+          final name = m?.name ?? SalonStrings.unknownItem;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    name,
                     style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.success),
+                      fontSize: 13,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                ],
+                ),
+                Text(
+                  '×${entry.value}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'TZS ${currency.format((m?.price ?? 0) * entry.value)}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+        const Divider(color: AppTheme.border),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              SalonStrings.total,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+                fontSize: 15,
               ),
-            ],
+            ),
+            Text(
+              'TZS ${currency.format(_totalAmount)}',
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.success,
+              ),
+            ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _buildTabletActions(NumberFormat currency) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.border)),
+      ),
+      child: Row(
+        children: [
+          if (_step > 0)
+            TextButton(onPressed: _goBack, child: Text(SalonStrings.stepBack)),
+          const Spacer(),
+          ElevatedButton.icon(
+            onPressed: _isLoading || _cart.isEmpty ? null : _submit,
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                : const Icon(Icons.send_rounded),
+            label: Text(
+              _isLoading ? SalonStrings.submitting : SalonStrings.submitBooking,
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepNav() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.border)),
+      ),
+      child: Row(
+        children: [
+          if (_step > 0)
+            TextButton(
+              onPressed: _goBack,
+              child: Text(SalonStrings.stepBack),
+            ),
+          const Spacer(),
+          if (_step < 2)
+            FilledButton.icon(
+              onPressed: () {
+                if (_step == 1 && _formKey.currentState != null) {
+                  if (!_formKey.currentState!.validate()) return;
+                }
+                _goNext();
+              },
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              label: Text(SalonStrings.stepContinue),
+            ),
+          if (_step == 2 && _cart.isEmpty)
+            Flexible(
+              child: Text(
+                SalonStrings.chooseServiceToSubmit,
+                textAlign: TextAlign.end,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildBottomBar(NumberFormat currency) {
-    if (_cart.isEmpty) return const SizedBox.shrink();
-
     return Container(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -635,6 +1126,8 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
               ],
             ),
           ),
+          TextButton(onPressed: _goBack, child: Text(SalonStrings.stepBack)),
+          const SizedBox(width: 8),
           SizedBox(
             height: 48,
             child: ElevatedButton.icon(

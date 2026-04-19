@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -36,10 +37,12 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort_order' => 'nullable|integer',
+            'catalog_kind' => ['nullable', Rule::in([Category::CATALOG_KIND_SERVICE, Category::CATALOG_KIND_PRODUCT])],
         ]);
 
-        $data = $request->all();
+        $data = $request->only(['name', 'sort_order']);
         $data['restaurant_id'] = Auth::user()->restaurant_id;
+        $data['catalog_kind'] = $request->input('catalog_kind', Category::CATALOG_KIND_SERVICE);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categories', 'public');
@@ -77,9 +80,10 @@ class CategoryController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort_order' => 'nullable|integer',
+            'catalog_kind' => ['sometimes', 'required', Rule::in([Category::CATALOG_KIND_SERVICE, Category::CATALOG_KIND_PRODUCT])],
         ]);
 
-        $data = $request->all();
+        $data = collect($request->only(['name', 'sort_order', 'catalog_kind']))->filter(fn ($v) => $v !== null)->all();
 
         if ($request->hasFile('image')) {
             if ($category->image) {
@@ -89,6 +93,10 @@ class CategoryController extends Controller
         }
 
         $category->update($data);
+
+        if ($category->wasChanged('catalog_kind')) {
+            $category->menuItems()->update(['stock_tracked' => $category->isProductCatalog()]);
+        }
         $category->imageUrl = $category->imageUrl();
 
         return response()->json([

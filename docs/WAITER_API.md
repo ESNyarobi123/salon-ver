@@ -1,6 +1,6 @@
 # TIPTAP Waiter API Documentation
 
-Base URL: `https://tiptapafrica.co.tz/api`
+Base URL: `https://sln.tiptapafrica.co.tz/api`
 
 Auth: `Authorization: Bearer {token}` (from `/api/auth/login`)
 

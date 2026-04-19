@@ -222,7 +222,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               child: Icon(
-                Icons.restaurant_menu_rounded,
+                Icons.spa_rounded,
                 size: 50,
                 color: const Color(0xFFD97706).withValues(alpha: 0.8),
               ),

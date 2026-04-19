@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../salon_strings.dart';
 import '../theme/app_theme.dart';
+import '../utils/booking_time_format.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;
@@ -25,8 +26,8 @@ class OrderCard extends StatelessWidget {
     final statusColor = AppTheme.getStatusColor(order.status);
     final statusIcon = AppTheme.getStatusIcon(order.status);
     final currency = NumberFormat('#,##0', 'en_US');
-    final timeFormat = DateFormat('HH:mm');
     final isTablet = MediaQuery.of(context).size.width > 600;
+    final apptFmt = DateFormat('EEE, d MMM · HH:mm');
 
     return GestureDetector(
       onTap: onTap,
@@ -138,11 +139,26 @@ class OrderCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        timeFormat.format(order.createdAt.toLocal()),
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: AppTheme.textMuted,
+                      Tooltip(
+                        message:
+                            'Booking: ${DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toLocal())}',
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceVariant,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppTheme.border),
+                          ),
+                          child: Text(
+                            formatBookingAgeShort(order.createdAt),
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textSecondary,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -197,6 +213,58 @@ class OrderCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            if (order.scheduledAt != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.accent.withOpacity(0.18),
+                        AppTheme.primary.withOpacity(0.12),
+                      ],
+                    ),
+                    border: Border.all(
+                        color: AppTheme.accent.withOpacity(0.35)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.event_available_rounded,
+                          color: AppTheme.accent.withOpacity(0.95), size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              SalonStrings.labelAppointment,
+                              style: GoogleFonts.poppins(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textMuted,
+                                letterSpacing: 0.6,
+                              ),
+                            ),
+                            Text(
+                              apptFmt.format(order.scheduledAt!.toLocal()),
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
             // Items summary
             Padding(

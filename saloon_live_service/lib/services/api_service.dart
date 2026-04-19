@@ -8,7 +8,7 @@ class ApiService {
   /// Override for dev: `flutter run --dart-define=ORDER_PORTAL_API_BASE=http://127.0.0.1:8000/api/order-portal`
   static const String baseUrl = String.fromEnvironment(
     'ORDER_PORTAL_API_BASE',
-    defaultValue: 'https://tiptapafrica.co.tz/api/order-portal',
+    defaultValue: 'https://sln.tiptapafrica.co.tz/api/order-portal',
   );
   static const String _authDataKey = 'auth_data';
 
@@ -115,12 +115,16 @@ class ApiService {
 
   Future<Order> createOrder({
     required String tableNumber,
+    required String scheduledDate,
+    required String scheduledTime,
     String? customerPhone,
     String? customerName,
     required List<Map<String, int>> items,
   }) async {
     final body = <String, dynamic>{
       'table_number': tableNumber,
+      'scheduled_date': scheduledDate,
+      'scheduled_time': scheduledTime,
       'items': items,
     };
     if (customerPhone != null && customerPhone.isNotEmpty) {

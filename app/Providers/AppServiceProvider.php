@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\OrderItem;
 use App\Notifications\SalaryPaymentConfirmed;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
             $count = MenuItem::query()
                 ->where('stock_tracked', true)
+                ->whereHas('category', fn ($q) => $q->where('catalog_kind', Category::CATALOG_KIND_PRODUCT))
                 ->whereRaw('stock_quantity <= low_stock_threshold')
                 ->count();
 

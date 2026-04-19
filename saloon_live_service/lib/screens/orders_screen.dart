@@ -206,7 +206,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => NewOrderScreen(
           tables: _data!.tables,
-          menuItems: _data!.menuItems,
+          bookingCategories: _data!.bookingCategories,
           onCreated: () => _loadData(showLoading: false),
         ),
         transitionsBuilder: (_, anim, __, child) => SlideTransition(

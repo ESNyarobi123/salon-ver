@@ -30,6 +30,7 @@ class Order {
   final String tableNumber;
   final String? customerPhone;
   final String? customerName;
+  final DateTime? scheduledAt;
   final double totalAmount;
   final String status;
   final DateTime createdAt;
@@ -40,6 +41,7 @@ class Order {
     required this.tableNumber,
     this.customerPhone,
     this.customerName,
+    this.scheduledAt,
     required this.totalAmount,
     required this.status,
     required this.createdAt,
@@ -51,6 +53,9 @@ class Order {
         tableNumber: json['table_number'] ?? '',
         customerPhone: json['customer_phone'],
         customerName: json['customer_name'],
+        scheduledAt: json['scheduled_at'] != null
+            ? DateTime.tryParse(json['scheduled_at'].toString())
+            : null,
         totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0,
         status: json['status'] ?? 'pending',
         createdAt:
@@ -65,6 +70,7 @@ class Order {
         tableNumber: tableNumber,
         customerPhone: customerPhone,
         customerName: customerName,
+        scheduledAt: scheduledAt,
         totalAmount: totalAmount,
         status: status ?? this.status,
         createdAt: createdAt,
@@ -103,6 +109,28 @@ class MenuItem {
       );
 }
 
+/// Service catalog group (matches API `meta.booking_categories`).
+class BookingCategory {
+  final int id;
+  final String name;
+  final List<MenuItem> items;
+
+  BookingCategory({
+    required this.id,
+    required this.name,
+    required this.items,
+  });
+
+  factory BookingCategory.fromJson(Map<String, dynamic> json) =>
+      BookingCategory(
+        id: json['id'] ?? 0,
+        name: json['name'] ?? '',
+        items: (json['items'] as List? ?? [])
+            .map((e) => MenuItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
 class Restaurant {
   final int id;
   final String name;
@@ -120,6 +148,7 @@ class OrdersData {
   final List<Order> paid;
   final List<TableInfo> tables;
   final List<MenuItem> menuItems;
+  final List<BookingCategory> bookingCategories;
   final Restaurant? restaurant;
 
   OrdersData({
@@ -129,32 +158,44 @@ class OrdersData {
     required this.paid,
     required this.tables,
     required this.menuItems,
+    required this.bookingCategories,
     this.restaurant,
   });
 
   factory OrdersData.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? {};
     final meta = json['meta'] as Map<String, dynamic>? ?? {};
+    final menuItems = (meta['menu_items'] as List? ?? [])
+        .map((e) => MenuItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+    List<BookingCategory> categories = (meta['booking_categories'] as List? ??
+            [])
+        .map((e) => BookingCategory.fromJson(e as Map<String, dynamic>))
+        .toList();
+    if (categories.isEmpty && menuItems.isNotEmpty) {
+      categories = [
+        BookingCategory(id: 0, name: 'Huduma', items: menuItems),
+      ];
+    }
     return OrdersData(
       pending: (data['pending'] as List? ?? [])
-          .map((e) => Order.fromJson(e))
+          .map((e) => Order.fromJson(e as Map<String, dynamic>))
           .toList(),
       preparing: (data['preparing'] as List? ?? [])
-          .map((e) => Order.fromJson(e))
+          .map((e) => Order.fromJson(e as Map<String, dynamic>))
           .toList(),
       served: (data['served'] as List? ?? [])
-          .map((e) => Order.fromJson(e))
+          .map((e) => Order.fromJson(e as Map<String, dynamic>))
           .toList(),
       paid:
-          (data['paid'] as List? ?? []).map((e) => Order.fromJson(e)).toList(),
+          (data['paid'] as List? ?? []).map((e) => Order.fromJson(e as Map<String, dynamic>)).toList(),
       tables: (meta['tables'] as List? ?? [])
-          .map((e) => TableInfo.fromJson(e))
+          .map((e) => TableInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
-      menuItems: (meta['menu_items'] as List? ?? [])
-          .map((e) => MenuItem.fromJson(e))
-          .toList(),
+      menuItems: menuItems,
+      bookingCategories: categories,
       restaurant: meta['restaurant'] != null
-          ? Restaurant.fromJson(meta['restaurant'])
+          ? Restaurant.fromJson(meta['restaurant'] as Map<String, dynamic>)
           : null,
     );
   }

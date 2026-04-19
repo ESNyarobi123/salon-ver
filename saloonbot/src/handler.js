@@ -1211,7 +1211,7 @@ async function showHomeScreen(sock, from, session) {
     const info = session.header_info || session.waiter_name || (session.table_number ? `${T(session, 'table')} ${session.table_number}` : '-');
 
     const rows = [
-        { id: 'view_menu', title: `🍽️ ${T(session, 'menu_view')}`, description: T(session, 'menu_view_desc') },
+        { id: 'view_menu', title: `💇 ${T(session, 'menu_view')}`, description: T(session, 'menu_view_desc') },
         { id: 'rate_service', title: session.waiter_name ? `⭐ ${T(session, 'rate_service')} ${session.waiter_name.toUpperCase()}` : `⭐ ${T(session, 'rate_service')}`, description: T(session, 'rate_desc') },
         { id: 'live_bill', title: `💳 ${T(session, 'pay_bill')}`, description: T(session, 'pay_bill_desc') },
         { id: 'give_tips', title: session.waiter_name ? `💵 ${T(session, 'tip')} ${session.waiter_name.toUpperCase()}` : `💵 ${T(session, 'tip')}`, description: T(session, 'tip_desc') }
@@ -1231,7 +1231,7 @@ async function showHomeScreen(sock, from, session) {
         T(session, 'serviceDesk'),
         [
             {
-                title: `🍽️ ${T(session, 'home_main_services')}`,
+                title: `💇 ${T(session, 'home_main_services')}`,
                 rows: rows
             }
         ],
@@ -1348,7 +1348,7 @@ async function showItemsList(sock, from, session, categoryId) {
 
         const rows = category.menu_items.map(i => ({
             id: `item_${i.id}`,
-            title: `🍲${i.name.replace(/\s/g, '')} - ${i.price.toLocaleString()}/=`,
+            title: `💇${i.name.replace(/\s/g, '')} - ${i.price.toLocaleString()}/=`,
             description: `${i.price.toLocaleString()}/=`
         }));
 
@@ -1364,7 +1364,7 @@ async function showItemsList(sock, from, session, categoryId) {
                     { id: 'go_cart', title: '🛒MyOrder' }
                 ]
             }
-        ], '✨🍴');
+        ], '✨💇');
     } else {
         await sendText(sock, from, T(session, 'items_none'));
         await showMenuHub(sock, from, session);
@@ -1383,7 +1383,7 @@ async function showItemDetail(sock, from, session, itemId) {
     }
 
     const text =
-        `🍲*${item.name.replace(/\s/g, '')}*\n` +
+        `💇*${item.name.replace(/\s/g, '')}*\n` +
         `💰${item.price?.toLocaleString()}/=\n` +
         `${item.description ? `📝${item.description}\n` : ''}`;
 
@@ -1394,9 +1394,9 @@ async function showItemDetail(sock, from, session, itemId) {
     ];
 
     if (item.image) {
-        await sendImageWithButtons(sock, from, item.image, text, buttons, '🍲✨');
+        await sendImageWithButtons(sock, from, item.image, text, buttons, '💇✨');
     } else {
-        await sendButtons(sock, from, text, buttons, '🍲✨');
+        await sendButtons(sock, from, text, buttons, '💇✨');
     }
 }
 

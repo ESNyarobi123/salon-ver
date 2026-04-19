@@ -27,9 +27,47 @@ class MenuItem extends Model
         return $this->stock_quantity <= $this->low_stock_threshold;
     }
 
+    public function isOutOfStock(): bool
+    {
+        return $this->stock_tracked && $this->stock_quantity <= 0;
+    }
+
+    /** @return 'out'|'low'|'ok' */
+    public function stockHealth(): string
+    {
+        if (! $this->stock_tracked) {
+            return 'ok';
+        }
+        if ($this->stock_quantity <= 0) {
+            return 'out';
+        }
+        if ($this->isLowStock()) {
+            return 'low';
+        }
+
+        return 'ok';
+    }
+
     protected static function booted()
     {
         static::addGlobalScope(new \App\Models\Scopes\RestaurantScope);
+
+        static::saving(function (MenuItem $item): void {
+            if (! $item->category_id || ! $item->restaurant_id) {
+                return;
+            }
+
+            $category = Category::withoutGlobalScopes()
+                ->whereKey($item->category_id)
+                ->where('restaurant_id', $item->restaurant_id)
+                ->first();
+
+            if (! $category) {
+                return;
+            }
+
+            $item->stock_tracked = $category->isProductCatalog();
+        });
     }
 
     public function restaurant()

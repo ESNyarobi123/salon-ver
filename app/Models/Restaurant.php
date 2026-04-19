@@ -28,6 +28,10 @@ class Restaurant extends Model
     /**
      * Boot method - auto-generate tag_prefix on create
      */
+    public const DEFAULT_SERVICE_CATEGORY_NAME = 'Service';
+
+    public const DEFAULT_PRODUCT_CATEGORY_NAME = 'Product';
+
     protected static function booted()
     {
         static::creating(function ($restaurant) {
@@ -35,6 +39,39 @@ class Restaurant extends Model
                 $restaurant->tag_prefix = $restaurant->generateUniqueTagPrefix();
             }
         });
+
+        static::created(function (Restaurant $restaurant): void {
+            $restaurant->ensureDefaultCatalogCategories();
+        });
+    }
+
+    /**
+     * Ensure the manager always has baseline Service + Product categories (idempotent).
+     */
+    public function ensureDefaultCatalogCategories(): void
+    {
+        $defaults = [
+            ['name' => self::DEFAULT_SERVICE_CATEGORY_NAME, 'catalog_kind' => Category::CATALOG_KIND_SERVICE, 'sort_order' => 0],
+            ['name' => self::DEFAULT_PRODUCT_CATEGORY_NAME, 'catalog_kind' => Category::CATALOG_KIND_PRODUCT, 'sort_order' => 1],
+        ];
+
+        foreach ($defaults as $def) {
+            $exists = Category::withoutGlobalScopes()
+                ->where('restaurant_id', $this->id)
+                ->where('name', $def['name'])
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
+            Category::withoutGlobalScopes()->create([
+                'restaurant_id' => $this->id,
+                'name' => $def['name'],
+                'catalog_kind' => $def['catalog_kind'],
+                'sort_order' => $def['sort_order'],
+            ]);
+        }
     }
 
     /**

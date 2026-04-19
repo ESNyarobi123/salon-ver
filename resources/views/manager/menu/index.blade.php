@@ -218,11 +218,17 @@
                 <!-- Add Category Form -->
                 <form action="{{ route('manager.categories.store') }}" method="POST" enctype="multipart/form-data" class="mb-6 glass p-5 rounded-xl">
                     @csrf
-                    <h4 class="text-lg font-bold text-white mb-4">Add New Category</h4>
+                    <h4 class="text-lg font-bold text-white mb-2">Add New Category</h4>
+                    <p class="text-[11px] text-white/45 mb-3">{{ config('salon.category_catalog_kind_hint') }}</p>
                     <div class="flex gap-3 items-start">
                         <div class="flex-1 space-y-3">
                             <input type="text" name="name" required placeholder="Category Name" 
                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Catalog type</label>
+                            <select name="catalog_kind" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500">
+                                <option value="service">{{ config('salon.category_catalog_kind_service') }}</option>
+                                <option value="product">{{ config('salon.category_catalog_kind_product') }}</option>
+                            </select>
                             <input type="file" name="image" class="w-full text-sm text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-600 file:text-white hover:file:bg-violet-500 transition-all">
                         </div>
                         <button type="submit" class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white p-3 rounded-xl shadow-lg hover:shadow-violet-500/25 transition-all">
@@ -247,7 +253,12 @@
                                         </svg>
                                     </div>
                                 @endif
-                                <span class="font-semibold text-white text-lg">{{ $category->name }}</span>
+                                <div class="flex flex-col gap-1">
+                                    <span class="font-semibold text-white text-lg">{{ $category->name }}</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md w-fit {{ $category->isProductCatalog() ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25' : 'bg-white/10 text-white/50 border border-white/10' }}">
+                                        {{ $category->isProductCatalog() ? config('salon.category_catalog_kind_product') : config('salon.category_catalog_kind_service') }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onclick="editCategory({{ json_encode($category) }})" class="p-2 text-white/60 hover:text-violet-400 hover:bg-white/5 rounded-lg transition-all">
@@ -294,7 +305,13 @@
                         <input type="text" name="name" id="editCategoryName" required 
                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
                     </div>
-                    
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Catalog type</label>
+                        <select name="catalog_kind" id="editCategoryCatalogKind" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-medium text-white focus:ring-2 focus:ring-violet-500">
+                            <option value="service">{{ config('salon.category_catalog_kind_service') }}</option>
+                            <option value="product">{{ config('salon.category_catalog_kind_product') }}</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">New Image (Optional)</label>
                         <input type="file" name="image" class="w-full text-sm text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-600 file:text-white hover:file:bg-violet-500 transition-all">
@@ -368,7 +385,7 @@
         function editCategory(category) {
             document.getElementById('editCategoryForm').action = `/manager/categories/${category.id}`;
             document.getElementById('editCategoryName').value = category.name;
-            
+            document.getElementById('editCategoryCatalogKind').value = category.catalog_kind === 'product' ? 'product' : 'service';
             document.getElementById('editCategoryModal').classList.remove('hidden');
             document.getElementById('editCategoryModal').classList.add('flex');
         }

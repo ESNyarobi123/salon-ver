@@ -176,7 +176,11 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _navItem(0, Icons.home_rounded, SalonStrings.navHome),
-                  _navItem(1, Icons.receipt_long_rounded, SalonStrings.navBookings),
+                  _navItem(
+                    1,
+                    Icons.calendar_month_rounded,
+                    SalonStrings.navBookings,
+                  ),
                   _navItemWithBadge(
                     2,
                     Icons.notifications_active_rounded,

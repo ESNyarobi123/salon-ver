@@ -284,8 +284,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget _buildInfoRow(bool isTablet) {
+    final apptFmt = DateFormat('EEE d MMM yyyy, HH:mm');
     final infos = [
       (Icons.chair_outlined, SalonStrings.labelSeat, _order.tableNumber),
+      if (_order.scheduledAt != null)
+        (
+          Icons.event_available_rounded,
+          SalonStrings.labelAppointment,
+          apptFmt.format(_order.scheduledAt!.toLocal())
+        ),
       if (_order.customerName != null && _order.customerName!.isNotEmpty)
         (Icons.person_outline_rounded, SalonStrings.labelClient, _order.customerName!),
       if (_order.customerPhone != null && _order.customerPhone!.isNotEmpty)

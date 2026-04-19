@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['restaurant_id', 'waiter_id', 'table_number', 'customer_phone', 'customer_name', 'status', 'payment_reference', 'total_amount', 'notes', 'is_vip'];
+    protected $fillable = ['restaurant_id', 'waiter_id', 'table_number', 'customer_phone', 'customer_name', 'scheduled_at', 'status', 'payment_reference', 'total_amount', 'notes', 'is_vip'];
+
+    protected function casts(): array
+    {
+        return [
+            'scheduled_at' => 'datetime',
+            'is_vip' => 'boolean',
+        ];
+    }
 
     protected static function booted()
     {
@@ -37,6 +45,7 @@ class Order extends Model
     {
         return $this->hasOne(Tip::class);
     }
+
     public function waiter()
     {
         return $this->belongsTo(User::class, 'waiter_id');

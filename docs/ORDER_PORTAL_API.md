@@ -130,6 +130,7 @@ Inahitaji login (session). Tuma `Accept: application/json`.
         "table_number": "5",
         "customer_phone": "255712345678",
         "customer_name": "John",
+        "scheduled_at": "2025-02-26T14:00:00+03:00",
         "total_amount": 25000,
         "status": "pending",
         "created_at": "2025-02-26T10:30:00+00:00",
@@ -165,9 +166,23 @@ Inahitaji login (session). Tuma `Accept: application/json`.
     "menu_items": [
       {
         "id": 10,
-        "name": "Chips Mayai",
+        "name": "Haircut",
         "price": 5000,
         "image_url": "https://yoursite.com/storage/serve/menu/xxx.jpg"
+      }
+    ],
+    "booking_categories": [
+      {
+        "id": 3,
+        "name": "Hair",
+        "items": [
+          {
+            "id": 10,
+            "name": "Haircut",
+            "price": 5000,
+            "image_url": null
+          }
+        ]
       }
     ],
     "restaurant": {
@@ -179,6 +194,10 @@ Inahitaji login (session). Tuma `Accept: application/json`.
 ```
 
 Waiter anaona **orders zake tu** (waiter_id = user aliyelogin).
+
+- Kila order inaweza kuwa na **`scheduled_at`** (ISO 8601, timezone ya app) au `null`.
+- **`meta.menu_items`**: huduma za **service catalog** tu (sio bidhaa za product).
+- **`meta.booking_categories`**: huduma zimepangwa kwa **kategoria** za `catalog_kind = service` — tumia hii kwenye UI ya booking mpya.
 
 ---
 
@@ -193,11 +212,12 @@ Body: JSON. Tuma `Accept: application/json`.
 ```json
 {
   "table_number": "5",
+  "scheduled_date": "2025-02-26",
+  "scheduled_time": "14:30",
   "customer_phone": "255712345678",
   "customer_name": "John",
   "items": [
-    { "id": 10, "quantity": 2 },
-    { "id": 12, "quantity": 2 }
+    { "id": 10, "quantity": 2 }
   ]
 }
 ```
@@ -205,9 +225,11 @@ Body: JSON. Tuma `Accept: application/json`.
 | Field | Type | Required | Maelezo |
 |-------|------|----------|---------|
 | table_number | string | Ndiyo | Nambari/jina la meza (max 50) |
+| scheduled_date | string | Ndiyo (JSON) | Tarehe `Y-m-d` — kwa fomu ya web kisicho kituma, server inaweza kuweka leo |
+| scheduled_time | string | Ndiyo (JSON) | Saa `H:i` (mfano `09:05`) |
 | customer_phone | string | Hapana | Nambari ya simu |
 | customer_name | string | Hapana | Jina la mteja |
-| items | array | Ndiyo | Angalau item moja |
+| items | array | Ndiyo | Angalau huduma moja (**service** category tu) |
 | items[].id | int | Ndiyo | `menu_item_id` (lazima ipo kwenye restaurant) |
 | items[].quantity | int | Ndiyo | Idadi (≥ 1) |
 
@@ -277,6 +299,17 @@ Status zinazoruhusiwa: `pending` | `preparing` | `served` | `paid`.
   "table_number": "6",
   "customer_phone": "255798765432",
   "customer_name": "Jane"
+}
+```
+
+### Mfano – sasisha tarehe/saa ya booking (`scheduled_at`)
+
+Kwa **JSON** tu: ikiwa utatuma **`scheduled_date`** na **`scheduled_time`** pamoja, zote mbili lazima zijaze (au zote mbili tupu kwa kuondoa appointment). Moja pekee → hitilafu ya validation. Ikiwa hujatuma hizo keys, **`scheduled_at`** haibadilishwi.
+
+```json
+{
+  "scheduled_date": "2025-02-27",
+  "scheduled_time": "10:00"
 }
 ```
 

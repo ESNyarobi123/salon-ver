@@ -4,7 +4,7 @@
             <h3 class="text-xl font-bold text-white tracking-tight">New booking</h3>
             <button type="button" onclick="closeCreateOrderModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">✕</button>
         </div>
-        <form action="{{ route('order-portal.orders.store') }}" method="POST" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6 min-h-0">
+        <form id="orderPortalCreateForm" action="{{ route('order-portal.orders.store') }}" method="POST" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6 min-h-0">
             @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -27,6 +27,7 @@
             </div>
             <div>
                 <label class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">{{ config('salon.services') }} &amp; products</label>
+                <p class="text-[11px] text-white/45 mb-2">Tick each line you want; you can add several services/products in one booking.</p>
                 <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                     @foreach($menuItems as $item)
                         <div class="flex items-center justify-between glass p-3 rounded-xl">
@@ -43,10 +44,10 @@
                                     <label for="create_item_{{ $item->id }}" class="text-sm font-medium text-white cursor-pointer ml-2">{{ $item->name }} <span class="block text-[10px] text-white/40">Tsh {{ number_format($item->price) }}</span></label>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 opacity-50 pointer-events-none transition-all" id="create_qty_container_{{ $loop->index }}">
-                                <button type="button" onclick="adjustCreateQty({{ $loop->index }}, -1)" class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-white/20">−</button>
-                                <input type="number" name="items[{{ $loop->index }}][quantity]" id="create_qty_{{ $loop->index }}" value="1" min="1" class="w-12 text-center bg-transparent border-none text-white font-bold p-0" readonly>
-                                <button type="button" onclick="adjustCreateQty({{ $loop->index }}, 1)" class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-white/20">+</button>
+                            <div class="flex items-center gap-2 opacity-50 transition-all shrink-0" id="create_qty_container_{{ $loop->index }}">
+                                <button type="button" id="create_qty_minus_{{ $loop->index }}" onclick="adjustCreateQty({{ $loop->index }}, -1)" disabled class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none">−</button>
+                                <input type="number" name="items[{{ $loop->index }}][quantity]" id="create_qty_{{ $loop->index }}" value="1" min="1" disabled class="w-12 text-center bg-transparent border-none text-white font-bold p-0 disabled:opacity-50" readonly>
+                                <button type="button" id="create_qty_plus_{{ $loop->index }}" onclick="adjustCreateQty({{ $loop->index }}, 1)" disabled class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none">+</button>
                             </div>
                         </div>
                     @endforeach
@@ -70,13 +71,35 @@ function closeCreateOrderModal() {
 function toggleCreateQty(i) {
     const cb = document.querySelector('input[name="items['+i+'][id]"]');
     const container = document.getElementById('create_qty_container_'+i);
-    if (cb && cb.checked) { container.classList.remove('opacity-50','pointer-events-none'); }
-    else { container.classList.add('opacity-50','pointer-events-none'); }
+    const qty = document.getElementById('create_qty_'+i);
+    const minus = document.getElementById('create_qty_minus_'+i);
+    const plus = document.getElementById('create_qty_plus_'+i);
+    if (!cb || !qty) return;
+    if (cb.checked) {
+        qty.disabled = false;
+        if (minus) minus.disabled = false;
+        if (plus) plus.disabled = false;
+        container.classList.remove('opacity-50');
+    } else {
+        qty.value = 1;
+        qty.disabled = true;
+        if (minus) minus.disabled = true;
+        if (plus) plus.disabled = true;
+        container.classList.add('opacity-50');
+    }
 }
 function adjustCreateQty(i, d) {
     const el = document.getElementById('create_qty_'+i);
-    let v = parseInt(el.value||0)+d;
-    if (v<1) v=1;
-    el.value=v;
+    if (!el || el.disabled) return;
+    let v = parseInt(el.value || 0, 10) + d;
+    if (v < 1) v = 1;
+    el.value = v;
 }
+document.getElementById('orderPortalCreateForm')?.addEventListener('submit', function (e) {
+    const checked = this.querySelectorAll('input[type="checkbox"]:checked');
+    if (checked.length < 1) {
+        e.preventDefault();
+        alert('Select at least one service or product.');
+    }
+});
 </script>

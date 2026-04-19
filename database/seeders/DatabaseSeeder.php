@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             'location' => 'Dar es Salaam',
             'phone' => '0700000000',
         ]);
+        $restaurant->ensureDefaultCatalogCategories();
 
         // Create Manager
         $manager = User::factory()->create([

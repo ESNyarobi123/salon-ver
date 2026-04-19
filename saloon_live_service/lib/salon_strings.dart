@@ -41,7 +41,8 @@ abstract final class SalonStrings {
   static const labelSeat = 'Kiti';
   static const labelClient = 'Mteja';
   static const labelPhone = 'Simu';
-  static const sectionServicesProducts = 'Huduma & bidhaa';
+  static const sectionServicesProducts = 'Huduma';
+  static const labelAppointment = 'Miadi';
   static const totalBill = 'Jumla ya bili';
   static const statusStartService = 'Anza huduma';
   static const statusCompleteService = 'Maliza huduma';
@@ -53,9 +54,28 @@ abstract final class SalonStrings {
   static String moreItemsLine(int n) => '+$n vitu zaidi';
   static String linesCount(int n) => n == 1 ? '1 kipengele' : '$n vipengele';
 
-  // New order
+  // New order (3 steps: when → details → services by category)
   static const newBookingTitle = 'Booking mpya';
-  static const newBookingSubtitle = 'Chagua huduma / bidhaa';
+  static const newBookingSubtitleSteps =
+      'Hatua 3: muda → mteja & kiti → huduma kwa kategoria';
+  static const stepWhen = 'Muda';
+  static const stepDetails = 'Maelezo';
+  static const stepServices = 'Huduma';
+  static const stepBack = 'Rudi';
+  static const stepContinue = 'Endelea';
+  static const stepWhenTitle = 'Mteja anataka lini?';
+  static const stepWhenHint =
+      'Chagua tarehe na saa ya miadi. Unaweza kusahihisha baadaye na manager.';
+  static const stepDetailsTitle = 'Kiti na mteja';
+  static const labelAppointmentDate = 'Tarehe ya miadi';
+  static const labelAppointmentTime = 'Saa';
+  static const menuSearchServicesHint = 'Tafuta huduma…';
+  static const tapServicesToAdd =
+      'Gusa huduma kushoto kuongeza kwenye kikapu.';
+  static const chooseServiceToSubmit =
+      'Chagua angalau huduma moja ili kuwasilisha.';
+  static const noBookableServices =
+      'Hakuna huduma za kuweka booking. Ongiza huduma chini ya kategoria ya Service kwenye menyu, kisha sasisha.';
   static const cart = 'Kikapu';
   static const total = 'Jumla';
   static const bookingDetails = 'Maelezo ya booking';

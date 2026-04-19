@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OrderPortal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\Payment;
@@ -73,12 +74,29 @@ class LiveOrdersController extends Controller
             ->get();
 
         $tables = Table::withoutGlobalScopes()->where('restaurant_id', $restaurantId)->get();
-        $menuItems = MenuItem::withoutGlobalScopes()
+        $bookingCategories = Category::withoutGlobalScopes()
             ->where('restaurant_id', $restaurantId)
-            ->where('is_available', true)
-            ->get();
+            ->where('catalog_kind', Category::CATALOG_KIND_SERVICE)
+            ->with(['menuItems' => fn ($q) => $q->where('is_available', true)->orderBy('name')])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn (Category $c) => $c->menuItems->isNotEmpty());
+
+        $menuItems = $bookingCategories->flatMap(fn (Category $c) => $c->menuItems)->unique('id')->values();
 
         $restaurant = $this->restaurant();
+
+        $bookingCategoriesPayload = $bookingCategories->map(fn (Category $c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'items' => $c->menuItems->map(fn (MenuItem $m) => [
+                'id' => $m->id,
+                'name' => $m->name,
+                'price' => $m->price,
+                'image_url' => $m->image ? $m->imageUrl() : null,
+            ])->values()->all(),
+        ])->values()->all();
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -96,6 +114,7 @@ class LiveOrdersController extends Controller
                         'price' => $m->price,
                         'image_url' => $m->image ? $m->imageUrl() : null,
                     ]),
+                    'booking_categories' => $bookingCategoriesPayload,
                     'restaurant' => [
                         'id' => $restaurant->id,
                         'name' => $restaurant->name,
@@ -122,6 +141,7 @@ class LiveOrdersController extends Controller
             'table_number' => $order->table_number,
             'customer_phone' => $order->customer_phone,
             'customer_name' => $order->customer_name,
+            'scheduled_at' => $order->scheduled_at?->timezone(config('app.timezone'))->toIso8601String(),
             'total_amount' => $order->total_amount,
             'status' => $order->status,
             'created_at' => $order->created_at->toIso8601String(),
@@ -138,22 +158,49 @@ class LiveOrdersController extends Controller
 
     public function store(Request $request): RedirectResponse|JsonResponse
     {
+        $items = collect($request->input('items', []))
+            ->filter(fn ($row) => is_array($row) && ! empty($row['id']))
+            ->values()
+            ->all();
+
+        if (count($items) < 1) {
+            throw ValidationException::withMessages([
+                'items' => 'Select at least one service (tick the row and set quantity).',
+            ]);
+        }
+
+        $request->merge(['items' => $items]);
+
+        if (! $request->expectsJson()) {
+            $request->merge([
+                'scheduled_date' => $request->input('scheduled_date') ?: Carbon::now(config('app.timezone'))->format('Y-m-d'),
+                'scheduled_time' => $request->input('scheduled_time') ?: Carbon::now(config('app.timezone'))->format('H:i'),
+            ]);
+        }
+
         $request->validate([
             'table_number' => 'required|string|max:50',
+            'scheduled_date' => 'required|date',
+            'scheduled_time' => 'required|date_format:H:i',
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:menu_items,id',
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
         $restaurantId = $this->restaurantId();
+        $scheduledAt = Carbon::parse(
+            $request->input('scheduled_date').' '.$request->input('scheduled_time'),
+            config('app.timezone')
+        );
         $totalAmount = 0;
         $orderItems = [];
 
         foreach ($request->items as $itemData) {
-            $menuItem = MenuItem::withoutGlobalScopes()->findOrFail($itemData['id']);
-            if ($menuItem->restaurant_id != $restaurantId) {
-                abort(403);
-            }
+            $menuItem = MenuItem::withoutGlobalScopes()
+                ->where('restaurant_id', $restaurantId)
+                ->whereHas('category', fn ($q) => $q->where('catalog_kind', Category::CATALOG_KIND_SERVICE))
+                ->whereKey($itemData['id'])
+                ->firstOrFail();
             $subtotal = $menuItem->price * (int) $itemData['quantity'];
             $totalAmount += $subtotal;
             $orderItems[] = [
@@ -166,13 +213,14 @@ class LiveOrdersController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($restaurantId, $request, $totalAmount, $orderItems) {
+            $order = DB::transaction(function () use ($restaurantId, $request, $totalAmount, $orderItems, $scheduledAt) {
                 $order = Order::withoutGlobalScopes()->create([
                     'restaurant_id' => $restaurantId,
                     'waiter_id' => $this->waiterId(),
                     'table_number' => $request->table_number,
                     'customer_phone' => $request->customer_phone ?? '',
                     'customer_name' => $request->customer_name ?? '',
+                    'scheduled_at' => $scheduledAt,
                     'total_amount' => $totalAmount,
                     'status' => 'pending',
                 ]);
@@ -216,11 +264,30 @@ class LiveOrdersController extends Controller
         }
 
         if ($request->has('table_number')) {
-            $orderModel->update([
+            $payload = [
                 'table_number' => $request->table_number,
                 'customer_phone' => $request->customer_phone ?? '',
                 'customer_name' => $request->customer_name ?? '',
-            ]);
+            ];
+            if ($request->expectsJson() && ($request->exists('scheduled_date') || $request->exists('scheduled_time'))) {
+                $request->validate([
+                    'scheduled_date' => 'nullable|date',
+                    'scheduled_time' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
+                ]);
+                if ($request->filled('scheduled_date') && $request->filled('scheduled_time')) {
+                    $payload['scheduled_at'] = Carbon::parse(
+                        $request->input('scheduled_date').' '.$request->input('scheduled_time'),
+                        config('app.timezone')
+                    );
+                } elseif (! $request->filled('scheduled_date') && ! $request->filled('scheduled_time')) {
+                    $payload['scheduled_at'] = null;
+                } else {
+                    throw ValidationException::withMessages([
+                        'scheduled_date' => 'Enter both appointment date and time, or omit both.',
+                    ]);
+                }
+            }
+            $orderModel->update($payload);
         }
 
         if ($request->has('items') && is_array($request->items)) {
@@ -239,8 +306,12 @@ class LiveOrdersController extends Controller
                         if ($qty < 1) {
                             continue;
                         }
-                        $menuItem = MenuItem::withoutGlobalScopes()->findOrFail($itemData['id']);
-                        if ($menuItem->restaurant_id != $restaurantId) {
+                        $menuItem = MenuItem::withoutGlobalScopes()
+                            ->where('restaurant_id', $restaurantId)
+                            ->whereHas('category', fn ($q) => $q->where('catalog_kind', Category::CATALOG_KIND_SERVICE))
+                            ->whereKey($itemData['id'])
+                            ->first();
+                        if (! $menuItem) {
                             continue;
                         }
                         $subtotal = $menuItem->price * $qty;

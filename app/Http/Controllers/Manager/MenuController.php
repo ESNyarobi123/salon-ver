@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\MenuItem;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,9 @@ class MenuController extends Controller
     public function index()
     {
         $restaurantId = Auth::user()->restaurant_id;
+        if ($restaurantId) {
+            Restaurant::find($restaurantId)?->ensureDefaultCatalogCategories();
+        }
         $categories = Category::where('restaurant_id', $restaurantId)->get();
         $menuItems = MenuItem::with('category')->where('restaurant_id', $restaurantId)->latest()->get();
 

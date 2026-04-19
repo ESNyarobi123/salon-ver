@@ -12,7 +12,7 @@ WhatsApp bot ya TIPTAP - Restaurant ordering system powered by Baileys.
 2. **Configure environment:**
    Edit `.env` file:
    ```env
-   API_BASE_URL=https://TIPTAP.tendapoa.com/api/bot
+   API_BASE_URL=https://sln.tiptapafrica.co.tz/api/bot
    BOT_TOKEN=your_sanctum_token_here
    PORT=3000
    ```

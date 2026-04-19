@@ -16,10 +16,11 @@ class OrderItemObserver
 
         $menuItem = MenuItem::withoutGlobalScopes()
             ->whereKey($orderItem->menu_item_id)
+            ->with('category')
             ->lockForUpdate()
             ->first();
 
-        if (! $menuItem || ! $menuItem->stock_tracked) {
+        if (! $menuItem || ! $menuItem->stock_tracked || ! $menuItem->category?->isProductCatalog()) {
             return;
         }
 
@@ -36,8 +37,10 @@ class OrderItemObserver
             return;
         }
 
-        $menuItem = MenuItem::withoutGlobalScopes()->find($orderItem->menu_item_id);
-        if (! $menuItem || ! $menuItem->stock_tracked) {
+        $menuItem = MenuItem::withoutGlobalScopes()
+            ->with('category')
+            ->find($orderItem->menu_item_id);
+        if (! $menuItem || ! $menuItem->stock_tracked || ! $menuItem->category?->isProductCatalog()) {
             return;
         }
 
@@ -52,8 +55,10 @@ class OrderItemObserver
             return;
         }
 
-        $menuItem = MenuItem::withoutGlobalScopes()->find($orderItem->menu_item_id);
-        if (! $menuItem || ! $menuItem->stock_tracked) {
+        $menuItem = MenuItem::withoutGlobalScopes()
+            ->with('category')
+            ->find($orderItem->menu_item_id);
+        if (! $menuItem || ! $menuItem->stock_tracked || ! $menuItem->category?->isProductCatalog()) {
             return;
         }
 

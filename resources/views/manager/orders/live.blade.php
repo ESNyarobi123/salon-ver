@@ -10,6 +10,12 @@
             <p class="text-[13px] text-white/50 mt-1 max-w-xl leading-relaxed">Cards highlight <span class="text-violet-200/90">appointment date &amp; time</span>, guest, phone, stylist, and services—scannable at a glance.</p>
         </div>
         <div class="flex gap-3">
+            <button type="button" onclick="openCalendarModal()" class="glass px-5 py-3 rounded-xl font-semibold text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2" title="Calendar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+                </svg>
+                Calendar
+            </button>
             <button onclick="openCreateOrderModal()" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-violet-600/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -40,6 +46,16 @@
                     <h4 class="font-bold text-white uppercase tracking-wider text-[11px]">Pending</h4>
                 </div>
                 <span class="bg-rose-500/20 text-rose-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-rose-500/20">{{ $pendingOrders->count() }}</span>
+            </div>
+            <div class="mb-4 px-1">
+                <div class="flex items-center justify-between gap-2 text-[11px] text-white/45">
+                    <span>Showing: <span class="text-white/70 font-semibold">{{ $boardDate->format('D, M j') }}</span></span>
+                    @if($boardDate->isToday())
+                        <span class="px-2 py-1 rounded-lg bg-white/5 border border-white/10">Today</span>
+                    @else
+                        <a href="{{ route('manager.orders.live') }}" class="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/70 hover:text-white transition-all">Back to today</a>
+                    @endif
+                </div>
             </div>
             <div class="space-y-3">
                 @forelse($pendingOrders as $order)
@@ -228,7 +244,14 @@
                     <div class="w-2 h-2 bg-cyan-500 rounded-full"></div>
                     <h4 class="font-bold text-white uppercase tracking-wider text-[11px]">Completed</h4>
                 </div>
-                <span class="bg-cyan-500/20 text-cyan-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-cyan-500/20">{{ $paidOrders->count() }}</span>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('manager.orders.completed') }}" class="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-cyan-300 transition-all" title="Open completed bookings">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
+                        </svg>
+                    </a>
+                    <span class="bg-cyan-500/20 text-cyan-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-cyan-500/20">{{ $paidOrders->count() }}</span>
+                </div>
             </div>
             <div class="space-y-3 opacity-[0.82]">
                 @forelse($paidOrders as $order)
@@ -259,11 +282,158 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-sm text-white/30 text-center py-8">No completed bookings today</p>
+                    <p class="text-sm text-white/30 text-center py-8">No completed bookings for {{ $boardDate->format('M j') }}</p>
                 @endforelse
             </div>
         </div>
     </div>
+
+    <!-- Calendar modal -->
+    <div id="calendarModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] hidden items-center justify-center p-6">
+        <div class="bg-surface-900 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+            <div class="p-5 border-b border-white/10 flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white tracking-tight">Booking calendar</h3>
+                    <p class="text-[11px] text-white/45 mt-1">Days with bookings are marked. Click a day to open the board.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="calendarPrev()" class="glass px-3 py-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all" title="Previous month">‹</button>
+                    <button type="button" onclick="calendarNext()" class="glass px-3 py-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all" title="Next month">›</button>
+                    <button type="button" onclick="closeCalendarModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white" title="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <p id="calendarTitle" class="text-sm font-semibold text-white/80"></p>
+                    <div class="text-[11px] text-white/45">Timezone: {{ config('app.timezone') }}</div>
+                </div>
+                <div class="grid grid-cols-7 gap-2 text-[10px] font-bold text-white/35 uppercase tracking-wider mb-2">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CAL_INITIAL = @js($calendar);
+        let calMonth = CAL_INITIAL.month; // YYYY-MM
+        let calCounts = CAL_INITIAL.counts || {};
+
+        function openCalendarModal() {
+            const el = document.getElementById('calendarModal');
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            renderCalendar();
+        }
+        function closeCalendarModal() {
+            const el = document.getElementById('calendarModal');
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+        function calendarPrev() {
+            const d = new Date(calMonth + '-01T00:00:00');
+            d.setMonth(d.getMonth() - 1);
+            calMonth = d.toISOString().slice(0, 7);
+            fetchCalendar();
+        }
+        function calendarNext() {
+            const d = new Date(calMonth + '-01T00:00:00');
+            d.setMonth(d.getMonth() + 1);
+            calMonth = d.toISOString().slice(0, 7);
+            fetchCalendar();
+        }
+        async function fetchCalendar() {
+            try {
+                const res = await fetch('{{ route('manager.orders.calendar') }}?month=' + encodeURIComponent(calMonth), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return renderCalendar();
+                const json = await res.json();
+                calMonth = json.month || calMonth;
+                calCounts = json.counts || {};
+                renderCalendar();
+            } catch (_) {
+                renderCalendar();
+            }
+        }
+
+        function renderCalendar() {
+            const title = document.getElementById('calendarTitle');
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            const first = new Date(calMonth + '-01T00:00:00');
+            const monthIndex = first.getMonth();
+            const year = first.getFullYear();
+            const monthName = first.toLocaleString(undefined, { month: 'long' });
+            title.textContent = monthName + ' ' + year;
+
+            // Sunday=0
+            const startDow = first.getDay();
+            const start = new Date(first);
+            start.setDate(first.getDate() - startDow);
+
+            // 6 rows x 7 days
+            for (let i = 0; i < 42; i++) {
+                const day = new Date(start);
+                day.setDate(start.getDate() + i);
+                const dayMonth = day.getMonth();
+                const iso = day.toISOString().slice(0, 10);
+                const count = Number(calCounts[iso] || 0);
+
+                const isCurrentMonth = dayMonth === monthIndex;
+                const isToday = iso === new Date().toISOString().slice(0,10);
+
+                const cell = document.createElement('a');
+                cell.href = '{{ route('manager.orders.live') }}' + '?date=' + encodeURIComponent(iso);
+                cell.className = [
+                    'block rounded-xl border p-3 min-h-[74px] transition-all',
+                    isCurrentMonth ? 'bg-white/[0.03] border-white/10 hover:bg-white/[0.06] hover:border-violet-500/25' : 'bg-black/20 border-white/5 opacity-60 hover:opacity-80',
+                    isToday ? 'ring-2 ring-violet-500/60' : '',
+                ].join(' ');
+
+                const top = document.createElement('div');
+                top.className = 'flex items-start justify-between gap-2';
+                const num = document.createElement('div');
+                num.className = 'text-sm font-bold ' + (isCurrentMonth ? 'text-white' : 'text-white/60');
+                num.textContent = String(day.getDate());
+                top.appendChild(num);
+
+                if (count > 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/20';
+                    badge.textContent = count;
+                    top.appendChild(badge);
+                }
+
+                const dot = document.createElement('div');
+                dot.className = 'mt-2 flex items-center gap-1';
+                if (count > 0) {
+                    const d1 = document.createElement('span');
+                    d1.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                    const d2 = document.createElement('span');
+                    d2.className = 'w-2 h-2 rounded-full bg-cyan-400/70';
+                    dot.appendChild(d1);
+                    dot.appendChild(d2);
+                } else {
+                    const m = document.createElement('span');
+                    m.className = 'text-[10px] text-white/25';
+                    m.textContent = '—';
+                    dot.appendChild(m);
+                }
+
+                cell.appendChild(top);
+                cell.appendChild(dot);
+                grid.appendChild(cell);
+            }
+        }
+    </script>
 
     <!-- Create booking modal -->
     <div id="createOrderModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-6">

@@ -170,7 +170,9 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
     Route::get('/dashboard', [ManagerDashboard::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [ManagerDashboard::class, 'getStats'])->name('dashboard.stats');
     Route::get('/live-orders', [\App\Http\Controllers\Manager\LiveOrderController::class, 'index'])->name('orders.live');
+    Route::get('/live-orders/calendar', [\App\Http\Controllers\Manager\LiveOrderController::class, 'calendar'])->name('orders.calendar');
     Route::get('/product-sales', [\App\Http\Controllers\Manager\ProductSalesController::class, 'index'])->name('product-sales.index');
+    Route::get('/orders/completed', [\App\Http\Controllers\Manager\CompletedBookingsController::class, 'index'])->name('orders.completed');
     Route::get('/orders/history', [\App\Http\Controllers\Manager\OrderHistoryController::class, 'index'])->name('orders.history');
     Route::get('/orders/history/export', [\App\Http\Controllers\Manager\OrderHistoryController::class, 'export'])->name('orders.history.export');
     Route::get('/orders/{order}', [\App\Http\Controllers\Manager\OrderHistoryController::class, 'show'])->name('orders.show');

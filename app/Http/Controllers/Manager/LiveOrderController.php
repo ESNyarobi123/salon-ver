@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -15,13 +16,26 @@ class LiveOrderController extends Controller
 {
     public function index()
     {
-        $today = Carbon::today();
+        $tz = config('app.timezone');
+        $boardDate = request('date')
+            ? Carbon::parse((string) request('date'), $tz)->startOfDay()
+            : Carbon::today($tz);
         $restaurantId = auth()->user()->restaurant_id;
 
         $pendingOrders = Order::with(['items.menuItem', 'waiter'])
             ->where('restaurant_id', $restaurantId)
             ->where('order_kind', Order::KIND_BOOKING)
             ->where('status', 'pending')
+            ->where(function ($q) use ($boardDate) {
+                // Show today's bookings only; keep older pending bookings until worked.
+                // Future bookings appear on their day.
+                $q->whereNotNull('scheduled_at')
+                    ->whereDate('scheduled_at', '<=', $boardDate->toDateString())
+                    ->orWhere(function ($q2) use ($boardDate) {
+                        $q2->whereNull('scheduled_at')
+                            ->whereDate('created_at', '<=', $boardDate->toDateString());
+                    });
+            })
             ->latest()
             ->get();
 
@@ -43,9 +57,10 @@ class LiveOrderController extends Controller
             ->where('restaurant_id', $restaurantId)
             ->where('order_kind', Order::KIND_BOOKING)
             ->where('status', 'paid')
-            ->whereDate('created_at', $today)
-            ->latest()
-            ->take(20)
+            // Paid date = last update time (covers bookings created earlier).
+            ->whereDate('updated_at', $boardDate->toDateString())
+            ->orderByDesc('updated_at')
+            ->take(40)
             ->get();
 
         $tables = \App\Models\Table::where('restaurant_id', $restaurantId)->get();
@@ -63,7 +78,77 @@ class LiveOrderController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return view('manager.orders.live', compact('pendingOrders', 'preparingOrders', 'servedOrders', 'paidOrders', 'tables', 'bookingCategories', 'waiters'));
+        $calendar = $this->calendarCounts($restaurantId, $boardDate);
+
+        return view('manager.orders.live', compact(
+            'pendingOrders',
+            'preparingOrders',
+            'servedOrders',
+            'paidOrders',
+            'tables',
+            'bookingCategories',
+            'waiters',
+            'boardDate',
+            'calendar'
+        ));
+    }
+
+    /**
+     * Calendar markers (month grid) for bookings.
+     *
+     * @return array{month: string, counts: array<string,int>}
+     */
+    private function calendarCounts(int $restaurantId, Carbon $boardDate): array
+    {
+        $tz = config('app.timezone');
+        $start = $boardDate->copy()->timezone($tz)->startOfMonth()->startOfDay();
+        $end = $boardDate->copy()->timezone($tz)->endOfMonth()->endOfDay();
+
+        $counts = [];
+
+        $scheduled = Order::query()
+            ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
+            ->whereNotNull('scheduled_at')
+            ->whereBetween('scheduled_at', [$start, $end])
+            ->selectRaw('DATE(scheduled_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd')
+            ->toArray();
+
+        foreach ($scheduled as $d => $c) {
+            $counts[(string) $d] = ($counts[(string) $d] ?? 0) + (int) $c;
+        }
+
+        $unscheduled = Order::query()
+            ->where('restaurant_id', $restaurantId)
+            ->where('order_kind', Order::KIND_BOOKING)
+            ->whereNull('scheduled_at')
+            ->whereBetween('created_at', [$start, $end])
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd')
+            ->toArray();
+
+        foreach ($unscheduled as $d => $c) {
+            $counts[(string) $d] = ($counts[(string) $d] ?? 0) + (int) $c;
+        }
+
+        return [
+            'month' => $boardDate->format('Y-m'),
+            'counts' => $counts,
+        ];
+    }
+
+    public function calendar(Request $request): JsonResponse
+    {
+        $tz = config('app.timezone');
+        $restaurantId = (int) auth()->user()->restaurant_id;
+        $boardDate = $request->input('month')
+            ? Carbon::parse($request->input('month').'-01', $tz)
+            : Carbon::today($tz);
+
+        return response()->json($this->calendarCounts($restaurantId, $boardDate));
     }
 
     /**

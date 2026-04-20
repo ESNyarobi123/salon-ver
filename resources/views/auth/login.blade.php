@@ -1,15 +1,17 @@
-<x-guest-layout title="TIPTAP | Login">
+<x-guest-layout title="TIPTAP | Sign in" :showTopLogo="false">
     <div class="relative">
-        <!-- Header -->
         <div class="text-center mb-6 sm:mb-8">
-            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Welcome Back!</h2>
-            <p class="text-white/50 font-medium mt-2 text-sm sm:text-base">Sign in to your TIPTAP account</p>
+            <div class="mx-auto w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-lg shadow-violet-500/10 overflow-hidden">
+                <img src="{{ asset('logo.jpeg') }}" alt="TIPTAP" class="w-full h-full object-cover">
+            </div>
+            <h2 class="mt-4 text-2xl sm:text-3xl font-black text-white tracking-tight">Karibu tena</h2>
+            <p class="text-white/55 font-medium mt-2 text-sm sm:text-base">Ingia kwenye saloon workspace yako uendelee na bookings na mauzo.</p>
         </div>
 
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-6">
+        <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-6" novalidate>
             @csrf
 
             <!-- Email Address -->
@@ -22,7 +24,7 @@
                         </svg>
                     </div>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="you@example.com"
-                           class="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl font-medium text-white text-sm sm:text-base placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                           class="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl font-medium text-white text-sm sm:text-base placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all hover:border-white/20">
                 </div>
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
@@ -44,23 +46,35 @@
                         </svg>
                     </div>
                     <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="••••••••"
-                           class="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl font-medium text-white text-sm sm:text-base placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                           class="block w-full pl-10 sm:pl-12 pr-12 sm:pr-14 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl font-medium text-white text-sm sm:text-base placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all hover:border-white/20">
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-3 sm:px-4 text-white/40 hover:text-white transition-colors" aria-label="Show password" title="Show/Hide">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
                 </div>
+                <p id="capsHint" class="mt-2 text-[11px] font-semibold text-amber-200/90 hidden">
+                    Caps Lock iko ON
+                </p>
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
             <!-- Remember Me -->
-            <div class="flex items-center">
-                <label for="remember_me" class="inline-flex items-center cursor-pointer">
+            <div class="flex items-center justify-between gap-3">
+                <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
                     <input id="remember_me" type="checkbox" class="w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/5 border-white/20 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 transition-all" name="remember">
-                    <span class="ms-2 sm:ms-3 text-xs sm:text-sm font-medium text-white/60">Remember me</span>
+                    <span class="ms-2 sm:ms-3 text-xs sm:text-sm font-medium text-white/60">Nikumbuke</span>
                 </label>
+                <div class="text-[10px] sm:text-xs text-white/40 font-semibold hidden sm:block">
+                    Tip: tumia password ya manager/stylist
+                </div>
             </div>
 
             <!-- Sign In Button -->
             <div class="pt-1 sm:pt-2">
                 <button type="submit" class="w-full py-3 sm:py-4 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <span>Sign In</span>
+                    <span>Ingia</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
@@ -87,5 +101,28 @@
                 </div>
             </div> -->
         </form>
+
+        <script>
+            (function () {
+                const pwd = document.getElementById('password');
+                const btn = document.getElementById('togglePassword');
+                const caps = document.getElementById('capsHint');
+                if (!pwd || !btn) return;
+
+                btn.addEventListener('click', function () {
+                    const isHidden = pwd.type === 'password';
+                    pwd.type = isHidden ? 'text' : 'password';
+                    btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                });
+
+                const updateCaps = (e) => {
+                    if (!caps) return;
+                    const on = e && typeof e.getModifierState === 'function' ? e.getModifierState('CapsLock') : false;
+                    caps.classList.toggle('hidden', !on);
+                };
+                pwd.addEventListener('keyup', updateCaps);
+                pwd.addEventListener('keydown', updateCaps);
+            })();
+        </script>
     </div>
 </x-guest-layout>

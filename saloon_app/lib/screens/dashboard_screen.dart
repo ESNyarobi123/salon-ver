@@ -485,7 +485,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// Unlinked waiter hero card — shows unique code and CTA
   Widget _buildUnlinkedHeroCard(dynamic user) {
-    final code = user.globalWaiterNumber ?? 'TIPTAP-W-?????';
+    final code = user.globalWaiterNumber ?? '????';
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(

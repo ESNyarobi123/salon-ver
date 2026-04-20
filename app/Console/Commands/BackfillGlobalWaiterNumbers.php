@@ -8,17 +8,30 @@ use Illuminate\Console\Command;
 class BackfillGlobalWaiterNumbers extends Command
 {
     protected $signature = 'waiters:backfill-global-numbers
-                            {--dry-run : List waiters that would be updated without saving}';
+                            {--dry-run : List waiters that would be updated without saving}
+                            {--migrate-legacy : Also replace legacy TIPTAP-W-##### codes with new 8-hex ids}';
 
-    protected $description = 'Assign global_waiter_number to existing waiters who do not have one (so they can be found by manager search)';
+    protected $description = 'Assign global_waiter_number (8 hex) to waiters missing one; optionally migrate legacy TIPTAP-W-##### codes';
 
     public function handle(): int
     {
         $dryRun = $this->option('dry-run');
-        $waiters = User::role('waiter')->whereNull('global_waiter_number')->orderBy('id')->get();
+        $migrateLegacy = $this->option('migrate-legacy');
+
+        $waiters = User::role('waiter')
+            ->where(function ($q) use ($migrateLegacy) {
+                $q->whereNull('global_waiter_number');
+                if ($migrateLegacy) {
+                    $q->orWhere('global_waiter_number', 'like', 'TIPTAP-W-%');
+                }
+            })
+            ->orderBy('id')
+            ->get();
 
         if ($waiters->isEmpty()) {
-            $this->info('No waiters without a global number found.');
+            $this->info($migrateLegacy
+                ? 'No waiters found without a number or with legacy TIPTAP-W- codes.'
+                : 'No waiters without a global number found.');
 
             return self::SUCCESS;
         }
@@ -27,9 +40,14 @@ class BackfillGlobalWaiterNumbers extends Command
             ? 'Would assign global numbers to '.$waiters->count().' waiter(s):'
             : 'Assigning global numbers to '.$waiters->count().' waiter(s)...');
 
+        $pendingReserved = [];
         foreach ($waiters as $waiter) {
-            $number = User::generateGlobalWaiterNumber();
-            $this->line("  {$waiter->name} (id: {$waiter->id}) → {$number}");
+            $previous = $waiter->global_waiter_number;
+            $number = User::generateGlobalWaiterNumber($dryRun ? $pendingReserved : []);
+            if ($dryRun) {
+                $pendingReserved[] = $number;
+            }
+            $this->line("  {$waiter->name} (id: {$waiter->id})".($previous ? " ← {$previous}" : '')." → {$number}");
             if (! $dryRun) {
                 $waiter->global_waiter_number = $number;
                 $waiter->save();

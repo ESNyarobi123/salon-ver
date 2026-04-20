@@ -10,7 +10,7 @@
     @if (session('order_portal_password_generated'))
         <div class="mb-6 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-sm">
             {{ session('success') }}
-            <p class="mt-2 font-semibold">Nenosiri la Service desk (onyesha {{ strtolower(config('salon.staff')) }} mara moja):</p>
+            <p class="mt-2 font-semibold">Nenosiri la Service desk (namba 4: 0000–9999; onyesha {{ strtolower(config('salon.staff')) }} mara moja):</p>
             <p class="mt-1 font-mono text-lg tracking-wider bg-black/20 px-3 py-2 rounded-lg inline-block">{{ session('order_portal_password_generated') }}</p>
             <p class="mt-2 text-white/70">{{ config('salon.staff') }}: <strong>{{ session('order_portal_waiter_name') }}</strong> · Nambari: <code>{{ session('order_portal_waiter_number') }}</code></p>
             <p class="mt-1 text-white/50 text-xs">Login: <a href="{{ $orderPortalLoginUrl ?? route('order-portal.login') }}" class="text-cyan-400 underline" target="_blank">{{ $orderPortalLoginUrl ?? url('/order-portal/login') }}</a></p>
@@ -20,12 +20,12 @@
     <!-- Link stylist card -->
     <div class="glass-card rounded-2xl p-6 mb-8 border border-white/10">
         <h3 class="text-lg font-bold text-white mb-1">Unganisha {{ config('salon.staff') }}</h3>
-        <p class="text-sm text-white/50 mb-2">{{ config('salon.staff') }} anajisajili kwenye wavuti, kisha anakupa nambari yake ya pekee (TIPTAP-W-xxxxx). Tafuta hapa na uunganishe na {{ strtolower(config('salon.entity')) }} yako.</p>
+        <p class="text-sm text-white/50 mb-2">{{ config('salon.staff') }} anajisajili kwenye wavuti, kisha anakupa nambari yake ya pekee (msimbo wa herufi/namba). Tafuta hapa na uunganishe na {{ strtolower(config('salon.entity')) }} yako.</p>
         <p class="text-xs text-white/40 mb-4">Chagua <strong class="text-white/60">Muda mrefu</strong> (permanent) au <strong class="text-white/60">Show-time</strong> (muda maalum – weka tarehe ya mwisho).</p>
         <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[200px]">
                 <label for="searchCode" class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2 block">Nambari ya pekee ya {{ strtolower(config('salon.staff')) }}</label>
-                <input type="text" id="searchCode" placeholder="TIPTAP-W-00001"
+                <input type="text" id="searchCode" placeholder="Mfano: 09E26870"
                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl font-mono text-white placeholder-white/30 focus:ring-2 focus:ring-violet-500 focus:border-transparent">
             </div>
             <button type="button" onclick="searchWaiter()" class="px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all flex items-center gap-2">
@@ -333,7 +333,7 @@
             resultEl.innerHTML = '';
             errorEl.classList.add('hidden');
             if (!q) {
-                errorEl.textContent = 'Ingiza nambari ya pekee (TIPTAP-W-xxxxx).';
+                errorEl.textContent = 'Ingiza nambari ya pekee (mfano msimbo wa usajili).';
                 errorEl.classList.remove('hidden');
                 return;
             }

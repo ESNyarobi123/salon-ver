@@ -100,7 +100,7 @@ class WhatsAppBotController extends Controller
 
     /**
      * Verify service tag: PREFIX-T## (seat) or PREFIX-W## (stylist at that saloon).
-     * TipTap-wide stylist account IDs (TIPTAP-W-#####) are handled in parseEntry(), not here.
+     * TipTap-wide stylist account IDs (8-hex, legacy 4-digit, or TIPTAP-W-#####) are handled in parseEntry(), not here.
      */
     public function verifyTag(Request $request)
     {
@@ -200,14 +200,14 @@ class WhatsAppBotController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid tag. Use PREFIX-T## (seat) or PREFIX-W## (stylist at that saloon). For TipTap ID TIPTAP-W-#####, use parse-entry as plain text.',
+                'message' => 'Invalid tag. Use PREFIX-T## (seat) or PREFIX-W## (stylist at that saloon). For TipTap stylist ID (8-hex, legacy 4-digit, or TIPTAP-W-#####), use parse-entry as plain text.',
             ], 400);
         }
     }
 
     /**
      * Parse QR code or tag input and return appropriate data
-     * Handles: START_2, START_2_T5, START_2_S3 (stylist), legacy START_2_W3, TIPTAP-W-00001, SMK-T01, SMK-W01
+     * Handles: START_2, START_2_T5, START_2_S3 (stylist), legacy START_2_W3, 8-hex / legacy 4-digit TipTap ID, TIPTAP-W-00001, SMK-T01, SMK-W01
      */
     public function parseEntry(Request $request)
     {
@@ -218,7 +218,7 @@ class WhatsAppBotController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'The input field is required.',
-                'hint' => 'Send input as POST body: {"input": "START_2_S12"} or ?input=TIPTAP-W-00001',
+                'hint' => 'Send input as POST body: {"input": "START_2_S12"} or ?input=09E26870',
             ], 422);
         }
 
@@ -318,7 +318,70 @@ class WhatsAppBotController extends Controller
         // Pattern 3c: Global TipTap stylist ID (typed or scanned as plain text)
         if (preg_match('/^TIPTAP-W-\d+$/i', $input)) {
             $waiter = User::role('waiter')
+                ->where('global_waiter_number', strtoupper($input))
+                ->with('restaurant')
+                ->first();
+
+            if (! $waiter || ! $waiter->restaurant_id || ! $waiter->restaurant || ! $waiter->restaurant->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stylist not found or not linked to an active saloon',
+                ], 404);
+            }
+
+            $restaurant = $waiter->restaurant;
+
+            return response()->json([
+                'success' => true,
+                'type' => 'waiter',
+                'skip_standalone_welcome' => true,
+                'data' => [
+                    'restaurant_id' => $restaurant->id,
+                    'restaurant_name' => $restaurant->name,
+                    'support_phone' => $restaurant->getCustomerSupportPhone(),
+                    'waiter_id' => $waiter->id,
+                    'waiter_name' => $waiter->name,
+                    'waiter_code' => $waiter->waiter_code,
+                ],
+            ]);
+        }
+
+        // Pattern 3d: 8-char hex global stylist ID (current format)
+        if (preg_match('/^[0-9A-F]{8}$/', $input)) {
+            $waiter = User::role('waiter')
                 ->where('global_waiter_number', $input)
+                ->with('restaurant')
+                ->first();
+
+            if (! $waiter || ! $waiter->restaurant_id || ! $waiter->restaurant || ! $waiter->restaurant->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stylist not found or not linked to an active saloon',
+                ], 404);
+            }
+
+            $restaurant = $waiter->restaurant;
+
+            return response()->json([
+                'success' => true,
+                'type' => 'waiter',
+                'skip_standalone_welcome' => true,
+                'data' => [
+                    'restaurant_id' => $restaurant->id,
+                    'restaurant_name' => $restaurant->name,
+                    'support_phone' => $restaurant->getCustomerSupportPhone(),
+                    'waiter_id' => $waiter->id,
+                    'waiter_name' => $waiter->name,
+                    'waiter_code' => $waiter->waiter_code,
+                ],
+            ]);
+        }
+
+        // Pattern 3e: legacy 4-digit global stylist ID (0000–9999)
+        if (preg_match('/^\d{1,4}$/', trim($input))) {
+            $code = User::normalizeGlobalWaiterNumberForLookup($input);
+            $waiter = User::role('waiter')
+                ->where('global_waiter_number', $code)
                 ->with('restaurant')
                 ->first();
 

@@ -50,10 +50,37 @@ class OrderPortalPassword extends Model
     }
 
     /**
-     * Generate a random password suitable for display once (e.g. 8 alphanumeric).
+     * Generate a unique 4-digit numeric PIN (0000–9999) for one-time display.
+     * Plain PINs must not collide across non-revoked rows: login scans all active credentials with Hash::check.
      */
     public static function generateRandomPassword(): string
     {
-        return strtoupper(bin2hex(random_bytes(4)));
+        $active = self::query()->whereNull('revoked_at')->get();
+
+        $isTaken = function (string $plain) use ($active): bool {
+            foreach ($active as $credential) {
+                if ($credential->checkPassword($plain)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        for ($t = 0; $t < 64; $t++) {
+            $plain = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+            if (! $isTaken($plain)) {
+                return $plain;
+            }
+        }
+
+        for ($i = 0; $i <= 9999; $i++) {
+            $plain = str_pad((string) $i, 4, '0', STR_PAD_LEFT);
+            if (! $isTaken($plain)) {
+                return $plain;
+            }
+        }
+
+        throw new \RuntimeException('No available 4-digit order portal PIN (0000–9999).');
     }
 }

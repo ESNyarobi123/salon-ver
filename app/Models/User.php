@@ -52,21 +52,50 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate next global waiter number (e.g. TIPTAP-W-00001).
+     * Normalize lookup input to match how `global_waiter_number` is stored.
+     * Accepts 8-char hex (current), 1–4 digit numeric zero-padded (legacy), or `TIPTAP-W-#####`.
      */
-    public static function generateGlobalWaiterNumber(): string
+    public static function normalizeGlobalWaiterNumberForLookup(string $raw): string
     {
-        $last = self::whereNotNull('global_waiter_number')
-            ->where('global_waiter_number', 'like', 'TIPTAP-W-%')
-            ->orderByRaw('CAST(SUBSTRING(global_waiter_number, 10) AS UNSIGNED) DESC')
-            ->value('global_waiter_number');
-
-        $num = 1;
-        if ($last && preg_match('/TIPTAP-W-(\d+)$/', $last, $m)) {
-            $num = (int) $m[1] + 1;
+        $raw = trim($raw);
+        if (preg_match('/^TIPTAP-W-\d+$/i', $raw)) {
+            return strtoupper($raw);
+        }
+        if (preg_match('/^\d{1,4}$/', $raw)) {
+            return str_pad($raw, 4, '0', STR_PAD_LEFT);
         }
 
-        return 'TIPTAP-W-'.str_pad((string) $num, 5, '0', STR_PAD_LEFT);
+        return strtoupper($raw);
+    }
+
+    /**
+     * Generate a unique global stylist id (8 uppercase hex characters).
+     *
+     * @param  list<string>  $alsoReserved  Treat these as taken (e.g. batch backfill dry-run).
+     *
+     * @throws \RuntimeException When a new unique value could not be generated after several attempts.
+     */
+    public static function generateGlobalWaiterNumber(array $alsoReserved = []): string
+    {
+        $taken = [];
+        foreach ($alsoReserved as $code) {
+            if (is_string($code) && $code !== '') {
+                $taken[strtoupper(trim($code))] = true;
+            }
+        }
+
+        foreach (self::query()->whereNotNull('global_waiter_number')->pluck('global_waiter_number') as $v) {
+            $taken[strtoupper((string) $v)] = true;
+        }
+
+        for ($t = 0; $t < 64; $t++) {
+            $candidate = strtoupper(bin2hex(random_bytes(4)));
+            if (! isset($taken[$candidate])) {
+                return $candidate;
+            }
+        }
+
+        throw new \RuntimeException('Could not generate a unique global_waiter_number.');
     }
 
     /**

@@ -41,13 +41,13 @@ class WaiterController extends Controller
     }
 
     /**
-     * Search waiter by unique code (global_waiter_number, e.g. TIPTAP-W-00001).
+     * Search waiter by unique code (global_waiter_number, e.g. 8-char hex or legacy TIPTAP-W-00001).
      */
     public function search(Request $request): JsonResponse
     {
         $request->validate(['q' => 'required|string|max:30']);
 
-        $q = strtoupper(trim($request->q));
+        $q = User::normalizeGlobalWaiterNumberForLookup($request->q);
 
         $waiter = User::role('waiter')
             ->where('global_waiter_number', $q)

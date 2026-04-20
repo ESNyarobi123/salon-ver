@@ -90,7 +90,7 @@ class WaiterController extends Controller
     {
         $request->validate(['q' => 'required|string|max:30']);
 
-        $q = strtoupper(trim($request->q));
+        $q = User::normalizeGlobalWaiterNumberForLookup($request->q);
 
         $waiter = User::role('waiter')
             ->where('global_waiter_number', $q)

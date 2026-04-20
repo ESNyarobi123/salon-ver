@@ -26,7 +26,7 @@
             </div>
             <div class="flex-1 min-w-[180px]">
                 <label for="filter_q" class="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1 block">Tafuta (jina au nambari)</label>
-                <input type="text" name="q" id="filter_q" value="{{ old('q', $filters['q'] ?? '') }}" placeholder="Jina au TIPTAP-W-xxxxx"
+                <input type="text" name="q" id="filter_q" value="{{ old('q', $filters['q'] ?? '') }}" placeholder="Jina au nambari (mfano 0042)"
                        class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent">
             </div>
             <div class="min-w-[140px]">

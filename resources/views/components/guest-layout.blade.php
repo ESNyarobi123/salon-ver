@@ -1,4 +1,8 @@
-@props(['title' => 'TIPTAP |  ', 'showTopLogo' => true])
+@props(['title' => 'TIPTAP |  ', 'showTopLogo' => true, 'backdrop' => 'default'])
+
+@php
+    $salonHeroBackdrop = in_array($backdrop, ['salon-hero', 'order-portal'], true);
+@endphp
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -58,6 +62,33 @@
                 pointer-events: none;
             }
 
+            /* Local salon illustration (main login + service desk) + teal / red accents */
+            .salon-backdrop-hero::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                background-image:
+                    linear-gradient(115deg, rgba(8, 35, 42, 0.92) 0%, rgba(12, 18, 32, 0.78) 42%, rgba(18, 10, 22, 0.82) 100%),
+                    url('{{ asset('images/order-portal-salon-login.png') }}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: saturate(1.08) contrast(1.04);
+            }
+            .salon-backdrop-hero::after {
+                content: '';
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                background:
+                    radial-gradient(ellipse 85% 65% at 65% 40%, transparent 0%, rgba(8, 10, 22, 0.45) 100%),
+                    radial-gradient(520px 380px at 92% 88%, rgba(220, 38, 38, 0.14) 0%, transparent 55%),
+                    radial-gradient(480px 420px at 8% 25%, rgba(45, 212, 191, 0.10) 0%, transparent 50%),
+                    linear-gradient(to top, rgba(5, 8, 16, 0.65) 0%, transparent 45%);
+                pointer-events: none;
+            }
+
             /* Gradient Text */
             .gradient-text {
                 background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
@@ -114,14 +145,27 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased text-white salon-backdrop">
+    <body @class([
+        'font-sans antialiased text-white',
+        'salon-backdrop' => $backdrop === 'default',
+        'salon-backdrop-hero' => $salonHeroBackdrop,
+    ])>
         <!-- Background Effects -->
         <div class="fixed inset-0 pointer-events-none overflow-hidden">
-            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[150px] -mr-48 -mt-48"></div>
-            <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px] -ml-48 -mb-48"></div>
+            @if ($salonHeroBackdrop)
+                <div class="absolute top-0 right-0 w-[min(90vw,560px)] h-[min(90vw,560px)] bg-teal-500/10 rounded-full blur-[120px] -mr-40 -mt-40"></div>
+                <div class="absolute bottom-0 left-0 w-[min(85vw,480px)] h-[min(85vw,480px)] bg-red-600/10 rounded-full blur-[130px] -ml-36 -mb-36"></div>
+            @else
+                <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[150px] -mr-48 -mt-48"></div>
+                <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px] -ml-48 -mb-48"></div>
+            @endif
         </div>
 
-        <div class="min-h-screen flex flex-col justify-center items-center pt-4 sm:pt-0 px-3 sm:px-4 relative z-10">
+        <div @class([
+            'min-h-screen min-h-[100dvh] flex flex-col justify-center pt-4 sm:pt-0 px-3 sm:px-6 relative z-10',
+            'items-center' => ! $salonHeroBackdrop,
+            'items-center lg:items-end lg:pr-10 xl:pr-20' => $salonHeroBackdrop,
+        ])>
             <!-- Auth card -->
             <div class="flex flex-col items-center justify-center w-full">
                 @if($showTopLogo)
@@ -135,9 +179,21 @@
                     </a>
                 @endif
 
-                <div class="w-full sm:max-w-md glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl shadow-black/50 relative overflow-hidden">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 sm:w-40 sm:h-40 bg-violet-500/10 rounded-full blur-2xl sm:blur-3xl"></div>
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 sm:w-40 sm:h-40 bg-cyan-500/10 rounded-full blur-2xl sm:blur-3xl"></div>
+                <div @class([
+                    'w-full glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl shadow-black/50 relative overflow-hidden',
+                    'sm:max-w-md' => ! $salonHeroBackdrop,
+                    'sm:max-w-lg border border-white/12 shadow-red-950/20' => $salonHeroBackdrop,
+                ])>
+                    <div @class([
+                        'absolute -top-10 -right-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full blur-2xl sm:blur-3xl',
+                        'bg-violet-500/10' => ! $salonHeroBackdrop,
+                        'bg-red-500/10' => $salonHeroBackdrop,
+                    ])></div>
+                    <div @class([
+                        'absolute -bottom-10 -left-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full blur-2xl sm:blur-3xl',
+                        'bg-cyan-500/10' => ! $salonHeroBackdrop,
+                        'bg-teal-500/10' => $salonHeroBackdrop,
+                    ])></div>
                     <div class="relative z-10">
                         {{ $slot }}
                     </div>

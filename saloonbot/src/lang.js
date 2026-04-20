@@ -132,7 +132,7 @@ const L = {
     cmd_stylist: '!stylist',
     cmd_stylist_legacy: '!waiter',
     invalid_entry_help:
-      'No match.\n\n• *TipTap stylist ID*: TIPTAP-W-12345 (your account; works after you are linked to a saloon)\n• *At the saloon*: ABC-T01 = seat, ABC-W01 = stylist at that saloon (ABC = that saloon’s prefix)\n• *WhatsApp QR text*: START_5_S12 = saloon 5 + stylist user 12 (S = stylist; old QRs may show …_W12 — still works)\n\nOr scan the official QR / type the saloon name to search.',
+      'No match.\n\n• *TipTap stylist ID*: 4 digits (e.g. 0042) or older TIPTAP-W-12345 (your account; works after you are linked to a saloon)\n• *At the saloon*: ABC-T01 = seat, ABC-W01 = stylist at that saloon (ABC = that saloon’s prefix)\n• *WhatsApp QR text*: START_5_S12 = saloon 5 + stylist user 12 (S = stylist; old QRs may show …_W12 — still works)\n\nOr scan the official QR / type the saloon name to search.',
     bill_payment_desc: 'Bill payment',
     call_stylist_label: 'Call stylist',
     request_bill_label: 'Request bill',
@@ -345,7 +345,7 @@ const L = {
     cmd_stylist: '!stylist',
     cmd_stylist_legacy: '!waiter',
     invalid_entry_help:
-      'Hakuna mechi.\n\n• *Kitambulisho cha TipTap*: TIPTAP-W-12345 (akaunti yako; inafanya ukiunganishwa na saloon)\n• *Ndani ya saloon*: ABC-T01 = kiti, ABC-W01 = stylist wa saloon hiyo (ABC = kifupi cha saloon)\n• *QR ya WhatsApp*: START_5_S12 = saloon 5 + stylist 12 (S = stylist; QR za zamani zinaweza kuwa …_W12 — bado zinafanya kazi)\n\nAu scan QR rasmi / andika jina la saloon kutafuta.',
+      'Hakuna mechi.\n\n• *Kitambulisho cha TipTap*: msimbo wa herufi/namba (mf. 09E26870), nambari 4 za zamani, au TIPTAP-W-12345 (akaunti yako; inafanya ukiunganishwa na saloon)\n• *Ndani ya saloon*: ABC-T01 = kiti, ABC-W01 = stylist wa saloon hiyo (ABC = kifupi cha saloon)\n• *QR ya WhatsApp*: START_5_S12 = saloon 5 + stylist 12 (S = stylist; QR za zamani zinaweza kuwa …_W12 — bado zinafanya kazi)\n\nAu scan QR rasmi / andika jina la saloon kutafuta.',
     bill_payment_desc: 'Malipo ya bili',
     call_stylist_label: 'Mwita stylist',
     request_bill_label: 'Omba bili',
